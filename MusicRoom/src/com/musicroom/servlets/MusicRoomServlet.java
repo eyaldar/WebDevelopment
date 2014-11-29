@@ -1,4 +1,4 @@
-package com.musicroom;
+package com.musicroom.servlets;
 
 import java.io.IOException;
 import javax.servlet.ServletConfig;
@@ -27,7 +27,7 @@ public class MusicRoomServlet extends HttpServlet {
 	 * @see Servlet#init(ServletConfig)
 	 */
 	public void init(ServletConfig config) throws ServletException {
-		// TODO Auto-generated method stub
+		
 	}
 
 	/**
