@@ -5,11 +5,13 @@
 package com.musicroom.servlets;
 
 import com.musicroom.database.MainDBHandler;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +48,7 @@ public class InitDataBaseServlet extends HttpServlet
         Connection con = MainDBHandler.GetConnection();
         try
         {
+        	
         	MainDBHandler.createDB(con);
 
         	MainDBHandler.InitDBData(con);

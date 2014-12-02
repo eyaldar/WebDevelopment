@@ -249,8 +249,10 @@ public class MainDBHandler
     {
         try
         {
+        	
         	initDecodes(connection);
         	initSampleData(connection);
+        	
         }
         catch (SQLException e)
         {
@@ -641,7 +643,8 @@ public class MainDBHandler
         {
             // Create a result set containing all data from my_table
             Statement stmt = GetConnection().createStatement();
-
+            stmt.executeUpdate("USE musicRoomDB");
+            
             // Executed query
             ResultSet rs = stmt.executeQuery(selectionString);
 
@@ -650,7 +653,7 @@ public class MainDBHandler
             {
             	JSONObject current = new JSONObject();
             	current.put("ID", rs.getInt("ID"));
-            	current.put("AREA_NAME", rs.getInt("AREA_NAME"));
+            	current.put("AREA_NAME", rs.getString("AREA_NAME"));
             	
             	result.append("AREAS", current);
             }
