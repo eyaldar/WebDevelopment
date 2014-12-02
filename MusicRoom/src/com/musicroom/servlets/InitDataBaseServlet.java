@@ -41,6 +41,8 @@ public class InitDataBaseServlet extends HttpServlet
 
     public InitDataBaseServlet()
     {
+    	super();
+    	
         Connection con = MainDBHandler.GetConnection();
         try
         {
