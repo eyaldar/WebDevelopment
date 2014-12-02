@@ -1,7 +1,12 @@
 package com.musicroom.servlets;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,7 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.musicroom.database.RedisManager;
+import com.musicroom.database.MainDBHandler;
 
 /**
  * Servlet implementation class MusicRoomServlet
@@ -30,8 +35,22 @@ public class MusicRoomServlet extends HttpServlet {
 	 * @see Servlet#init(ServletConfig)
 	 */
 	public void init(ServletConfig config) throws ServletException {
-		
+    	
+        Connection con = MainDBHandler.GetConnection();
+        try
+        {
+        	MainDBHandler.createDB(con);
 
+        	MainDBHandler.InitDBData(con);
+        }
+        catch (SQLException ex)
+        {
+            Logger.getLogger(InitDataBaseServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+
+        System.out.println("Create database sceame");
 	}
 
 	/**

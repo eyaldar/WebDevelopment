@@ -32,8 +32,8 @@ public class MainDBHandler
             try
             {
                 String userName = "root";
-                String password = "root";
-                String url = "jdbc:mysql://localhost/musicRoomDB";
+                String password = "";
+                String url = "jdbc:mysql://localhost/";
 
                 Class.forName("com.mysql.jdbc.Driver").newInstance();
                 connection = DriverManager.getConnection(url, userName, password);
@@ -96,7 +96,7 @@ public class MainDBHandler
                            "	   USER_NAME 	VARCHAR(100) NOT NULL," + 
                            "	   PASSWORD 	VARCHAR(100) NOT NULL," +
                            "	   USER_TYPE_ID	INTEGER UNSIGNED NOT NULL," + 
-                           "	   Foreign Key (USER_TYPE) references USER_TYPES(ID)," +
+                           "	   Foreign Key (USER_TYPE_ID) references USER_TYPES(ID)," +
                            "	   UNIQUE(USER_NAME)" + 
                            ");");
         
@@ -136,12 +136,12 @@ public class MainDBHandler
                            "	   ADDRESS	 		VARCHAR(200) NOT NULL," +
                            "	   EMAIL	 		VARCHAR(100) NOT NULL," +
                            "	   CONTACT_NAME		VARCHAR(100) NOT NULL," +
-                           "	   SITE_URL			VARCHAR(100) NOT NULL," +
-                           "	   FACEBOOK_PAGE	VARCHAR(100) NOT NULL," +
+                           "	   SITE_URL			VARCHAR(500) NOT NULL," +
+                           "	   FACEBOOK_PAGE	VARCHAR(500) NOT NULL," +
                            "	   PHONE			VARCHAR(15) NOT NULL," +
                            "	   USER_ID			INTEGER UNSIGNED NOT NULL," +
                            "	   EXTRA_DETAILS	VARCHAR(200) NOT NULL," +
-                           "	   LOGO_URL			VARCHAR(100) NOT NULL," +
+                           "	   LOGO_URL			VARCHAR(500) NOT NULL," +
                            "	   Foreign Key (CITY_ID) references CITIES(ID)," +
                            "	   Foreign Key (USER_ID) references USERS(ID)" +
                            ");");
@@ -188,7 +188,7 @@ public class MainDBHandler
         stmt.executeUpdate("CREATE TABLE BANDS(" +
                            "       ID			INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT," +
                            "	   BAND_NAME 	VARCHAR(100) NOT NULL," +
-                           "	   LOGO_URL	 	VARCHAR(100) NOT NULL," +
+                           "	   LOGO_URL	 	VARCHAR(500) NOT NULL," +
                            "	   GENRE	 	VARCHAR(50) NOT NULL," +
                            "	   USER_ID	 	INTEGER UNSIGNED NOT NULL," +
                            "	   Foreign Key (USER_ID) references USERS(ID)" +
@@ -201,7 +201,7 @@ public class MainDBHandler
                            "       ID			INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT," +
                            "	   MEMBER_NAME 	VARCHAR(100) NOT NULL," +
                            "	   ROLE		 	VARCHAR(100) NOT NULL," +
-                           "	   PICTURE_URL 	VARCHAR(100) NOT NULL," +
+                           "	   PICTURE_URL 	VARCHAR(500) NOT NULL," +
                            "	   BAND_ID	 	INTEGER UNSIGNED NOT NULL," +
                            "	   Foreign Key (BAND_ID) references BAND_MEMBERS(ID)" +
                            ");");
@@ -261,32 +261,39 @@ public class MainDBHandler
 	private static void initSampleData(Connection connection) throws SQLException
 	{
 		Statement stmt = connection.createStatement();
-
+		ResultSet rs;
+		
         System.out.println("-----------------");
 
         System.out.println("Adding users");
         stmt.executeUpdate("INSERT INTO USERS (USER_NAME, PASSWORD, USER_TYPE_ID) VALUES('LinkPark', 'Link123', 2)", 
         					Statement.RETURN_GENERATED_KEYS);
+        
+        rs = stmt.getGeneratedKeys();
+        rs.next();
+        int linkUserID = rs.getInt(1);
+        
         stmt.executeUpdate("INSERT INTO USERS (USER_NAME, PASSWORD, USER_TYPE_ID) VALUES('Aqua', 'Aqua123', 2)", 
         					Statement.RETURN_GENERATED_KEYS);
+        
+        rs = stmt.getGeneratedKeys();
+        rs.next();
+        int aquaUserID = rs.getInt(1);
+        
         stmt.executeUpdate("INSERT INTO USERS (USER_NAME, PASSWORD, USER_TYPE_ID) VALUES('tlvStd', 'p@ssw0rd', 1)",
         					Statement.RETURN_GENERATED_KEYS);
+        
+        rs = stmt.getGeneratedKeys();
+        rs.next();
+        int tlvUserID = rs.getInt(1);
+        
         stmt.executeUpdate("INSERT INTO USERS (USER_NAME, PASSWORD, USER_TYPE_ID) VALUES('mscWrd', 'aaabbb1', 1)", 
         					Statement.RETURN_GENERATED_KEYS);
 
-        // Get the users IDs 
-        ResultSet rs = stmt.getGeneratedKeys();
+        rs = stmt.getGeneratedKeys();
         rs.next();
-        int linkUserID = rs.getInt(1);
-        rs.next();
-        int aquaUserID = rs.getInt(1);
-        rs.next();
-        int tlvUserID = rs.getInt(1);
-        rs.next();
-        int mscWorldUserID = rs.getInt(1);
+        int mscWorldUserID = rs.getInt(1);       
         
-        stmt = connection.createStatement();
-
         System.out.println("-----------------");
 
         System.out.println("Adding Bands");
@@ -295,18 +302,18 @@ public class MainDBHandler
         				   "VALUES('Linkin Park', 'Rock', " + linkUserID + 
         				   ", 'http://upload.wikimedia.org/wikipedia/commons/thumb/4/41/LPLogo-black_2000-07.svg/248px-LPLogo-black_2000-07.svg.png')", 
         				   Statement.RETURN_GENERATED_KEYS);
+        
+        rs = stmt.getGeneratedKeys();
+        rs.next();
+        int linkBandID = rs.getInt(1);
+        
         stmt.executeUpdate("INSERT INTO BANDS (BAND_NAME, GENRE, USER_ID, LOGO_URL) " +
 				   		   "VALUES('Aqua', 'Pop', " + aquaUserID + ", 'http://vkontakte.dj/cat/image/1243/AQUA.jpg')", 
 				   		   Statement.RETURN_GENERATED_KEYS);
         
-        // Get the bands IDs 
         rs = stmt.getGeneratedKeys();
         rs.next();
-        int linkBandID = rs.getInt(1);
-        rs.next();
         int aquaBandID = rs.getInt(1);
-        
-        stmt = connection.createStatement();
         
         System.out.println("-----------------");
 
@@ -317,41 +324,46 @@ public class MainDBHandler
         				   ", 'http://images2.fanpop.com/image/photos/11700000/CB-chester-bennington-11791491-532-643.jpg')", 
         				   Statement.RETURN_GENERATED_KEYS);
         
+        rs = stmt.getGeneratedKeys();
+        rs.next();
+        int chesterID = rs.getInt(1);
+        
         stmt.executeUpdate("INSERT INTO BAND_MEMBERS (MEMBER_NAME, ROLE, BAND_ID, PICTURE_URL) " +
 				   "VALUES('Mike Shinoda', 'Singer', " + linkBandID + 
 				   ", 'http://cdn.pigeonsandplanes.com/wp-content/uploads/2013/09/shinoda3243.jpg')", 
 				   Statement.RETURN_GENERATED_KEYS);
+        
+        rs = stmt.getGeneratedKeys();
+        rs.next();
+        int shinodaID = rs.getInt(1);
         
         stmt.executeUpdate("INSERT INTO BAND_MEMBERS (MEMBER_NAME, ROLE, BAND_ID, PICTURE_URL) " +
 				   "VALUES('Joe Hahn', 'DJ', " + linkBandID + 
 				   ", 'http://images2.fanpop.com/image/photos/11200000/Joe-Hahn-joe-hahn-11285555-266-316.jpg')", 
 				   Statement.RETURN_GENERATED_KEYS);
         
+        rs = stmt.getGeneratedKeys();
+        rs.next();
+        int hahnID = rs.getInt(1);
+        
         stmt.executeUpdate("INSERT INTO BAND_MEMBERS (MEMBER_NAME, ROLE, BAND_ID, PICTURE_URL) " +
 				   "VALUES('Lene Nystrom Rasted', 'Singer', " + aquaBandID + 
 				   ", 'http://www.entertainmentwallpaper.com/images/desktops/celebrity/lene_nystrom01.jpg')", 
 				   Statement.RETURN_GENERATED_KEYS);
+        
+        rs = stmt.getGeneratedKeys();
+        rs.next();
+        int leneID = rs.getInt(1);
         
         stmt.executeUpdate("INSERT INTO BAND_MEMBERS (MEMBER_NAME, ROLE, BAND_ID, PICTURE_URL) " +
 				   "VALUES('Claus Norreen', 'Keyboards', " + aquaBandID + 
 				   ", 'http://showbizgeek.com/wp-content/uploads/2012/11/claus-norreen.jpg')", 
 				   Statement.RETURN_GENERATED_KEYS);
                 
-        // Get the members IDs 
         rs = stmt.getGeneratedKeys();
         rs.next();
-        int chesterID = rs.getInt(1);
-        rs.next();
-        int shinodaID = rs.getInt(1);
-        rs.next();
-        int hahnID = rs.getInt(1);
-        rs.next();
-        int leneID = rs.getInt(1);
-        rs.next();
         int clausID = rs.getInt(1);
-        
-        stmt = connection.createStatement();
-        
+                
         System.out.println("-----------------");
 
         System.out.println("Adding Band Members Instruments");
@@ -390,25 +402,24 @@ public class MainDBHandler
         				   " FACEBOOK_PAGE, SITE_URL, LOGO_URL) " +
         				   "VALUES('TLV studios', 1, 'Ben Yehoda 39', 'tlv_studios@gmail.com', 'Avi Cohen', '050-55660243', " +
         				   tlvUserID + ", 'Best studio in Tel Aviv!', 'http://www.facebook.com/tlv.studios', "+
-        				   ", 'http://www.tlvstudios.co.il', 'http://www.allenby.co.il/sites/default/files/styles/campteaser/public/20_0.jpg')",
+        				   "'http://www.tlvstudios.co.il', 'http://www.allenby.co.il/sites/default/files/styles/campteaser/public/20_0.jpg')",
         				   Statement.RETURN_GENERATED_KEYS);
      
+        rs = stmt.getGeneratedKeys();
+        rs.next();
+        int tlvStudioID = rs.getInt(1);
+        
         stmt.executeUpdate("INSERT INTO STUDIOS (STUDIO_NAME, CITY_ID, ADDRESS, EMAIL, CONTACT_NAME, PHONE, USER_ID, EXTRA_DETAILS, " +
 				   		   " FACEBOOK_PAGE, SITE_URL, LOGO_URL) " +
 						   "VALUES('Music World', 2, 'Ben Gurion 54', 'musicworld@gmail.com', 'Moshe Moshe', '052-56140263', " +
 						   mscWorldUserID + ", 'We know music!', 'http://www.facebook.com/msc.world', "+
-						   ", 'http://www.musicworld.co.il', 'https://lh5.googleusercontent.com/-yHmlcK-QYKU/UZ93xYp8CnI/AAAAAAAAAC8/_um6-5aNmAo/s0/Music_world_logo_round.jpg')",
+						   "'http://www.musicworld.co.il', 'https://lh5.googleusercontent.com/-yHmlcK-QYKU/UZ93xYp8CnI/AAAAAAAAAC8/_um6-5aNmAo/s0/Music_world_logo_round.jpg')",
 						   Statement.RETURN_GENERATED_KEYS);
-        
-        // Get the studios IDs 
+
         rs = stmt.getGeneratedKeys();
         rs.next();
-        int tlvStudioID = rs.getInt(1);
-        rs.next();
         int mscWorldStudioID = rs.getInt(1);
-        
-        stmt = connection.createStatement();
-        
+
         System.out.println("-----------------");
 
         System.out.println("Adding Rooms");
@@ -417,20 +428,23 @@ public class MainDBHandler
 						   "VALUES(" + tlvStudioID + ", 90, 'Big recording', 'The big room in the studio')",
 						   Statement.RETURN_GENERATED_KEYS);
         
+        rs = stmt.getGeneratedKeys();
+        rs.next();
+        int tlvBigRoomID = rs.getInt(1);
+        
         stmt.executeUpdate("INSERT INTO ROOMS (STUDIO_ID, RATE, ROOM_NAME, EXTRA_DETAILS) " +
 						   "VALUES(" + tlvStudioID + ", 70, 'Small recording', 'Only for vocal recording')",
 						   Statement.RETURN_GENERATED_KEYS);
         
+        rs = stmt.getGeneratedKeys();
+        rs.next();
+        int tlvSmallRoomID = rs.getInt(1);
+        
         stmt.executeUpdate("INSERT INTO ROOMS (STUDIO_ID, RATE, ROOM_NAME, EXTRA_DETAILS) " +
 						   "VALUES(" + mscWorldStudioID + ", 75, 'Production', 'DA BOMB!')",
 						   Statement.RETURN_GENERATED_KEYS);
-        
-        // Get the rooms IDs 
+
         rs = stmt.getGeneratedKeys();
-        rs.next();
-        int tlvBigRoomID = rs.getInt(1);
-        rs.next();
-        int tlvSmallRoomID = rs.getInt(1);
         rs.next();
         int mscWorldRoomID = rs.getInt(1);
         
@@ -499,41 +513,41 @@ public class MainDBHandler
 	     
 	     java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	     
-	     java.util.Date start = new java.util.Date(2015, 0, 5, 16, 0);
-	     java.util.Date end = new java.util.Date(2015, 0, 5, 17, 0);
+	     java.util.Date start = new java.util.Date(115, 0, 5, 16, 0);
+	     java.util.Date end = new java.util.Date(115, 0, 5, 17, 0);
 
 	     String startString = sdf.format(start);
 	     String endString = sdf.format(end);
 	     
 	     stmt.executeUpdate("INSERT INTO ROOM_SCHEDULE (ROOM_ID, BAND_ID, START_TIME, END_TIME) " +
-							"VALUES(" + tlvBigRoomID + ", " + aquaBandID + ", " + startString + ", " + endString + ")");
+							"VALUES(" + tlvBigRoomID + ", " + aquaBandID + ", '" + startString + "', '" + endString + "')");
 	     
-	     start = new java.util.Date(2015, 0, 7, 17, 30);
-	     end = new java.util.Date(2015, 0, 7, 19, 0);
+	     start = new java.util.Date(115, 0, 7, 17, 30);
+	     end = new java.util.Date(115, 0, 7, 19, 0);
 
 	     startString = sdf.format(start);
 	     endString = sdf.format(end);
 	     
 	     stmt.executeUpdate("INSERT INTO ROOM_SCHEDULE (ROOM_ID, BAND_ID, START_TIME, END_TIME) " +
-							"VALUES(" + tlvBigRoomID + ", " + aquaBandID + ", " + startString + ", " + endString + ")");
+							"VALUES(" + tlvBigRoomID + ", " + aquaBandID + ", '" + startString + "', '" + endString + "')");
 	     
-	     start = new java.util.Date(2015, 1, 22, 15, 45);
-	     end = new java.util.Date(2015, 1, 22, 16, 30);
+	     start = new java.util.Date(115, 1, 22, 15, 45);
+	     end = new java.util.Date(115, 1, 22, 16, 30);
 
 	     startString = sdf.format(start);
 	     endString = sdf.format(end);
 	     
 	     stmt.executeUpdate("INSERT INTO ROOM_SCHEDULE (ROOM_ID, BAND_ID, START_TIME, END_TIME) " +
-							"VALUES(" + tlvSmallRoomID + ", " + linkBandID + ", " + startString + ", " + endString + ")");
+							"VALUES(" + tlvSmallRoomID + ", " + linkBandID + ", '" + startString + "', '" + endString + "')");
 
-	     start = new java.util.Date(2015, 0, 8, 18, 45);
-	     end = new java.util.Date(2015, 0, 8, 20, 15);
+	     start = new java.util.Date(115, 0, 8, 18, 45);
+	     end = new java.util.Date(115, 0, 8, 20, 15);
 		
 	     startString = sdf.format(start);
 	     endString = sdf.format(end);
 	     
 	     stmt.executeUpdate("INSERT INTO ROOM_SCHEDULE (ROOM_ID, BAND_ID, START_TIME, END_TIME) " +
-							"VALUES(" + mscWorldRoomID + ", " + linkBandID + ", " + startString + ", " + endString + ")");
+							"VALUES(" + mscWorldRoomID + ", " + linkBandID + ", '" + startString + "', '" + endString + "')");
 	}
 	
 	private static void initDecodes(Connection connection) throws SQLException
@@ -577,7 +591,7 @@ public class MainDBHandler
         System.out.println("Adding Room Types");
         stmt.executeUpdate("INSERT INTO ROOM_TYPES VALUES(1, 'Rehearsal')");
         stmt.executeUpdate("INSERT INTO ROOM_TYPES VALUES(2, 'Recording')");
-        stmt.executeUpdate("INSERT INTO ROOM_TYPES VALUES(2, 'Music Production')");
+        stmt.executeUpdate("INSERT INTO ROOM_TYPES VALUES(3, 'Music Production')");
         
         
         System.out.println("-----------------");
