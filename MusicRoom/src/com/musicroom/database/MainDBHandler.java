@@ -75,7 +75,7 @@ public class MainDBHandler
         stmt.executeUpdate("DROP TABLE IF EXISTS CITIES;");
         stmt.executeUpdate("CREATE TABLE CITIES(" +
                            "	    ID           INTEGER UNSIGNED PRIMARY KEY," +
-                           "	    CITIE_NAME   VARCHAR(100) NOT NULL," +
+                           "	    CITY_NAME   VARCHAR(100) NOT NULL," +
                            "        AREA_ID      INTEGER UNSIGNED NOT NULL," +
                            "	    Foreign Key (AREA_ID) references AREAS(ID)" +
                            ");");
@@ -243,6 +243,17 @@ public class MainDBHandler
                            "	   Foreign Key (BAND_ID) references BANDS(ID)," +
                            "	   Foreign Key (ROOM_ID) references ROOMS(ID)" +
                            ");");
+        
+        // Create Indexes
+        System.out.println("Creating table indexes");
+        stmt.executeUpdate("CREATE UNIQUE INDEX STD_CT_IDX 		ON STUDIOS 			(CITY_ID)");
+        stmt.executeUpdate("CREATE UNIQUE INDEX CT_AREA_IDX 	ON CITIES 			(AREA_ID)");
+        stmt.executeUpdate("CREATE UNIQUE INDEX STD_NAME_IDX 	ON STUDIOS 			(STUDIO_NAME)");
+        stmt.executeUpdate("CREATE UNIQUE INDEX ROM_STD_IDX 	ON ROOMS 			(STUDIO_ID)");
+        stmt.executeUpdate("CREATE UNIQUE INDEX ROM_RATE_IDX 	ON ROOMS 			(RATE)");
+        stmt.executeUpdate("CREATE UNIQUE INDEX EQP_CAT_IDX 	ON EQUIPMENT_TYPE 	(CATEGORY_ID)");
+        stmt.executeUpdate("CREATE UNIQUE INDEX USR_NAME_IDX 	ON USERS 			(USER_NAME)");
+        stmt.executeUpdate("CREATE UNIQUE INDEX USR_PAS_IDX 	ON USERS 			(PASSWORD)");
     }
 	
 	public static void InitDBData(Connection connection) throws SQLException
@@ -635,13 +646,12 @@ public class MainDBHandler
 	
     public static String getAreas()
     {
-        JSONObject result = new JSONObject();
+    	JSONArray result = new JSONArray();
         
         String selectionString = "select * from AREAS";
         
         try
         {
-            // Create a result set containing all data from my_table
             Statement stmt = GetConnection().createStatement();
             stmt.executeUpdate("USE musicRoomDB");
             
@@ -655,7 +665,203 @@ public class MainDBHandler
             	current.put("ID", rs.getInt("ID"));
             	current.put("AREA_NAME", rs.getString("AREA_NAME"));
             	
-            	result.append("AREAS", current);
+            	result.put(current);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("Error in reading data");
+        }
+
+        return (result.toString());
+    }
+    
+    public static String getCities()
+    {
+    	JSONArray result = new JSONArray();
+        
+        String selectionString = "select * from CITIES";
+        
+        try
+        {
+            Statement stmt = GetConnection().createStatement();
+            stmt.executeUpdate("USE musicRoomDB");
+            
+            // Executed query
+            ResultSet rs = stmt.executeQuery(selectionString);
+
+            // Fetch each row from the result set
+            while (rs.next())
+            {
+            	JSONObject current = new JSONObject();
+            	current.put("ID", rs.getInt("ID"));
+            	current.put("AREA_ID", rs.getInt("AREA_ID"));
+            	current.put("CITY_NAME", rs.getString("CITY_NAME"));
+            	
+            	result.put(current);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("Error in reading data");
+        }
+
+        return (result.toString());
+    }
+    
+    public static String getUserTypes()
+    {
+    	JSONArray result = new JSONArray();
+        
+        String selectionString = "select * from USER_TYPES";
+        
+        try
+        {
+            Statement stmt = GetConnection().createStatement();
+            stmt.executeUpdate("USE musicRoomDB");
+            
+            // Executed query
+            ResultSet rs = stmt.executeQuery(selectionString);
+
+            // Fetch each row from the result set
+            while (rs.next())
+            {
+            	JSONObject current = new JSONObject();
+            	current.put("ID", rs.getInt("ID"));
+            	current.put("DESCRIPTION", rs.getString("DESCRIPTION"));
+            	
+            	result.put(current);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("Error in reading data");
+        }
+
+        return (result.toString());
+    }
+    
+    public static String getEquipmentCategories()
+    {
+    	JSONArray result = new JSONArray();
+        
+        String selectionString = "select * from EQUIPMENT_CATEGORIES";
+        
+        try
+        {
+            Statement stmt = GetConnection().createStatement();
+            stmt.executeUpdate("USE musicRoomDB");
+            
+            // Executed query
+            ResultSet rs = stmt.executeQuery(selectionString);
+
+            // Fetch each row from the result set
+            while (rs.next())
+            {
+            	JSONObject current = new JSONObject();
+            	current.put("ID", rs.getInt("ID"));
+            	current.put("EQUIP_CAT_NAME", rs.getString("EQUIP_CAT_NAME"));
+            	
+            	result.put(current);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("Error in reading data");
+        }
+
+        return (result.toString());
+    }
+    
+    public static String getEquipmentTypes()
+    {
+    	JSONArray result = new JSONArray();
+        
+        String selectionString = "select * from EQUIPMENT_TYPES";
+        
+        try
+        {
+            Statement stmt = GetConnection().createStatement();
+            stmt.executeUpdate("USE musicRoomDB");
+            
+            // Executed query
+            ResultSet rs = stmt.executeQuery(selectionString);
+
+            // Fetch each row from the result set
+            while (rs.next())
+            {
+            	JSONObject current = new JSONObject();
+            	current.put("ID", rs.getInt("ID"));
+            	current.put("CATEGORY_ID", rs.getInt("CATEGORY_ID"));
+            	current.put("EQUIP_NAME", rs.getString("EQUIP_NAME"));
+            	
+            	result.put(current);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("Error in reading data");
+        }
+
+        return (result.toString());
+    }
+    
+    public static String getRoomTypes()
+    {
+    	JSONArray result = new JSONArray();
+        
+        String selectionString = "select * from ROOM_TYPES";
+        
+        try
+        {
+            Statement stmt = GetConnection().createStatement();
+            stmt.executeUpdate("USE musicRoomDB");
+            
+            // Executed query
+            ResultSet rs = stmt.executeQuery(selectionString);
+
+            // Fetch each row from the result set
+            while (rs.next())
+            {
+            	JSONObject current = new JSONObject();
+            	current.put("ID", rs.getInt("ID"));
+            	current.put("ROOM_TYPE_NAME", rs.getString("ROOM_TYPE_NAME"));
+            	
+            	result.put(current);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("Error in reading data");
+        }
+
+        return (result.toString());
+    }
+    
+    public static String getUserByLogin(JSONObject loginData)
+    {
+    	JSONObject result = new JSONObject();
+        
+        String selectionString = "select * from USERS where USER_NAME = ? and PASSWORD = ?";
+        
+        try
+        {
+        	Connection con = GetConnection();
+            java.sql.PreparedStatement stmt = con.prepareStatement(selectionString);
+            stmt.executeUpdate("USE musicRoomDB");
+            stmt.setString(1, loginData.getString("USER_NAME"));
+            stmt.setString(2, loginData.getString("PASSWORD"));
+            
+            // Executed query
+            ResultSet rs = stmt.executeQuery();
+
+            // Fetch each row from the result set
+            if (rs.next())
+            {
+            	result.put("ID", rs.getInt("ID"));
+            	result.put("USER_NAME", rs.getString("USER_NAME"));
+            	result.put("PASSWORD", rs.getString("PASSWORD"));
+            	result.put("USER_TYPE_ID", rs.getInt("USER_TYPE_ID"));
             }
         }
         catch (SQLException e)

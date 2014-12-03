@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONObject;
+
 import com.musicroom.database.MainDBHandler;
 
 /**
@@ -43,6 +45,8 @@ public class MusicRoomServlet extends HttpServlet {
         	MainDBHandler.createDB(con);
 
         	MainDBHandler.InitDBData(con);
+
+        	
         }
         catch (SQLException ex)
         {
