@@ -19,6 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.musicroom.database.MainDBHandler;
+import com.musicroom.database.initialization.SampleMySQLSchemaCreator;
+import com.musicroom.database.interfaces.MySQLDataBasePopulator;
+import com.musicroom.database.interfaces.MySQLSchemaCreator;
 import com.musicroom.utils.RequestQueryParser;
 
 @WebServlet("/ResetMySQLDB")
@@ -78,9 +81,12 @@ public class InitDataBaseServlet extends HttpServlet
 		Connection con = MainDBHandler.GetConnection();
         try {
 
-        	MainDBHandler.createDB(con);
-
-        	MainDBHandler.InitDBData(con);
+        	MySQLSchemaCreator dbCreator = new SampleMySQLSchemaCreator();
+        	dbCreator.createDB(con);
+        	
+        	MySQLDataBasePopulator dbPopulator = dbCreator.getPopulator();
+        	dbPopulator.initDBData(con);
+        	
             System.out.println("Create database scheme");
         }
         catch (SQLException ex) {
