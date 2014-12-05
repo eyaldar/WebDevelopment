@@ -1,4 +1,4 @@
-package com.musicroom.servlet.requests_api;
+package com.musicroom.session;
 
 import javax.servlet.http.HttpServletRequest;
 
