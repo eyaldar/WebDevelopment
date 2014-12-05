@@ -1,8 +1,15 @@
 package com.musicroom.database;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MainDBHandler 
 {
@@ -246,14 +253,14 @@ public class MainDBHandler
         
         // Create Indexes
         System.out.println("Creating table indexes");
-        stmt.executeUpdate("CREATE UNIQUE INDEX STD_CT_IDX 		ON STUDIOS 			(CITY_ID)");
-        stmt.executeUpdate("CREATE UNIQUE INDEX CT_AREA_IDX 	ON CITIES 			(AREA_ID)");
-        stmt.executeUpdate("CREATE UNIQUE INDEX STD_NAME_IDX 	ON STUDIOS 			(STUDIO_NAME)");
-        stmt.executeUpdate("CREATE UNIQUE INDEX ROM_STD_IDX 	ON ROOMS 			(STUDIO_ID)");
-        stmt.executeUpdate("CREATE UNIQUE INDEX ROM_RATE_IDX 	ON ROOMS 			(RATE)");
-        stmt.executeUpdate("CREATE UNIQUE INDEX EQP_CAT_IDX 	ON EQUIPMENT_TYPE 	(CATEGORY_ID)");
+        stmt.executeUpdate("CREATE INDEX STD_CT_IDX 		ON STUDIOS 			(CITY_ID)");
+        stmt.executeUpdate("CREATE INDEX CT_AREA_IDX 	ON CITIES 			(AREA_ID)");
+        stmt.executeUpdate("CREATE INDEX STD_NAME_IDX 	ON STUDIOS 			(STUDIO_NAME)");
+        stmt.executeUpdate("CREATE INDEX ROM_STD_IDX 	ON ROOMS 			(STUDIO_ID)");
+        stmt.executeUpdate("CREATE INDEX ROM_RATE_IDX 	ON ROOMS 			(RATE)");
+        stmt.executeUpdate("CREATE INDEX EQP_CAT_IDX 	ON EQUIPMENT_TYPES 	(CATEGORY_ID)");
+        stmt.executeUpdate("CREATE INDEX USR_PAS_IDX 	ON USERS 			(PASSWORD)");
         stmt.executeUpdate("CREATE UNIQUE INDEX USR_NAME_IDX 	ON USERS 			(USER_NAME)");
-        stmt.executeUpdate("CREATE UNIQUE INDEX USR_PAS_IDX 	ON USERS 			(PASSWORD)");
     }
 	
 	public static void InitDBData(Connection connection) throws SQLException
@@ -267,7 +274,7 @@ public class MainDBHandler
         }
         catch (SQLException e)
         {
-            System.err.println("error initializing the DB");
+            System.err.println("error initializing the DB:\n" + e.toString());
         }
     }
 
@@ -523,20 +530,19 @@ public class MainDBHandler
 	     System.out.println("-----------------");
 
 	     System.out.println("Adding Schedule");
-	     
+	    
 	     java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	     
-	     java.util.Date start = new java.util.Date(115, 0, 5, 16, 0);
-	     java.util.Date end = new java.util.Date(115, 0, 5, 17, 0);
 
+	     java.util.Date start = getTodayTime(17, 0);
+	     java.util.Date end = getTodayTime(17, 15);
 	     String startString = sdf.format(start);
 	     String endString = sdf.format(end);
-	     
+
 	     stmt.executeUpdate("INSERT INTO ROOM_SCHEDULE (ROOM_ID, BAND_ID, START_TIME, END_TIME) " +
 							"VALUES(" + tlvBigRoomID + ", " + aquaBandID + ", '" + startString + "', '" + endString + "')");
 	     
-	     start = new java.util.Date(115, 0, 7, 17, 30);
-	     end = new java.util.Date(115, 0, 7, 19, 0);
+	     start =  getTodayTime(17, 30);
+	     end = getTodayTime(19, 0);
 
 	     startString = sdf.format(start);
 	     endString = sdf.format(end);
@@ -544,8 +550,8 @@ public class MainDBHandler
 	     stmt.executeUpdate("INSERT INTO ROOM_SCHEDULE (ROOM_ID, BAND_ID, START_TIME, END_TIME) " +
 							"VALUES(" + tlvBigRoomID + ", " + aquaBandID + ", '" + startString + "', '" + endString + "')");
 	     
-	     start = new java.util.Date(115, 1, 22, 15, 45);
-	     end = new java.util.Date(115, 1, 22, 16, 30);
+	     start = getTodayTime(15, 45);
+	     end = getTodayTime(16, 30);
 
 	     startString = sdf.format(start);
 	     endString = sdf.format(end);
@@ -553,8 +559,8 @@ public class MainDBHandler
 	     stmt.executeUpdate("INSERT INTO ROOM_SCHEDULE (ROOM_ID, BAND_ID, START_TIME, END_TIME) " +
 							"VALUES(" + tlvSmallRoomID + ", " + linkBandID + ", '" + startString + "', '" + endString + "')");
 
-	     start = new java.util.Date(115, 0, 8, 18, 45);
-	     end = new java.util.Date(115, 0, 8, 20, 15);
+	     start = getTodayTime(18, 45);
+	     end = getTodayTime(20, 15);
 		
 	     startString = sdf.format(start);
 	     endString = sdf.format(end);
@@ -644,6 +650,18 @@ public class MainDBHandler
         stmt.executeUpdate("INSERT INTO EQUIPMENT_TYPES VALUES(20, 'Vocals', 8)");
 	}
 	
+	private static java.util.Date getTodayTime(int hours, int minutes) {
+        Calendar calendar = GregorianCalendar.getInstance();
+		calendar.set(calendar.get(Calendar.YEAR), 
+					 calendar.get(Calendar.MONTH), 
+					 calendar.get(Calendar.DAY_OF_MONTH), 
+					 hours, 
+					 minutes, 
+					 0);
+	    
+		return calendar.getTime();
+	}
+	
     public static String getAreas()
     {
     	JSONArray result = new JSONArray();
@@ -670,7 +688,7 @@ public class MainDBHandler
         }
         catch (SQLException e)
         {
-            System.err.println("Error in reading data");
+            System.err.println("Error in reading data" + e.toString());
         }
 
         return (result.toString());
