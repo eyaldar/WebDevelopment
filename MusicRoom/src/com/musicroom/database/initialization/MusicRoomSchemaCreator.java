@@ -7,7 +7,7 @@ import java.sql.Statement;
 import com.musicroom.database.interfaces.MySQLDataBasePopulator;
 import com.musicroom.database.interfaces.MySQLSchemaCreator;
 
-public class SampleMySQLSchemaCreator implements MySQLSchemaCreator {
+public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 	public void createDB(Connection connection) throws SQLException
     {
         Statement stmt = connection.createStatement();
@@ -216,6 +216,6 @@ public class SampleMySQLSchemaCreator implements MySQLSchemaCreator {
 
 	@Override
 	public MySQLDataBasePopulator getPopulator() {
-		return new SampleMySQLDataPopulator();
+		return new MusicRoomSampleDataPopulator();
 	}
 }

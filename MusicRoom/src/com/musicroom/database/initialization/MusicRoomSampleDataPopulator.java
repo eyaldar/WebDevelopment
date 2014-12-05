@@ -9,7 +9,7 @@ import java.util.GregorianCalendar;
 
 import com.musicroom.database.interfaces.MySQLDataBasePopulator;
 
-public class SampleMySQLDataPopulator implements MySQLDataBasePopulator {
+public class MusicRoomSampleDataPopulator implements MySQLDataBasePopulator {
 
 	@Override
 	public void initDBData(Connection connection) throws SQLException
