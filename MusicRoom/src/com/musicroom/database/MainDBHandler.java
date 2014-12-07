@@ -109,7 +109,7 @@ public class MainDBHandler {
 
 		return result;
 	}
-
+	
 	public static JSONArray getPreparedStatementResult(String selectionString,
 			Object... params) {
 		JSONArray result = new JSONArray();
