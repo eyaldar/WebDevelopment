@@ -149,7 +149,7 @@ public class StudiosRequestsAPI {
 						stmt.executeUpdate();
 					}
 					
-					// Add room equipment
+					// Add room equipments
 					JSONArray roomsEquipmentArray = roomObj.getJSONArray("equipment");
 					
 					for (int k = 0; k < roomsEquipmentArray.length(); k++)
