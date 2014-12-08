@@ -1,6 +1,9 @@
 package com.musicroom.rest.api;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -25,10 +28,55 @@ public class StudiosRequestsAPI {
 	@Produces("application/json")
 	public Response getStudios() 
 	{
-		JSONArray results = 
-				MainDBHandler.getStatementResult("select * from STUDIOS");
+		JSONArray selectResult = 
+				MainDBHandler.getStatementResult(
+						  "select r.STUDIO_ID, s.STUDIO_NAME, s.ADDRESS, s.CITY_ID, s.USER_ID, s.CONTACT_NAME, s.EMAIL, s.PHONE, "
+								  + "r.ID as ROOM_ID, r.RATE, r.ROOM_NAME "
+						+ "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID");
 
-		return Response.ok(results.toString()).build();
+		JSONArray result = new JSONArray();
+		List<Integer> studioIDs = new ArrayList<Integer>();
+		
+		for (int i = 0; i < selectResult.length(); i++)
+		{
+			JSONObject currentRow = selectResult.getJSONObject(i);
+			JSONObject currentStudio;
+			
+			int studioID = currentRow.getInt("STUDIO_ID");
+			
+			int studioIndex = studioIDs.indexOf(studioID);
+			
+			// If the studio is new in the result
+			if (studioIndex == -1)
+			{
+				// Add the studio
+				studioIDs.add(studioID);
+				currentStudio = new JSONObject();
+				currentStudio.put("ID", studioID);
+				currentStudio.put("STUDIO_NAME", currentRow.getString("STUDIO_NAME"));
+				currentStudio.put("ADDRESS", currentRow.getString("ADDRESS"));
+				currentStudio.put("CITY_ID", currentRow.getInt("CITY_ID"));
+				currentStudio.put("USER_ID", currentRow.getInt("USER_ID"));
+				currentStudio.put("CONTACT_NAME", currentRow.getString("CONTACT_NAME"));
+				currentStudio.put("EMAIL", currentRow.getString("EMAIL"));
+				currentStudio.put("PHONE", currentRow.getString("PHONE"));
+				result.put(currentStudio);
+			}
+			// the studio exists in the result
+			else
+			{
+				currentStudio = result.getJSONObject(studioIndex);
+			}
+			
+			// Add the room
+			JSONObject room = new JSONObject();
+			room.put("ID", currentRow.getInt("ROOM_ID"));
+			room.put("RATE", currentRow.getInt("RATE"));
+			room.put("ROOM_NAME", currentRow.getString("ROOM_NAME"));
+			currentStudio.append("ROOMS", room);
+		}
+
+		return Response.ok(result.toString()).build();
 	}
 
 	@GET
@@ -37,13 +85,61 @@ public class StudiosRequestsAPI {
 	public Response getStudioByID(@PathParam("id") int id)
 	{
 		JSONArray results = 
-				MainDBHandler.getPreparedStatementResult("select * from STUDIOS where id = ?", id);
+				MainDBHandler.getPreparedStatementResult("select *, r.ID as ROOM_ID "
+													   + "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID "
+													   + "where s.ID = ?", id);
 
-		JSONObject result = JSONUtils.extractJSONObject(results);
-
-		if (result.length() > 0) 
+		// Check if any result
+		if (results.length() > 0) 
 		{
-			return Response.ok(result.toString()).build();
+			// Get the first row for studio details
+			JSONObject firstRow = JSONUtils.extractJSONObject(results);
+			
+			JSONObject studio = new JSONObject();
+			studio.put("ID", firstRow.getInt("STUDIO_ID"));
+			studio.put("STUDIO_NAME", firstRow.getString("STUDIO_NAME"));
+			studio.put("ADDRESS", firstRow.getString("ADDRESS"));
+			studio.put("CITY_ID", firstRow.getInt("CITY_ID"));
+			studio.put("USER_ID", firstRow.getInt("USER_ID"));
+			studio.put("CONTACT_NAME", firstRow.getString("CONTACT_NAME"));
+			studio.put("EMAIL", firstRow.getString("EMAIL"));
+			studio.put("PHONE", firstRow.getString("PHONE"));
+			studio.put("SITE_URL", firstRow.getString("SITE_URL"));
+			studio.put("FACEBOOK_PAGE", firstRow.getString("FACEBOOK_PAGE"));
+			studio.put("LOGO_URL", firstRow.getString("LOGO_URL"));
+			studio.put("EXTRA_DETAILS", firstRow.getString("EXTRA_DETAILS"));		
+
+			int[] roomIDs = new int[results.length()];
+			
+			// Add rooms
+			for (int i = 0; i < results.length(); i++)
+			{
+				JSONObject currentRow = results.getJSONObject(i);
+				JSONObject room = new JSONObject();
+				
+				roomIDs[i] = currentRow.getInt("ROOM_ID");
+				room.put("ID", roomIDs[i]);
+				room.put("RATE", currentRow.getInt("RATE"));
+				room.put("ROOM_NAME", currentRow.getString("ROOM_NAME"));
+				
+				studio.append("ROOMS", room);
+			}
+			
+			// Add bands
+			if (roomIDs.length > 0)
+			{
+				String roomIDsStr = 
+						Arrays.toString(roomIDs).replace("[", "").replace("]", "");
+				
+				JSONArray bands = 
+						MainDBHandler.getStatementResult("select distinct b.BAND_NAME "
+											   		   + "from BANDS as b join ROOM_SCHEDULE as rs on b.ID = rs.BAND_ID "
+											   		   + "where rs.ROOM_ID in (" + roomIDsStr + ")");
+				
+				studio.put("PLAYING_BANDS", bands);
+			}
+			
+			return Response.ok(studio.toString()).build();
 		} 
 		else 
 		{
@@ -51,7 +147,7 @@ public class StudiosRequestsAPI {
 			return Response.status(HttpServletResponse.SC_NOT_FOUND).entity(errorJson).build();
 		}
 	}
-	
+
 	public Response AddStudio(JSONObject data)
 	{
 		JSONObject userObj = data.getJSONObject("user");
