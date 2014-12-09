@@ -1,12 +1,18 @@
 package com.musicroom.rest.api;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -22,6 +28,7 @@ import com.musicroom.utils.JSONUtils;
 public class StudiosRequestsAPI {
 
 	private static final String STUDIO_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Studio with id '%d' was not found\"}";
+	private static final String STUDIO_ID_ROOM_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Room with id %d in studio with id '%d' was not found\"}";
 	private static final String USER_ALREADY_EXISTS_ERROR_JSON = "{\"error\":\"User name '%s' already exists\"}";
 	
 	@GET
@@ -31,7 +38,7 @@ public class StudiosRequestsAPI {
 		JSONArray selectResult = 
 				MainDBHandler.getStatementResult(
 						  "select r.STUDIO_ID, s.STUDIO_NAME, s.ADDRESS, s.CITY_ID, s.USER_ID, s.CONTACT_NAME, s.EMAIL, s.PHONE, "
-								  + "r.ID as ROOM_ID, r.RATE, r.ROOM_NAME "
+								  + "r.ID as ROOM_ID, r.RATE, r.ROOM_NAME, s.VOTES_SUM / s.VOTES_COUNT as AVG_REVIEW "
 						+ "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID");
 
 		JSONArray result = new JSONArray();
@@ -60,6 +67,12 @@ public class StudiosRequestsAPI {
 				currentStudio.put("CONTACT_NAME", currentRow.getString("CONTACT_NAME"));
 				currentStudio.put("EMAIL", currentRow.getString("EMAIL"));
 				currentStudio.put("PHONE", currentRow.getString("PHONE"));
+				
+				if (currentRow.has("AVG_REVIEW"))
+					currentStudio.put("AVG_REVIEW", currentRow.getDouble("AVG_REVIEW"));
+				else
+					currentStudio.put("AVG_REVIEW", "No Reviews");
+					
 				result.put(currentStudio);
 			}
 			// the studio exists in the result
@@ -85,7 +98,7 @@ public class StudiosRequestsAPI {
 	public Response getStudioByID(@PathParam("id") int id)
 	{
 		JSONArray results = 
-				MainDBHandler.getPreparedStatementResult("select *, r.ID as ROOM_ID "
+				MainDBHandler.getPreparedStatementResult("select *, r.ID as ROOM_ID, s.VOTES_SUM / s.VOTES_COUNT as AVG_REVIEW "
 													   + "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID "
 													   + "where s.ID = ?", id);
 
@@ -107,7 +120,12 @@ public class StudiosRequestsAPI {
 			studio.put("SITE_URL", firstRow.getString("SITE_URL"));
 			studio.put("FACEBOOK_PAGE", firstRow.getString("FACEBOOK_PAGE"));
 			studio.put("LOGO_URL", firstRow.getString("LOGO_URL"));
-			studio.put("EXTRA_DETAILS", firstRow.getString("EXTRA_DETAILS"));		
+			studio.put("EXTRA_DETAILS", firstRow.getString("EXTRA_DETAILS"));	
+
+			if (firstRow.has("AVG_REVIEW"))
+				studio.put("AVG_REVIEW", firstRow.getDouble("AVG_REVIEW"));
+			else
+				studio.put("AVG_REVIEW", "No Reviews");
 
 			int[] roomIDs = new int[results.length()];
 			
@@ -148,8 +166,12 @@ public class StudiosRequestsAPI {
 		}
 	}
 
-	public Response AddStudio(JSONObject data)
+	@POST
+	@Produces("application/json")
+	@Consumes
+	public Response AddStudio(String dataStr)
 	{
+		JSONObject data = new JSONObject("dataStr");
 		JSONObject userObj = data.getJSONObject("user");
 
 		JSONArray existingUser = MainDBHandler.getPreparedStatementResult("select * from USERS where USER_NAME = ?", userObj.getString("name"));
@@ -186,8 +208,8 @@ public class StudiosRequestsAPI {
 				
 				stmt = conn.prepareStatement(
 								  "INSERT INTO STUDIOS (STUDIO_NAME, CITY_ID, ADDRESS, EMAIL, CONTACT_NAME, PHONE, USER_ID, EXTRA_DETAILS, "
-								+ " FACEBOOK_PAGE, SITE_URL, LOGO_URL) "
-								+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+								+ " FACEBOOK_PAGE, SITE_URL, LOGO_URL, VOTES_SUM, VOTES_COUNT) "
+								+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)",
 								Statement.RETURN_GENERATED_KEYS);
 				
 				stmt.executeUpdate("USE musicRoomDB");
@@ -273,6 +295,58 @@ public class StudiosRequestsAPI {
 			{
 				return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
 			}
+		}
+	}
+	
+	@GET
+	@Path("/{studioID}/{roomID}")
+	@Produces("application/json")
+	public Response getStudioRoomByID(@PathParam("studioID") int studioID, @PathParam("roomID") int roomID)
+	{
+		JSONArray results = 
+				MainDBHandler.getPreparedStatementResult("select * "
+													   + "from 	ROOMS as r  left join ROOM_ROOM_TYPES as rrt on r.ID = rrt.ROOM_ID "
+													   + "where r.ID = ?", roomID);
+
+		// Check if any result
+		if (results.length() > 0) 
+		{
+			// Get the first row for studio details
+			JSONObject firstRow = JSONUtils.extractJSONObject(results);
+			
+			JSONObject room = new JSONObject();
+			room.put("STUDIO_ID", firstRow.getInt("STUDIO_ID"));
+			room.put("ID", firstRow.getInt("ROOM_ID"));
+			room.put("ROOM_NAME", firstRow.getString("ROOM_NAME"));
+			room.put("RATE", firstRow.getInt("RATE"));
+			room.put("EXTRA_DETAILS", firstRow.getString("EXTRA_DETAILS"));	
+
+			// Add room types
+			for (int i = 0; i < results.length(); i++)
+			{
+				JSONObject currentRow = results.getJSONObject(i);
+				room.append("ROOM_TYPE", currentRow.getInt("TYPE_ID"));
+			}
+			
+
+			// Add equipment
+			JSONArray equipment = 
+					MainDBHandler.getPreparedStatementResult("select * "
+											   		   		+ "from ROOM_EQUIPMENT as re "
+											   		   		+ "where re.ROOM_ID = ?", roomID);
+				
+			for (int i = 0; i < equipment.length(); i++)
+			{
+				JSONObject currentRow = equipment.getJSONObject(i);
+				room.append("EQUIPMENT", currentRow);
+			}
+
+			return Response.ok(room.toString()).build();
+		} 
+		else 
+		{
+			String errorJson = String.format(STUDIO_ID_ROOM_ID_WAS_NOT_FOUND_ERROR_JSON, roomID, studioID);
+			return Response.status(HttpServletResponse.SC_NOT_FOUND).entity(errorJson).build();
 		}
 	}
 }

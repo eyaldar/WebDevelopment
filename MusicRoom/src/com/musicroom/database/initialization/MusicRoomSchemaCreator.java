@@ -93,6 +93,8 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "	   USER_ID			INTEGER UNSIGNED NOT NULL,"
 				+ "	   EXTRA_DETAILS	VARCHAR(200) NOT NULL,"
 				+ "	   LOGO_URL			VARCHAR(500) NOT NULL,"
+				+ "	   VOTES_COUNT		INTEGER UNSIGNED NOT NULL,"
+				+ "	   VOTES_SUM		INTEGER UNSIGNED NOT NULL,"
 				+ "	   Foreign Key (CITY_ID) references CITIES(ID),"
 				+ "	   Foreign Key (USER_ID) references USERS(ID)" + ");");
 
