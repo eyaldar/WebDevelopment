@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -15,10 +17,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import com.musicroom.database.MainDBHandler;
+import com.musicroom.session.SessionManager;
 import com.musicroom.utils.JSONUtils;
 
 
@@ -167,7 +173,7 @@ public class StudiosRequestsAPI {
 	@POST
 	@Produces("application/json")
 	@Consumes
-	public Response AddStudio(String dataStr)
+	public Response AddStudio(String dataStr, @Context HttpServletRequest Request)
 	{
 		JSONObject data = new JSONObject("dataStr");
 		JSONObject userObj = data.getJSONObject("user");
@@ -193,13 +199,16 @@ public class StudiosRequestsAPI {
 																		Statement.RETURN_GENERATED_KEYS);
 				
 				stmt.executeUpdate("USE musicRoomDB");
-				stmt.setString(1, userObj.getString("name"));
-				stmt.setString(2, userObj.getString("password"));
+				stmt.setString(1, userObj.getString("USER_NAME"));
+				stmt.setString(2, userObj.getString("PASSWORD"));
 				stmt.executeUpdate();
 				
 				ResultSet rs = stmt.getGeneratedKeys();
 				rs.next();
 				int userID = rs.getInt(1);
+				
+				userObj.put("USER_TYPE_ID", 1);
+				userObj.put("ID", userID);
 				
 				// Add studio
 				JSONObject studioObj = data.getJSONObject("studio");
@@ -286,6 +295,9 @@ public class StudiosRequestsAPI {
 				
 				MainDBHandler.GetConnection().commit();
 				MainDBHandler.GetConnection().setAutoCommit(true);
+				
+				// Set user as logged in session
+				SessionManager.setLoggedInUser(Request, userObj);
 				
 				return Response.ok("{message: \"success\"}").build();
 			} 
