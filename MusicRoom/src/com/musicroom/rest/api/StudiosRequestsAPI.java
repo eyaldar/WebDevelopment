@@ -3,7 +3,6 @@ package com.musicroom.rest.api;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.json.JSONArray;
@@ -25,16 +25,17 @@ import org.json.JSONObject;
 import com.musicroom.database.MainDBHandler;
 import com.musicroom.session.SessionManager;
 import com.musicroom.utils.JSONUtils;
+import com.musicroom.utils.UserType;
+import com.musicroom.utils.UsersTableUtils;
 
 @Path("/studios")
 public class StudiosRequestsAPI {
 
 	private static final String STUDIO_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Studio with id '%d' was not found\"}";
 	private static final String STUDIO_ID_ROOM_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Room with id %d in studio with id '%d' was not found\"}";
-	private static final String USER_ALREADY_EXISTS_ERROR_JSON = "{\"error\":\"User name '%s' already exists\"}";
 
 	@GET
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudios() {
 		try {
 			JSONArray selectResult = MainDBHandler
@@ -101,7 +102,7 @@ public class StudiosRequestsAPI {
 
 	@GET
 	@Path("/{id}")
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudioByID(@PathParam("id") int id) {
 		try {
 			JSONArray results = MainDBHandler
@@ -177,132 +178,122 @@ public class StudiosRequestsAPI {
 	}
 
 	@POST
-	@Produces("application/json")
-	@Consumes
-	public Response AddStudio(String dataStr,
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response addStudio(String dataStr,
 			@Context HttpServletRequest Request) {
 		try {
-			JSONObject data = new JSONObject("dataStr");
+			JSONObject data = new JSONObject(dataStr);
 			JSONObject userObj = data.getJSONObject("user");
 
-			JSONArray existingUser = MainDBHandler.selectWithParameters(
-					"select * from USERS where USER_NAME = ?",
-					userObj.getString("name"));
-
 			// if there are results from the user check
-			if (existingUser.length() > 0) {
+			if (UsersTableUtils.isExistingUser(userObj.getString("name"))) {
 				String errorJson = String.format(
-						USER_ALREADY_EXISTS_ERROR_JSON,
+						UsersTableUtils.USER_ALREADY_EXISTS_ERROR_JSON,
 						userObj.getString("name"));
 				return Response.status(HttpServletResponse.SC_CONFLICT)
 						.entity(errorJson).build();
 			} else {
-				try {
-					Connection conn = MainDBHandler.getConnection();
-					conn.setAutoCommit(false);
+				Connection conn = MainDBHandler.getConnection();
+				conn.setAutoCommit(false);
 
-					// Add the user
-					ResultSet rs = MainDBHandler
-							.insertWithAutoKey(
-									"INSERT INTO USERS (USER_NAME, PASSWORD, USER_TYPE_ID) VALUES(?, ?, 1)",
-									PreparedStatement.RETURN_GENERATED_KEYS,
-									userObj.getString("USER_NAME"),
-									userObj.getString("PASSWORD"));
-					if (!rs.next()) {
-						conn.rollback();
-					}
+				// Add the user
+				ResultSet rs;
+				int userID = UsersTableUtils.addUser(userObj.getString("name"),
+						userObj.getString("password"), UserType.STUDIO);
 
-					int userID = rs.getInt(1);
+				if (userID == -1) {
+					conn.rollback();
+					return Response.serverError().build();
+				}
+				;
 
-					userObj.put("USER_TYPE_ID", 1);
-					userObj.put("ID", userID);
+				userObj.put("USER_TYPE_ID", UserType.STUDIO.toInt());
+				userObj.put("ID", userID);
 
-					// Add studio
-					JSONObject studioObj = data.getJSONObject("studio");
+				// Add studio
+				JSONObject studioObj = data.getJSONObject("studio");
+
+				rs = MainDBHandler
+						.insertWithAutoKey(
+								"INSERT INTO STUDIOS (STUDIO_NAME, CITY_ID, ADDRESS, EMAIL, CONTACT_NAME, PHONE, USER_ID, EXTRA_DETAILS, "
+										+ " FACEBOOK_PAGE, SITE_URL, LOGO_URL, VOTES_SUM, VOTES_COUNT) "
+										+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)",
+								PreparedStatement.RETURN_GENERATED_KEYS,
+								studioObj.getString("name"),
+								studioObj.getInt("city_id"),
+								studioObj.getString("address"),
+								studioObj.getString("email"),
+								studioObj.getString("contact_name"),
+								studioObj.getString("phone"), userID,
+								studioObj.getString("extra_details"),
+								studioObj.getString("facebook_page"),
+								studioObj.getString("site"),
+								studioObj.getString("logo"));
+
+				if (!rs.next()) {
+					conn.rollback();
+					return Response.serverError().build();
+				}
+
+				int studioID = rs.getInt(1);
+
+				// Add rooms
+				JSONArray roomsArray = studioObj.getJSONArray("rooms");
+
+				for (int i = 0; i < roomsArray.length(); i++) {
+					// Add room
+					JSONObject roomObj = roomsArray.getJSONObject(i);
 
 					rs = MainDBHandler
 							.insertWithAutoKey(
-									"INSERT INTO STUDIOS (STUDIO_NAME, CITY_ID, ADDRESS, EMAIL, CONTACT_NAME, PHONE, USER_ID, EXTRA_DETAILS, "
-											+ " FACEBOOK_PAGE, SITE_URL, LOGO_URL, VOTES_SUM, VOTES_COUNT) "
-											+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)",
+									"INSERT INTO ROOMS (STUDIO_ID, RATE, ROOM_NAME, EXTRA_DETAILS) VALUES(?, ?, ?, ?)",
 									PreparedStatement.RETURN_GENERATED_KEYS,
-									studioObj.getString("name"),
-									studioObj.getInt("city_id"),
-									studioObj.getString("address"),
-									studioObj.getString("email"),
-									studioObj.getString("contact_name"),
-									studioObj.getString("phone"), userID,
-									studioObj.getString("extra_details"),
-									studioObj.getString("facebook_page"),
-									studioObj.getString("site"),
-									studioObj.getString("logo"));
+									studioID, roomObj.getInt("rate"),
+									roomObj.getString("name"),
+									roomObj.getString("extra_details"));
 
 					if (!rs.next()) {
 						conn.rollback();
+						return Response.serverError().build();
 					}
 
-					int studioID = rs.getInt(1);
+					int roomID = rs.getInt(1);
 
-					// Add rooms
-					JSONArray roomsArray = studioObj.getJSONArray("rooms");
+					// Add room types
+					JSONArray roomsTypesArray = roomObj
+							.getJSONArray("room_type");
 
-					for (int i = 0; i < roomsArray.length(); i++) {
-						// Add room
-						JSONObject roomObj = roomsArray.getJSONObject(i);
-
-						rs = MainDBHandler
-								.insertWithAutoKey(
-										"INSERT INTO ROOMS (STUDIO_ID, RATE, ROOM_NAME, EXTRA_DETAILS) VALUES(?, ?, ?, ?)",
-										PreparedStatement.RETURN_GENERATED_KEYS,
-										studioID, roomObj.getInt("rate"),
-										roomObj.getString("name"),
-										roomObj.getString("extra_details"));
-
-						if (!rs.next()) {
-							conn.rollback();
-						}
-
-						int roomID = rs.getInt(1);
-
-						// Add room types
-						JSONArray roomsTypesArray = roomObj
-								.getJSONArray("room_type");
-
-						for (int k = 0; k < roomsTypesArray.length(); k++) {
-							rs = MainDBHandler
-									.insert("INSERT INTO ROOM_ROOM_TYPES (ROOM_ID, TYPE_ID) VALUES (?, ?)",
-											roomID, roomsTypesArray.getInt(k));
-						}
-
-						// Add room equipments
-						JSONArray roomsEquipmentArray = roomObj
-								.getJSONArray("equipment");
-
-						for (int k = 0; k < roomsEquipmentArray.length(); k++) {
-							JSONObject equipObj = roomsEquipmentArray
-									.getJSONObject(k);
-
-							rs = MainDBHandler
-									.insert("INSERT INTO ROOM_EQUIPMENT (ROOM_ID, EQUIPMENT_TYPE_ID, MODEL, MANUFACTURER, QUANTITY) VALUES(?,?,?,?,?)",
-											roomID, equipObj.getInt("type"),
-											equipObj.getString("model"),
-											equipObj.getString("manufacturer"),
-											equipObj.getInt("quantity"));
-						}
+					for (int k = 0; k < roomsTypesArray.length(); k++) {
+						MainDBHandler
+								.insert("INSERT INTO ROOM_ROOM_TYPES (ROOM_ID, TYPE_ID) VALUES (?, ?)",
+										roomID, roomsTypesArray.getInt(k));
 					}
 
-					MainDBHandler.getConnection().commit();
-					MainDBHandler.getConnection().setAutoCommit(true);
+					// Add room equipments
+					JSONArray roomsEquipmentArray = roomObj
+							.getJSONArray("equipment");
 
-					// Set user as logged in session
-					SessionManager.setLoggedInUser(Request, userObj);
+					for (int k = 0; k < roomsEquipmentArray.length(); k++) {
+						JSONObject equipObj = roomsEquipmentArray
+								.getJSONObject(k);
 
-					return Response.ok("{message: \"success\"}").build();
-				} catch (SQLException e) {
-					return Response.status(
-							HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-							.build();
+						MainDBHandler
+								.insert("INSERT INTO ROOM_EQUIPMENT (ROOM_ID, EQUIPMENT_TYPE_ID, MODEL, MANUFACTURER, QUANTITY) VALUES(?,?,?,?,?)",
+										roomID, equipObj.getInt("type"),
+										equipObj.getString("model"),
+										equipObj.getString("manufacturer"),
+										equipObj.getInt("quantity"));
+					}
 				}
+
+				MainDBHandler.getConnection().commit();
+				MainDBHandler.getConnection().setAutoCommit(true);
+
+				// Set user as logged in session
+				SessionManager.setLoggedInUser(Request, userObj);
+
+				return Response.ok("{message: \"success\"}").build();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -312,14 +303,14 @@ public class StudiosRequestsAPI {
 
 	@GET
 	@Path("/{studioID}/{roomID}")
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudioRoomByID(@PathParam("studioID") int studioID,
 			@PathParam("roomID") int roomID) {
 		try {
 			JSONArray results = MainDBHandler
 					.selectWithParameters(
 							"select * "
-									+ "from 	ROOMS as r  left join ROOM_ROOM_TYPES as rrt on r.ID = rrt.ROOM_ID "
+									+ "from ROOMS as r left join ROOM_ROOM_TYPES as rrt on r.ID = rrt.ROOM_ID "
 									+ "where r.ID = ?", roomID);
 
 			// Check if any result

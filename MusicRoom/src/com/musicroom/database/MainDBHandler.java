@@ -132,8 +132,11 @@ public class MainDBHandler {
 		return result;
 	}
 
-	public static ResultSet insert(String sqlQuery, Object... params) {
-		return insert(sqlQuery, PreparedStatement.NO_GENERATED_KEYS, params);
+	public static void insert(String sqlQuery, Object... params) throws SQLException {
+		PreparedStatement stmt = createPreparedStatement(sqlQuery, params);
+
+		// Executed query
+		stmt.executeUpdate();
 	}
 
 	public static ResultSet insertWithAutoKey(String sqlQuery,
