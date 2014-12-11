@@ -62,11 +62,11 @@ public class ReviewsRequestsAPI {
 
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response AddReview(String dataStr,
 			@Context HttpServletRequest Request) {
 		try {
-			JSONObject data = new JSONObject("dataStr");
+			JSONObject data = new JSONObject(dataStr);
 			JSONObject loggedUser = SessionManager.getLoggedInUser(Request);
 
 			// Check if there is no logged user

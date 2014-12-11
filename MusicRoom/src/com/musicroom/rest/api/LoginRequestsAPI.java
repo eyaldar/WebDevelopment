@@ -7,6 +7,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.json.JSONArray;
@@ -21,10 +22,10 @@ public class LoginRequestsAPI {
 	private static final String BAD_LOGIN = "{\"error\":\"Invalid user name or password.\"}";
 
 	@POST
-	@Produces("application/json")
-	@Consumes
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response Login(String dataStr, @Context HttpServletRequest Request) {
-		JSONObject loginData = new JSONObject("dataStr");
+		JSONObject loginData = new JSONObject(dataStr);
 
 		// Get user by name and password
 		JSONArray loggedRes;
