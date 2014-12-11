@@ -14,13 +14,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 import com.musicroom.database.MainDBHandler;
 import com.musicroom.database.initialization.MusicRoomSchemaCreator;
 import com.musicroom.database.interfaces.MySQLDataBasePopulator;
 import com.musicroom.database.interfaces.MySQLSchemaCreator;
 
-@Path("/ResetDataBase")
+@Path("/ResetDatabase")
 public class ResetDatabaseRequestsAPI {
 	private static final String RESET_MYSQL_DB_USERNAME = "root";
 	private static final String RESET_MYSQL_DB_PASSWORD = "root";
@@ -29,7 +30,7 @@ public class ResetDatabaseRequestsAPI {
 	private static final String FAILED_RESPONSE_STRING = "Reset failed!";
 
 	@GET
-	@Produces("text/html")
+	@Produces(MediaType.TEXT_HTML)
 	public String resetDB(
 			@QueryParam("user") @DefaultValue("-") String username,
 			@QueryParam("password") String password) {
@@ -47,7 +48,7 @@ public class ResetDatabaseRequestsAPI {
 	}
 
 	private void createAndFillDB() {
-		Connection con = MainDBHandler.GetConnection();
+		Connection con = MainDBHandler.getConnection();
 		try {
 
 			MySQLSchemaCreator dbCreator = new MusicRoomSchemaCreator();

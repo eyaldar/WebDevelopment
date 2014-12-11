@@ -5,6 +5,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.json.JSONArray;
@@ -19,19 +20,18 @@ public class BandsRequestsAPI {
 	private static final String BAND_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Band with id '%d' was not found\"}";
 
 	@GET
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getBands() {
-		JSONArray results = MainDBHandler
-				.getStatementResult("select * from BANDS");
+		JSONArray results = MainDBHandler.select("select * from BANDS");
 
 		return Response.ok(results.toString()).build();
 	}
 
 	@GET
 	@Path("/{id}")
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getBandByID(@PathParam("id") int id) {
-		JSONArray results = MainDBHandler.getPreparedStatementResult(
+		JSONArray results = MainDBHandler.selectWithParameters(
 				"select * from BANDS where id = ?", id);
 
 		JSONObject result = JSONUtils.extractJSONObject(results);

@@ -30,7 +30,7 @@ public class LoginRequestsAPI
 		
 		// Get user by name and password
 		JSONArray loggedRes = 
-				MainDBHandler.getPreparedStatementResult("select * from USERS where USER_NAME = ? and PASSWORD = ?", 
+				MainDBHandler.selectWithParameters("select * from USERS where USER_NAME = ? and PASSWORD = ?", 
 						loginData.getString("USER_NAME"), loginData.getString("PASSWORD"));
 		
 		// Check if there is a result

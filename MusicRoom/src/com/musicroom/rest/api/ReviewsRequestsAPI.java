@@ -31,7 +31,7 @@ public class ReviewsRequestsAPI
 	public Response getStudioReviews(@PathParam("id") int id)
 	{
 		JSONArray reviews = 
-				MainDBHandler.getPreparedStatementResult("select * "
+				MainDBHandler.selectWithParameters("select * "
 													   + "from REVIEWS as r left join USERS as u on r.USER_ID = u.ID "
 													   + "where r.STUDIO_ID = ?", id);
 
@@ -75,7 +75,7 @@ public class ReviewsRequestsAPI
 			
 			// Get user review count for this studio
 			JSONArray existingReview = 
-					MainDBHandler.getPreparedStatementResult("select count(*) as COUNT from REVIEWS where USER_ID = ? and STUDIO_ID = ?", 
+					MainDBHandler.selectWithParameters("select count(*) as COUNT from REVIEWS where USER_ID = ? and STUDIO_ID = ?", 
 							userId, studioId);
 			
 			// Check if there is an existing review
@@ -93,7 +93,7 @@ public class ReviewsRequestsAPI
 				}
 				else
 				{
-					MainDBHandler.getPreparedStatementResult("INSERT INTO REVIEWS (USER_ID, STUDIO_ID, RATING, COMMENT) VALUES(?, ?, ?, ?)",
+					MainDBHandler.selectWithParameters("INSERT INTO REVIEWS (USER_ID, STUDIO_ID, RATING, COMMENT) VALUES(?, ?, ?, ?)",
 							userId, studioId, rating, data.getString("COMMENT"));
 					
 					return Response.ok("{message: \"success\"}").build();
