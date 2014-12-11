@@ -22,7 +22,13 @@ public class BandsRequestsAPI {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getBands() {
-		JSONArray results = MainDBHandler.select("select * from BANDS");
+		JSONArray results;
+		try {
+			results = MainDBHandler.select("select * from BANDS");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.serverError().build();
+		}
 
 		return Response.ok(results.toString()).build();
 	}
@@ -31,18 +37,25 @@ public class BandsRequestsAPI {
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getBandByID(@PathParam("id") int id) {
-		JSONArray results = MainDBHandler.selectWithParameters(
-				"select * from BANDS where id = ?", id);
+		JSONArray results;
+		try {
+			results = MainDBHandler.selectWithParameters(
+					"select * from BANDS where id = ?", id);
+			JSONObject result = JSONUtils.extractJSONObject(results);
 
-		JSONObject result = JSONUtils.extractJSONObject(results);
+			if (result.length() > 0) {
+				return Response.ok(result.toString()).build();
+			} else {
+				String errorJson = String.format(
+						BAND_ID_WAS_NOT_FOUND_ERROR_JSON, id);
+				return Response.status(HttpServletResponse.SC_NOT_FOUND)
+						.entity(errorJson).build();
+			}
 
-		if (result.length() > 0) {
-			return Response.ok(result.toString()).build();
-		} else {
-			String errorJson = String.format(BAND_ID_WAS_NOT_FOUND_ERROR_JSON,
-					id);
-			return Response.status(HttpServletResponse.SC_NOT_FOUND)
-					.entity(errorJson).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.serverError().build();
 		}
+
 	}
 }

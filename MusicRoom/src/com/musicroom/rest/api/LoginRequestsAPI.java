@@ -17,36 +17,39 @@ import com.musicroom.session.SessionManager;
 import com.musicroom.utils.JSONUtils;
 
 @Path("/login")
-public class LoginRequestsAPI 
-{
+public class LoginRequestsAPI {
 	private static final String BAD_LOGIN = "{\"error\":\"Invalid user name or password.\"}";
-	
+
 	@POST
 	@Produces("application/json")
 	@Consumes
-	public Response Login(String dataStr, @Context HttpServletRequest Request)
-	{
+	public Response Login(String dataStr, @Context HttpServletRequest Request) {
 		JSONObject loginData = new JSONObject("dataStr");
-		
+
 		// Get user by name and password
-		JSONArray loggedRes = 
-				MainDBHandler.selectWithParameters("select * from USERS where USER_NAME = ? and PASSWORD = ?", 
-						loginData.getString("USER_NAME"), loginData.getString("PASSWORD"));
-		
-		// Check if there is a result
-		if (loggedRes.length() == 0)
-		{
-			return Response.status(HttpServletResponse.SC_NOT_FOUND).entity(BAD_LOGIN).build();
-		}
-		else
-		{
-			// Get the user
-			JSONObject loggedUser = JSONUtils.extractJSONObject(loggedRes);
-			
-			// Set user as logged in session
-			SessionManager.setLoggedInUser(Request, loggedUser);
-			
-			return Response.ok(loggedUser.toString()).build();
+		JSONArray loggedRes;
+		try {
+			loggedRes = MainDBHandler.selectWithParameters(
+					"select * from USERS where USER_NAME = ? and PASSWORD = ?",
+					loginData.getString("USER_NAME"),
+					loginData.getString("PASSWORD"));
+
+			// Check if there is a result
+			if (loggedRes.length() == 0) {
+				return Response.status(HttpServletResponse.SC_NOT_FOUND)
+						.entity(BAD_LOGIN).build();
+			} else {
+				// Get the user
+				JSONObject loggedUser = JSONUtils.extractJSONObject(loggedRes);
+
+				// Set user as logged in session
+				SessionManager.setLoggedInUser(Request, loggedUser);
+
+				return Response.ok(loggedUser.toString()).build();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.serverError().build();
 		}
 	}
 }
