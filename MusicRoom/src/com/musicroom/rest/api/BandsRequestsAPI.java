@@ -22,6 +22,7 @@ import org.json.JSONObject;
 
 import com.musicroom.database.MainDBHandler;
 import com.musicroom.session.SessionManager;
+import com.musicroom.utils.BandJSONArrayGenerator;
 import com.musicroom.utils.JSONUtils;
 import com.musicroom.utils.UserType;
 import com.musicroom.utils.UsersTableUtils;
@@ -30,50 +31,51 @@ import com.musicroom.utils.UsersTableUtils;
 public class BandsRequestsAPI {
 
 	private static final String BAND_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Band with id '%d' was not found\"}";
+	private static final String GET_BANDS_SELECT_QUERY = "select * from BANDS as b "
+			+ "left join BAND_MEMBERS as bm "
+			+ "on b.ID = bm.BAND_ID "
+			+ "left join MEMBER_INSTRUMENT as bi "
+			+ "on bm.ID = bi.MEMBER_ID "
+			+ "left join EQUIPMENT_TYPES as et "
+			+ "on et.ID = bi.EQUIPMENT_TYPE_ID";
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getBands() {
-		JSONArray results;
-		try {
-			results = MainDBHandler.select("select * from BANDS");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Response.serverError().build();
-		}
+	public String getBands() throws Exception {
+		JSONArray results = MainDBHandler.select(GET_BANDS_SELECT_QUERY);
 
-		return Response.ok(results.toString()).build();
+		BandJSONArrayGenerator bandsArrayGen = new BandJSONArrayGenerator();
+		JSONArray bandsArray = bandsArrayGen.createBandsArray(results);
+
+		return bandsArray.toString(2);
 	}
 
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getBandByID(@PathParam("id") int id) {
-		JSONArray results;
-		try {
-			results = MainDBHandler.selectWithParameters(
-					"select * from BANDS where id = ?", id);
-			JSONObject result = JSONUtils.extractJSONObject(results);
+	public Response getBandByID(@PathParam("id") int id) throws Exception {
+		JSONArray results = MainDBHandler.selectWithParameters(
+				GET_BANDS_SELECT_QUERY + " where b.id = ?", id);
 
-			if (result.length() > 0) {
-				return Response.ok(result.toString()).build();
-			} else {
-				String errorJson = String.format(
-						BAND_ID_WAS_NOT_FOUND_ERROR_JSON, id);
-				return Response.status(HttpServletResponse.SC_NOT_FOUND)
-						.entity(errorJson).build();
-			}
+		BandJSONArrayGenerator bandsArrayGen = new BandJSONArrayGenerator();
+		JSONArray bandsArray = bandsArrayGen.createBandsArray(results);
+		JSONObject result = JSONUtils.extractJSONObject(bandsArray);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Response.serverError().build();
+		if (result.length() > 0) {
+			return Response.ok(result.toString(2)).build();
+		} else {
+			String errorJson = String.format(BAND_ID_WAS_NOT_FOUND_ERROR_JSON,
+					id);
+			return Response.status(HttpServletResponse.SC_NOT_FOUND)
+					.entity(errorJson).build();
 		}
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addBand(String dataStr, @Context HttpServletRequest Request) {
+	public Response addBand(String dataStr, @Context HttpServletRequest Request)
+			throws Exception {
 		try {
 			JSONObject data = new JSONObject(dataStr);
 			JSONObject userObj = data.getJSONObject("user");
@@ -164,13 +166,8 @@ public class BandsRequestsAPI {
 		} catch (Exception e) {
 			e.printStackTrace();
 
-			try {
-				MainDBHandler.getConnection().rollback();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			return Response.serverError().build();
+			MainDBHandler.getConnection().rollback();
+			throw e;
 		}
 	}
 }

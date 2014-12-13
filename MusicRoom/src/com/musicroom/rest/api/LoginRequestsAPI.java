@@ -32,8 +32,8 @@ public class LoginRequestsAPI {
 		try {
 			loggedRes = MainDBHandler.selectWithParameters(
 					"select * from USERS where USER_NAME = ? and PASSWORD = ?",
-					loginData.getString("USER_NAME"),
-					loginData.getString("PASSWORD"));
+					loginData.getString("name"),
+					loginData.getString("password"));
 
 			// Check if there is a result
 			if (loggedRes.length() == 0) {
