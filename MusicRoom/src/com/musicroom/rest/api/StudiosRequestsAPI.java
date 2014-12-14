@@ -3,8 +3,10 @@ package com.musicroom.rest.api;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +20,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,74 +36,6 @@ public class StudiosRequestsAPI {
 
 	private static final String STUDIO_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Studio with id '%d' was not found\"}";
 	private static final String STUDIO_ID_ROOM_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Room with id %d in studio with id '%d' was not found\"}";
-
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStudios() {
-		try {
-			JSONArray selectResult = MainDBHandler
-					.select("select r.STUDIO_ID, s.STUDIO_NAME, s.ADDRESS, s.CITY_ID, s.USER_ID, s.CONTACT_NAME, s.EMAIL, s.PHONE, "
-							+ "r.ID as ROOM_ID, r.RATE, r.ROOM_NAME "
-							+ "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID");
-
-			JSONArray result = new JSONArray();
-			List<Integer> studioIDs = new ArrayList<Integer>();
-
-			for (int i = 0; i < selectResult.length(); i++) {
-				JSONObject currentRow = selectResult.getJSONObject(i);
-				JSONObject currentStudio;
-
-				int studioID = currentRow.getInt("STUDIO_ID");
-
-				int studioIndex = studioIDs.indexOf(studioID);
-
-				// If the studio is new in the result
-				if (studioIndex == -1) {
-					// Add the studio
-					studioIDs.add(studioID);
-					currentStudio = new JSONObject();
-					currentStudio.put("ID", studioID);
-					currentStudio.put("STUDIO_NAME",
-							currentRow.getString("STUDIO_NAME"));
-					currentStudio.put("ADDRESS",
-							currentRow.getString("ADDRESS"));
-					currentStudio.put("CITY_ID", currentRow.getInt("CITY_ID"));
-					currentStudio.put("USER_ID", currentRow.getInt("USER_ID"));
-					currentStudio.put("CONTACT_NAME",
-							currentRow.getString("CONTACT_NAME"));
-					currentStudio.put("EMAIL", currentRow.getString("EMAIL"));
-					currentStudio.put("PHONE", currentRow.getString("PHONE"));
-
-					// Add avg rating
-					JSONArray avg_rating = MainDBHandler.selectWithParameters(
-							"select avg(RATING) as AVG_RATING "
-						  + "from REVIEWS "
-						  + "where STUDIO_ID = ?", studioID);
-					
-					currentStudio.put("AVG_RATING", avg_rating.getJSONObject(0).getDouble("AVG_RATING"));
-					
-					result.put(currentStudio);
-				}
-				// the studio exists in the result
-				else {
-					currentStudio = result.getJSONObject(studioIndex);
-				}
-				
-				// Add the room
-				JSONObject room = new JSONObject();
-				room.put("ID", currentRow.getInt("ROOM_ID"));
-				room.put("RATE", currentRow.getInt("RATE"));
-				room.put("ROOM_NAME", currentRow.getString("ROOM_NAME"));
-				currentStudio.append("ROOMS", room);
-			}
-			
-			return Response.ok(result.toString()).build();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Response.serverError().build();
-		}
-	}
 
 	@GET
 	@Path("/{id}")
@@ -358,6 +293,170 @@ public class StudiosRequestsAPI {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.serverError().build();
+		}
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response searchStuidos(@Context UriInfo info) 
+	{
+		try
+		{
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			
+			// Get the params
+			Integer areaId = null;
+			Integer cityId = null;
+			Integer roomTypeId = null;
+			Integer equipTypeId = null;
+			Integer equipCatId = null;
+			Integer maxRoomRate = null;
+			Date startTime = null;
+			Date endTime = null;
+			
+			String name = info.getQueryParameters().getFirst("NAME");
+			String areaIdStr = info.getQueryParameters().getFirst("AREA_ID");
+			String cityIdStr = info.getQueryParameters().getFirst("CITY_ID");
+			String roomTypeIdStr = info.getQueryParameters().getFirst("ROOM_TYPE_ID");
+			String equipTypeIdStr = info.getQueryParameters().getFirst("EQUIPMENT_TYPE_ID");
+			String equipCatIdStr = info.getQueryParameters().getFirst("EQUIPMENT_CATEGORY_ID");
+			String maxRoomRateStr = info.getQueryParameters().getFirst("MAX_ROOM_RATE");
+			String startTimeStr = info.getQueryParameters().getFirst("START_TIME");
+			String endTimeStr = info.getQueryParameters().getFirst("END_TIME");
+			
+			if (areaIdStr != null)
+				areaId = Integer.parseInt(areaIdStr);
+			if (cityIdStr != null)
+				cityId = Integer.parseInt(cityIdStr);
+			if (roomTypeIdStr != null)
+				roomTypeId = Integer.parseInt(roomTypeIdStr);
+			if (equipTypeIdStr != null)
+				equipTypeId = Integer.parseInt(equipTypeIdStr);
+			if (equipCatIdStr != null)
+				equipCatId = Integer.parseInt(equipCatIdStr);
+			if (maxRoomRateStr != null)
+				maxRoomRate = Integer.parseInt(maxRoomRateStr);
+			if (startTimeStr != null)
+				startTime = format.parse(startTimeStr);
+			if (endTimeStr != null)
+				endTime = format.parse(endTimeStr);
+		
+			// Build sql query
+			String sqlQuery = "select r.STUDIO_ID, s.STUDIO_NAME, s.ADDRESS, s.CITY_ID, s.USER_ID, s.CONTACT_NAME, s.EMAIL, s.PHONE, "
+							+ "r.ID as ROOM_ID, r.RATE, r.ROOM_NAME "
+							+ "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID "
+							+ "where 1=1 ";
+			
+			if (name != null)
+			{
+				sqlQuery += "and s.NAME = " + name + " ";
+			}
+			
+			if (areaId != null)
+			{
+				sqlQuery += "and exists (select 1 "
+						  + "from CITIES as c "
+			              + "where c.ID = s.CITY_ID and c.AREA_ID = " + areaId + ") ";
+			}
+			
+			if (cityId != null)
+			{
+				sqlQuery += "and s.CITY_ID = " + cityId + " ";
+			}
+			
+			if (maxRoomRate != null)
+			{
+				sqlQuery += "and r.RATE <= " + maxRoomRate + " ";
+			}
+			
+			if (roomTypeId != null)
+			{
+				sqlQuery += "and exists (select 1 "
+						  + "from ROOM_ROOM_TYPES as rrt "
+						  + "where rrt.ROOM_ID = r.ID and rrt.TYPE_ID = " + roomTypeId + ") ";
+			}
+			
+			if (equipTypeId != null)
+			{
+				sqlQuery += "and exists (select 1 "
+						  + "from ROOM_EQUIPMENT as re "
+						  + "where re.ROOM_ID = r.ID and re.EQUIPMENT_TYPE_ID = " + equipTypeId + ") ";
+			}
+			
+			if (equipCatId != null)
+			{
+				sqlQuery += "and exists (select 1 "
+						  + "from ROOM_EQUIPMENT as re, EQUIPMENT_TYPES as et "
+						  + "where re.ROOM_ID = r.ID and re.EQUIPMENT_TYPE_ID =  et.ID and et.CATEGORY_ID = " + equipCatId + ") ";
+			}
+			
+			if (startTime != null && endTime != null)
+			{
+				sqlQuery += "and not exists (select 1 "
+						  + "from ROOM_SCHEDULE as rs "
+						  + "where rs.ROOM_ID = r.ID and rs.START_TIME < " + format.format(endTime)  + " and rs.END_TIME > " + format.format(startTime) + ") ";
+			}
+			
+			JSONArray selectResult = MainDBHandler
+					.select(sqlQuery);
+			
+			JSONArray result = new JSONArray();
+			List<Integer> studioIDs = new ArrayList<Integer>();
+
+			for (int i = 0; i < selectResult.length(); i++) {
+				JSONObject currentRow = selectResult.getJSONObject(i);
+				JSONObject currentStudio;
+
+				int studioID = currentRow.getInt("STUDIO_ID");
+
+				int studioIndex = studioIDs.indexOf(studioID);
+
+				// If the studio is new in the result
+				if (studioIndex == -1) {
+					// Add the studio
+					studioIDs.add(studioID);
+					currentStudio = new JSONObject();
+					currentStudio.put("ID", studioID);
+					currentStudio.put("STUDIO_NAME",
+							currentRow.getString("STUDIO_NAME"));
+					currentStudio.put("ADDRESS",
+							currentRow.getString("ADDRESS"));
+					currentStudio.put("CITY_ID", currentRow.getInt("CITY_ID"));
+					currentStudio.put("USER_ID", currentRow.getInt("USER_ID"));
+					currentStudio.put("CONTACT_NAME",
+							currentRow.getString("CONTACT_NAME"));
+					currentStudio.put("EMAIL", currentRow.getString("EMAIL"));
+					currentStudio.put("PHONE", currentRow.getString("PHONE"));
+
+					// Add avg rating
+					JSONArray avg_rating = MainDBHandler.selectWithParameters(
+							"select avg(RATING) as AVG_RATING "
+						  + "from REVIEWS "
+						  + "where STUDIO_ID = ?", studioID);
+					
+					currentStudio.put("AVG_RATING", avg_rating.getJSONObject(0).getDouble("AVG_RATING"));
+					
+					result.put(currentStudio);
+				}
+				// the studio exists in the result
+				else {
+					currentStudio = result.getJSONObject(studioIndex);
+				}
+				
+				// Add the room
+				JSONObject room = new JSONObject();
+				room.put("ID", currentRow.getInt("ROOM_ID"));
+				room.put("RATE", currentRow.getInt("RATE"));
+				room.put("ROOM_NAME", currentRow.getString("ROOM_NAME"));
+				currentStudio.append("ROOMS", room);
+			}
+			
+			return Response.ok(result.toString()).build();
+		} 
+		catch (Exception e) 
+		{
 			e.printStackTrace();
 			return Response.serverError().build();
 		}
