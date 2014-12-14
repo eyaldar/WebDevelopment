@@ -173,18 +173,4 @@ public class BandsRequestsAPI {
 			throw e;
 		}
 	}
-
-	@DELETE
-	@Path("/{id}")
-	public Response deleteBand(@PathParam("id") int id) throws Exception {
-		int rowsAffected = MainDBHandler.executeUpdateWithParameters(
-				"delete from BANDS where ID = ?", id);
-
-		if (rowsAffected > 0) {
-			return Response.ok("{message: \"success\"}").build();
-		} else {
-			return Response.notModified(BAND_ID_WAS_NOT_FOUND_ERROR_JSON)
-					.build();
-		}
-	}
 }

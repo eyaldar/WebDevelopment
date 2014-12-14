@@ -40,7 +40,7 @@ public class StudiosRequestsAPI {
 		try {
 			JSONArray selectResult = MainDBHandler
 					.select("select r.STUDIO_ID, s.STUDIO_NAME, s.ADDRESS, s.CITY_ID, s.USER_ID, s.CONTACT_NAME, s.EMAIL, s.PHONE, "
-							+ "r.ID as ROOM_ID, r.RATE, r.ROOM_NAME, s.VOTES_SUM / s.VOTES_COUNT as AVG_REVIEW "
+							+ "r.ID as ROOM_ID, r.RATE, r.ROOM_NAME "
 							+ "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID");
 
 			JSONArray result = new JSONArray();
@@ -71,19 +71,21 @@ public class StudiosRequestsAPI {
 					currentStudio.put("EMAIL", currentRow.getString("EMAIL"));
 					currentStudio.put("PHONE", currentRow.getString("PHONE"));
 
-					if (currentRow.has("AVG_REVIEW"))
-						currentStudio.put("AVG_REVIEW",
-								currentRow.getDouble("AVG_REVIEW"));
-					else
-						currentStudio.put("AVG_REVIEW", "No Reviews");
-
+					// Add avg rating
+					JSONArray avg_rating = MainDBHandler.selectWithParameters(
+							"select avg(RATING) as AVG_RATING "
+						  + "from REVIEWS "
+						  + "where STUDIO_ID = ?", studioID);
+					
+					currentStudio.put("AVG_RATING", avg_rating.getJSONObject(0).getDouble("AVG_RATING"));
+					
 					result.put(currentStudio);
 				}
 				// the studio exists in the result
 				else {
 					currentStudio = result.getJSONObject(studioIndex);
 				}
-
+				
 				// Add the room
 				JSONObject room = new JSONObject();
 				room.put("ID", currentRow.getInt("ROOM_ID"));
@@ -91,7 +93,7 @@ public class StudiosRequestsAPI {
 				room.put("ROOM_NAME", currentRow.getString("ROOM_NAME"));
 				currentStudio.append("ROOMS", room);
 			}
-
+			
 			return Response.ok(result.toString()).build();
 
 		} catch (Exception e) {
@@ -107,7 +109,7 @@ public class StudiosRequestsAPI {
 		try {
 			JSONArray results = MainDBHandler
 					.selectWithParameters(
-							"select *, r.ID as ROOM_ID, s.VOTES_SUM / s.VOTES_COUNT as AVG_REVIEW "
+							"select *, r.ID as ROOM_ID "
 									+ "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID "
 									+ "where s.ID = ?", id);
 
@@ -130,11 +132,14 @@ public class StudiosRequestsAPI {
 				studio.put("LOGO_URL", firstRow.getString("LOGO_URL"));
 				studio.put("EXTRA_DETAILS", firstRow.getString("EXTRA_DETAILS"));
 
-				if (firstRow.has("AVG_REVIEW"))
-					studio.put("AVG_REVIEW", firstRow.getDouble("AVG_REVIEW"));
-				else
-					studio.put("AVG_REVIEW", "No Reviews");
-
+				// Add avg rating
+				JSONArray avg_rating = MainDBHandler.selectWithParameters(
+						"select avg(RATING) as AVG_RATING "
+					  + "from REVIEWS "
+					  + "where STUDIO_ID = ?", id);
+				
+				studio.put("AVG_RATING", avg_rating.getJSONObject(0).getDouble("AVG_RATING"));
+				
 				int[] roomIDs = new int[results.length()];
 
 				// Add rooms

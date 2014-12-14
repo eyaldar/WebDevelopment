@@ -23,4 +23,28 @@ public class SessionManager {
 		JSONObject loggedUser = getLoggedInUser(request);
 		return loggedUser != null && loggedUser.getInt("ID") == UserId;
 	}
+	
+	public static void logoutUser(HttpServletRequest request) 
+	{
+		request.getSession().removeAttribute(USER);
+	}
+	
+	public static boolean updateLoggedUserPassword(HttpServletRequest request, String password) 
+	{
+		Object sessionAttribute = request.getSession().getAttribute(USER);
+
+		// check if user has found
+		if (sessionAttribute == null)
+		{
+			// return fail
+			return false;
+		}
+		else
+		{
+			// update and return success
+			((JSONObject)sessionAttribute).put("PASSWORD", password);
+			request.getSession().setAttribute(USER, sessionAttribute);
+			return true;
+		}
+	}
 }
