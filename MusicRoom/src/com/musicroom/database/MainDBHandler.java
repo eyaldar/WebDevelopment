@@ -105,6 +105,26 @@ public class MainDBHandler {
 		return result.toString();
 	}
 
+	public static int executeUpdateQuery(String sqlQuery) throws SQLException {
+
+		Statement stmt = getConnection().createStatement();
+
+		// Executed query
+		int result = stmt.executeUpdate(sqlQuery);
+
+		return result;
+	}
+
+	public static int executeUpdateWithParameters(String sqlQuery,
+			Object... params) throws SQLException {
+		PreparedStatement stmt = createPreparedStatement(sqlQuery, params);
+
+		// Executed query
+		int result = stmt.executeUpdate();
+
+		return result;
+	}
+
 	public static JSONArray select(String sqlQuery) throws Exception {
 		JSONArray result = new JSONArray();
 
@@ -130,13 +150,6 @@ public class MainDBHandler {
 		result = JSONUtils.convertToJSON(rs);
 
 		return result;
-	}
-
-	public static void insert(String sqlQuery, Object... params) throws SQLException {
-		PreparedStatement stmt = createPreparedStatement(sqlQuery, params);
-
-		// Executed query
-		stmt.executeUpdate();
 	}
 
 	public static ResultSet insertWithAutoKey(String sqlQuery,

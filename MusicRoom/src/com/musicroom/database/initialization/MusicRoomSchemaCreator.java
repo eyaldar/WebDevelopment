@@ -33,7 +33,7 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "	    ID           INTEGER UNSIGNED PRIMARY KEY,"
 				+ "	    CITY_NAME   VARCHAR(100) NOT NULL,"
 				+ "        AREA_ID      INTEGER UNSIGNED NOT NULL,"
-				+ "	    Foreign Key (AREA_ID) references AREAS(ID)" + ");");
+				+ "	    Foreign Key (AREA_ID) references AREAS(ID)" + "on delete cascade);");
 
 		// User types
 		System.out.println("Creating table USER_TYPES");
@@ -50,7 +50,7 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "	   USER_NAME 	VARCHAR(100) NOT NULL,"
 				+ "	   PASSWORD 	VARCHAR(100) NOT NULL,"
 				+ "	   USER_TYPE_ID	INTEGER UNSIGNED NOT NULL,"
-				+ "	   Foreign Key (USER_TYPE_ID) references USER_TYPES(ID),"
+				+ "	   Foreign Key (USER_TYPE_ID) references USER_TYPES(ID) on delete cascade,"
 				+ "	   UNIQUE(USER_NAME)" + ");");
 
 		// Room types
@@ -74,7 +74,7 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "       ID 				INTEGER UNSIGNED PRIMARY KEY,"
 				+ "	   EQUIPMENT_NAME 	VARCHAR(100) NOT NULL,"
 				+ "	   CATEGORY_ID 		INTEGER UNSIGNED NOT NULL,"
-				+ "	   Foreign Key (CATEGORY_ID) references EQUIPMENT_CATEGORIES(ID)"
+				+ "	   Foreign Key (CATEGORY_ID) references EQUIPMENT_CATEGORIES(ID) on delete cascade"
 				+ ");");
 
 		// Studios
@@ -93,10 +93,8 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "	   USER_ID			INTEGER UNSIGNED NOT NULL,"
 				+ "	   EXTRA_DETAILS	VARCHAR(200) NOT NULL,"
 				+ "	   LOGO_URL			VARCHAR(500) NOT NULL,"
-				+ "	   VOTES_COUNT		INTEGER UNSIGNED NOT NULL,"
-				+ "	   VOTES_SUM		INTEGER UNSIGNED NOT NULL,"
-				+ "	   Foreign Key (CITY_ID) references CITIES(ID),"
-				+ "	   Foreign Key (USER_ID) references USERS(ID)" + ");");
+				+ "	   Foreign Key (CITY_ID) references CITIES(ID) on delete cascade,"
+				+ "	   Foreign Key (USER_ID) references USERS(ID)" + " on delete cascade);");
 
 		// Rooms
 		System.out.println("Creating table ROOMS");
@@ -107,7 +105,7 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "	   RATE		 		INTEGER UNSIGNED NOT NULL,"
 				+ "	   ROOM_NAME 		VARCHAR(100) NOT NULL,"
 				+ "	   EXTRA_DETAILS	VARCHAR(200) NOT NULL,"
-				+ "	   Foreign Key (STUDIO_ID) references STUDIOS(ID)" + ");");
+				+ "	   Foreign Key (STUDIO_ID) references STUDIOS(ID)" + " on delete cascade);");
 
 		// Rooms to room types
 		System.out.println("Creating table ROOM_ROOM_TYPES");
@@ -116,8 +114,8 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "       ROOM_ID		INTEGER UNSIGNED NOT NULL,"
 				+ "	   TYPE_ID	 	INTEGER UNSIGNED NOT NULL,"
 				+ "	   PRIMARY KEY (ROOM_ID, TYPE_ID),"
-				+ "	   Foreign Key (ROOM_ID) references ROOMS(ID),"
-				+ "	   Foreign Key (TYPE_ID) references ROOM_TYPES(ID)" + ");");
+				+ "	   Foreign Key (ROOM_ID) references ROOMS(ID) on delete cascade,"
+				+ "	   Foreign Key (TYPE_ID) references ROOM_TYPES(ID)" + " on delete cascade);");
 
 		// reviews
 		System.out.println("Creating table REVIEWS");
@@ -128,8 +126,8 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "	   RATING	 	INTEGER UNSIGNED NOT NULL,"
 				+ "	   COMMENT	 	VARCHAR(200) NOT NULL,"
 				+ "	   USER_ID	 	INTEGER UNSIGNED NOT NULL,"
-				+ "	   Foreign Key (STUDIO_ID) references STUDIOS(ID),"
-				+ "	   Foreign Key (USER_ID) references USERS(ID)" + ");");
+				+ "	   Foreign Key (STUDIO_ID) references STUDIOS(ID) on delete cascade,"
+				+ "	   Foreign Key (USER_ID) references USERS(ID)" + " on delete cascade);");
 
 		// bands
 		System.out.println("Creating table BANDS");
@@ -140,7 +138,7 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "	   LOGO_URL	 	VARCHAR(500) NOT NULL,"
 				+ "	   GENRE	 	VARCHAR(50) NOT NULL,"
 				+ "	   USER_ID	 	INTEGER UNSIGNED NOT NULL,"
-				+ "	   Foreign Key (USER_ID) references USERS(ID)" + ");");
+				+ "	   Foreign Key (USER_ID) references USERS(ID)" + " on delete cascade);");
 
 		// band members
 		System.out.println("Creating table BAND_MEMBERS");
@@ -151,7 +149,7 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "	   ROLE		 	VARCHAR(100) NOT NULL,"
 				+ "	   PICTURE_URL 	VARCHAR(500) NOT NULL,"
 				+ "	   BAND_ID	 	INTEGER UNSIGNED NOT NULL,"
-				+ "	   Foreign Key (BAND_ID) references BAND_MEMBERS(ID)"
+				+ "	   Foreign Key (BAND_ID) references BAND_MEMBERS(ID) on delete cascade"
 				+ ");");
 
 		// members instruments
@@ -161,8 +159,8 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "       MEMBER_ID			INTEGER UNSIGNED NOT NULL,"
 				+ "	   EQUIPMENT_TYPE_ID 	INTEGER UNSIGNED NOT NULL,"
 				+ "	   PRIMARY KEY (MEMBER_ID, EQUIPMENT_TYPE_ID),"
-				+ "	   Foreign Key (EQUIPMENT_TYPE_ID) references EQUIPMENT_TYPES(ID),"
-				+ "	   Foreign Key (MEMBER_ID) references BAND_MEMBERS(ID)"
+				+ "	   Foreign Key (EQUIPMENT_TYPE_ID) references EQUIPMENT_TYPES(ID) on delete cascade,"
+				+ "	   Foreign Key (MEMBER_ID) references BAND_MEMBERS(ID) on delete cascade"
 				+ ");");
 
 		// Room Equipment
@@ -175,8 +173,8 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "	   MANUFACTURER			VARCHAR(100) NOT NULL,"
 				+ "	   QUANTITY	 			INTEGER UNSIGNED NOT NULL,"
 				+ "	   PRIMARY KEY (ROOM_ID, EQUIPMENT_TYPE_ID),"
-				+ "	   Foreign Key (EQUIPMENT_TYPE_ID) references EQUIPMENT_TYPES(ID),"
-				+ "	   Foreign Key (ROOM_ID) references ROOMS(ID)" + ");");
+				+ "	   Foreign Key (EQUIPMENT_TYPE_ID) references EQUIPMENT_TYPES(ID) on delete cascade,"
+				+ "	   Foreign Key (ROOM_ID) references ROOMS(ID)" + " on delete cascade);");
 
 		// Room schedule
 		System.out.println("Creating table ROOM_SCHEDULE");
@@ -187,8 +185,8 @@ public class MusicRoomSchemaCreator implements MySQLSchemaCreator {
 				+ "	   START_TIME 			DATETIME NOT NULL,"
 				+ "	   END_TIME				DATETIME NOT NULL,"
 				+ "	   PRIMARY KEY (ROOM_ID, START_TIME, END_TIME),"
-				+ "	   Foreign Key (BAND_ID) references BANDS(ID),"
-				+ "	   Foreign Key (ROOM_ID) references ROOMS(ID)" + ");");
+				+ "	   Foreign Key (BAND_ID) references BANDS(ID) on delete cascade,"
+				+ "	   Foreign Key (ROOM_ID) references ROOMS(ID)" + " on delete cascade);");
 
 		// Create Indexes
 		System.out.println("Creating table indexes");

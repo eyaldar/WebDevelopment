@@ -26,7 +26,6 @@ public class BandJSONArrayGenerator {
 			JSONObject currentBandMember = getOrCreateBandMember(currentRow,
 					currentBand);
 			addInstrument(currentRow, currentBandMember);
-	
 		}
 
 		return bandsArray;

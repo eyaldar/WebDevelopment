@@ -3,11 +3,11 @@ package com.musicroom.rest.api;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -30,6 +30,7 @@ import com.musicroom.utils.UsersTableUtils;
 @Path("/bands")
 public class BandsRequestsAPI {
 
+	private static final int SPACE_TO_INDENTS_EACH_LEVEL = 2;
 	private static final String BAND_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Band with id '%d' was not found\"}";
 	private static final String GET_BANDS_SELECT_QUERY = "select * from BANDS as b "
 			+ "left join BAND_MEMBERS as bm "
@@ -47,7 +48,7 @@ public class BandsRequestsAPI {
 		BandJSONArrayGenerator bandsArrayGen = new BandJSONArrayGenerator();
 		JSONArray bandsArray = bandsArrayGen.createBandsArray(results);
 
-		return bandsArray.toString(2);
+		return bandsArray.toString(SPACE_TO_INDENTS_EACH_LEVEL);
 	}
 
 	@GET
@@ -62,7 +63,8 @@ public class BandsRequestsAPI {
 		JSONObject result = JSONUtils.extractJSONObject(bandsArray);
 
 		if (result.length() > 0) {
-			return Response.ok(result.toString(2)).build();
+			return Response.ok(result.toString(SPACE_TO_INDENTS_EACH_LEVEL))
+					.build();
 		} else {
 			String errorJson = String.format(BAND_ID_WAS_NOT_FOUND_ERROR_JSON,
 					id);
@@ -149,7 +151,8 @@ public class BandsRequestsAPI {
 
 					for (int k = 0; k < instrumentsArray.length(); k++) {
 						MainDBHandler
-								.insert("INSERT INTO MEMBER_INSTRUMENT (MEMBER_ID, EQUIPMENT_TYPE_ID) VALUES(?, ?)",
+								.executeUpdateWithParameters(
+										"INSERT INTO MEMBER_INSTRUMENT (MEMBER_ID, EQUIPMENT_TYPE_ID) VALUES(?, ?)",
 										bandMemberID,
 										instrumentsArray.getInt(k));
 					}
@@ -168,6 +171,20 @@ public class BandsRequestsAPI {
 
 			MainDBHandler.getConnection().rollback();
 			throw e;
+		}
+	}
+
+	@DELETE
+	@Path("/{id}")
+	public Response deleteBand(@PathParam("id") int id) throws Exception {
+		int rowsAffected = MainDBHandler.executeUpdateWithParameters(
+				"delete from BANDS where ID = ?", id);
+
+		if (rowsAffected > 0) {
+			return Response.ok("{message: \"success\"}").build();
+		} else {
+			return Response.notModified(BAND_ID_WAS_NOT_FOUND_ERROR_JSON)
+					.build();
 		}
 	}
 }

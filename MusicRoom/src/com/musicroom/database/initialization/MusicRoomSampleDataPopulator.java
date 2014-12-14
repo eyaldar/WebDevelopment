@@ -182,11 +182,11 @@ public class MusicRoomSampleDataPopulator implements MySQLDataBasePopulator {
 
 		stmt.executeUpdate(
 				"INSERT INTO STUDIOS (STUDIO_NAME, CITY_ID, ADDRESS, EMAIL, CONTACT_NAME, PHONE, USER_ID, EXTRA_DETAILS, "
-						+ " FACEBOOK_PAGE, SITE_URL, LOGO_URL, VOTES_COUNT, VOTES_SUM) "
+						+ " FACEBOOK_PAGE, SITE_URL, LOGO_URL) "
 						+ "VALUES('TLV studios', 1, 'Ben Yehoda 39', 'tlv_studios@gmail.com', 'Avi Cohen', '050-55660243', "
 						+ tlvUserID
 						+ ", 'Best studio in Tel Aviv!', 'http://www.facebook.com/tlv.studios', "
-						+ "'http://www.tlvstudios.co.il', 'http://www.allenby.co.il/sites/default/files/styles/campteaser/public/20_0.jpg',0,0)",
+						+ "'http://www.tlvstudios.co.il', 'http://www.allenby.co.il/sites/default/files/styles/campteaser/public/20_0.jpg')",
 				Statement.RETURN_GENERATED_KEYS);
 
 		rs = stmt.getGeneratedKeys();
@@ -195,11 +195,11 @@ public class MusicRoomSampleDataPopulator implements MySQLDataBasePopulator {
 
 		stmt.executeUpdate(
 				"INSERT INTO STUDIOS (STUDIO_NAME, CITY_ID, ADDRESS, EMAIL, CONTACT_NAME, PHONE, USER_ID, EXTRA_DETAILS, "
-						+ " FACEBOOK_PAGE, SITE_URL, LOGO_URL, VOTES_COUNT, VOTES_SUM) "
+						+ " FACEBOOK_PAGE, SITE_URL, LOGO_URL) "
 						+ "VALUES('Music World', 2, 'Ben Gurion 54', 'musicworld@gmail.com', 'Moshe Moshe', '052-56140263', "
 						+ mscWorldUserID
 						+ ", 'We know music!', 'http://www.facebook.com/msc.world', "
-						+ "'http://www.musicworld.co.il', 'https://lh5.googleusercontent.com/-yHmlcK-QYKU/UZ93xYp8CnI/AAAAAAAAAC8/_um6-5aNmAo/s0/Music_world_logo_round.jpg',0,0)",
+						+ "'http://www.musicworld.co.il', 'https://lh5.googleusercontent.com/-yHmlcK-QYKU/UZ93xYp8CnI/AAAAAAAAAC8/_um6-5aNmAo/s0/Music_world_logo_round.jpg')",
 				Statement.RETURN_GENERATED_KEYS);
 
 		rs = stmt.getGeneratedKeys();

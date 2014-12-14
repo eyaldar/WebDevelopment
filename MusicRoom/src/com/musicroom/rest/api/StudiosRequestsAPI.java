@@ -266,7 +266,8 @@ public class StudiosRequestsAPI {
 
 					for (int k = 0; k < roomsTypesArray.length(); k++) {
 						MainDBHandler
-								.insert("INSERT INTO ROOM_ROOM_TYPES (ROOM_ID, TYPE_ID) VALUES (?, ?)",
+								.executeUpdateWithParameters(
+										"INSERT INTO ROOM_ROOM_TYPES (ROOM_ID, TYPE_ID) VALUES (?, ?)",
 										roomID, roomsTypesArray.getInt(k));
 					}
 
@@ -279,7 +280,8 @@ public class StudiosRequestsAPI {
 								.getJSONObject(k);
 
 						MainDBHandler
-								.insert("INSERT INTO ROOM_EQUIPMENT (ROOM_ID, EQUIPMENT_TYPE_ID, MODEL, MANUFACTURER, QUANTITY) VALUES(?,?,?,?,?)",
+								.executeUpdateWithParameters(
+										"INSERT INTO ROOM_EQUIPMENT (ROOM_ID, EQUIPMENT_TYPE_ID, MODEL, MANUFACTURER, QUANTITY) VALUES(?,?,?,?,?)",
 										roomID, equipObj.getInt("type"),
 										equipObj.getString("model"),
 										equipObj.getString("manufacturer"),
