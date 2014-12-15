@@ -1,40 +1,72 @@
 package com.musicroom.session;
 
 import javax.servlet.http.HttpServletRequest;
+
 import org.json.JSONObject;
+
+import redis.clients.jedis.Jedis;
+
+import com.musicroom.database.RedisManager;
 
 public class SessionManager {
 
-	static final String USER = "user";
+	static final String USERID = "USERID";
 
 	public static JSONObject getLoggedInUser(HttpServletRequest request) 
 	{
-		Object sessionAttribute = request.getSession().getAttribute(USER);
-		return sessionAttribute != null ? (JSONObject)sessionAttribute : null;
+		Integer id = (Integer)request.getSession().getAttribute(USERID);
+		
+		// if there is a logged user id
+		if (id != null)
+		{
+			// Get user from redis
+			Jedis redisConn = RedisManager.getConnection();
+			String userJson = redisConn.get(USERID+id);
+			return new JSONObject(userJson);
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	public static void setLoggedInUser(HttpServletRequest request, JSONObject userJSON) 
 	{
-		request.getSession().setAttribute(USER, userJSON);
+		Integer id = userJSON.getInt("ID");
+		
+		// set json in redis
+		Jedis redisConn = RedisManager.getConnection();
+		redisConn.set(USERID+id, userJSON.toString());
+		
+		// set key in session
+		request.getSession().setAttribute(USERID,  id);
 	}
 	
-	public static Boolean validateUser(HttpServletRequest request, int UserId)
+	public static Boolean validateUser(HttpServletRequest request, Integer UserId)
 	{
-		JSONObject loggedUser = getLoggedInUser(request);
-		return loggedUser != null && loggedUser.getInt("ID") == UserId;
+		return (Integer)request.getSession().getAttribute(USERID) == UserId;
 	}
 	
 	public static void logoutUser(HttpServletRequest request) 
 	{
-		request.getSession().removeAttribute(USER);
+		Integer id = (Integer)request.getSession().getAttribute(USERID);
+		
+		// if there is a logged user id
+		if (id != null)
+		{
+			// Remove from redis and from session
+			Jedis redisConn = RedisManager.getConnection();
+			redisConn.del(USERID+id);
+			request.getSession().removeAttribute(USERID);
+		}
 	}
 	
 	public static boolean updateLoggedUserPassword(HttpServletRequest request, String password) 
 	{
-		Object sessionAttribute = request.getSession().getAttribute(USER);
+		JSONObject userObj = getLoggedInUser(request);
 
 		// check if user has found
-		if (sessionAttribute == null)
+		if (userObj == null)
 		{
 			// return fail
 			return false;
@@ -42,8 +74,8 @@ public class SessionManager {
 		else
 		{
 			// update and return success
-			((JSONObject)sessionAttribute).put("PASSWORD", password);
-			request.getSession().setAttribute(USER, sessionAttribute);
+			userObj.put("PASSWORD", password);
+			setLoggedInUser(request, userObj);
 			return true;
 		}
 	}
