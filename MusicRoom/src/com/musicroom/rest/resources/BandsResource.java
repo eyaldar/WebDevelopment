@@ -1,4 +1,4 @@
-package com.musicroom.rest.api;
+package com.musicroom.rest.resources;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,7 +27,7 @@ import com.musicroom.utils.UserType;
 import com.musicroom.utils.UsersTableUtils;
 
 @Path("/bands")
-public class BandsRequestsAPI {
+public class BandsResource {
 
 	private static final int SPACE_TO_INDENTS_EACH_LEVEL = 2;
 	private static final String BAND_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Band with id '%d' was not found\"}";

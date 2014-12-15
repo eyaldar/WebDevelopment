@@ -1,4 +1,4 @@
-package com.musicroom.rest.api;
+package com.musicroom.rest.resources;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +19,7 @@ import com.musicroom.database.MainDBHandler;
 import com.musicroom.session.SessionManager;
 
 @Path("/reviews")
-public class ReviewsRequestsAPI {
+public class ReviewsResource {
 
 	private static final String NOT_LOGGED = "{\"error\":\"You must log in to add a review.\"}";
 	private static final String REVIEW_EXISTS = "{\"error\":\"You can only add one review per studio.\"}";

@@ -10,6 +10,10 @@ public class RedisManager {
 		if (connection == null) {
 			connection = new Jedis("localhost");
 		}
+		
+		if(!connection.isConnected()) {
+			connection.connect();
+		}
 
 		return connection;
 	}

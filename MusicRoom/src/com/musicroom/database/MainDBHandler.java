@@ -58,42 +58,6 @@ public class MainDBHandler {
 		return (connection);
 	}
 
-	public static JSONArray getAreas() throws Exception {
-		JSONArray result = select("select * from AREAS");
-
-		return result;
-	}
-
-	public static JSONArray getCities() throws Exception {
-		JSONArray result = select("select * from CITIES");
-
-		return result;
-	}
-
-	public static JSONArray getUserTypes() throws Exception {
-		JSONArray result = select("select * from USER_TYPES");
-
-		return result;
-	}
-
-	public static JSONArray getEquipmentCategories() throws Exception {
-		JSONArray result = select("select * from EQUIPMENT_CATEGORIES");
-
-		return result;
-	}
-
-	public static JSONArray getEquipmentTypes() throws Exception {
-		JSONArray result = select("select * from EQUIPMENT_TYPES");
-
-		return result;
-	}
-
-	public static JSONArray getRoomTypes() throws Exception {
-		JSONArray result = select("select * from ROOM_TYPES");
-
-		return result;
-	}
-
 	public static String getUserByLogin(JSONObject loginData)
 			throws JSONException, Exception {
 		String selectionString = "select * from USERS where USER_NAME = ? and PASSWORD = ?";

@@ -1,9 +1,10 @@
-package com.musicroom.rest.api;
+package com.musicroom.rest.resources;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -21,10 +22,20 @@ import com.musicroom.session.SessionManager;
 import com.musicroom.utils.JSONUtils;
 
 @Path("/users")
-public class UsersRequestsAPI {
+public class UsersResource {
 	private static final String BAD_LOGIN = "{\"error\":\"Invalid user name or password.\"}";
 	private static final String UNAUTHORIZED_DELETE = "{\"error\":\"Attempt to delete user without being logged-in.\"}";
 	private static final String UNAUTHORIZED_UPDATE = "{\"error\":\"Attempt to update user without being logged-in.\"}";
+	private static final int SPACE_TO_INDENTS_EACH_LEVEL = 2;
+	
+	@GET
+	@Path("/types")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response getUserTypes() throws Exception {
+		JSONArray result = MainDBHandler.select("select * from USER_TYPES");
+
+		return Response.ok(result.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
+	}
 	
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)

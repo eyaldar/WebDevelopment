@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.musicroom.rest.api;
+package com.musicroom.rest.resources;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -22,7 +22,7 @@ import com.musicroom.database.interfaces.MySQLDataBasePopulator;
 import com.musicroom.database.interfaces.MySQLSchemaCreator;
 
 @Path("/ResetDatabase")
-public class ResetDatabaseRequestsAPI {
+public class ResetDatabaseResource {
 	private static final String RESET_MYSQL_DB_USERNAME = "root";
 	private static final String RESET_MYSQL_DB_PASSWORD = "root";
 	private static final String INVALID_USER_OR_PASSWORD_RESPONSE_STRING = "Invalid user or password!";
@@ -59,7 +59,7 @@ public class ResetDatabaseRequestsAPI {
 
 			System.out.println("Create database scheme");
 		} catch (SQLException ex) {
-			Logger.getLogger(ResetDatabaseRequestsAPI.class.getName()).log(
+			Logger.getLogger(ResetDatabaseResource.class.getName()).log(
 					Level.SEVERE, null, ex);
 		}
 	}

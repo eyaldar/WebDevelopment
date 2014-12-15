@@ -1,4 +1,4 @@
-package com.musicroom.rest.api;
+package com.musicroom.rest.resources;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,8 +38,9 @@ import com.musicroom.utils.UserType;
 import com.musicroom.utils.UsersTableUtils;
 
 @Path("/studios")
-public class StudiosRequestsAPI {
+public class StudiosResource {
 
+	private static final int SPACE_TO_INDENTS_EACH_LEVEL = 2;
 	private static final String STUDIO_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Studio with id '%d' was not found\"}";
 	private static final String STUDIO_ID_ROOM_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Room with id %d in studio with id '%d' was not found\"}";
 
@@ -60,25 +61,25 @@ public class StudiosRequestsAPI {
 				JSONObject firstRow = JSONUtils.extractJSONObject(results);
 
 				JSONObject studio = new JSONObject();
-				studio.put("ID", firstRow.getInt("STUDIO_ID"));
-				studio.put("STUDIO_NAME", firstRow.getString("STUDIO_NAME"));
-				studio.put("ADDRESS", firstRow.getString("ADDRESS"));
-				studio.put("CITY_ID", firstRow.getInt("CITY_ID"));
-				studio.put("USER_ID", firstRow.getInt("USER_ID"));
-				studio.put("CONTACT_NAME", firstRow.getString("CONTACT_NAME"));
-				studio.put("EMAIL", firstRow.getString("EMAIL"));
-				studio.put("PHONE", firstRow.getString("PHONE"));
-				studio.put("SITE_URL", firstRow.getString("SITE_URL"));
-				studio.put("FACEBOOK_PAGE", firstRow.getString("FACEBOOK_PAGE"));
-				studio.put("LOGO_URL", firstRow.getString("LOGO_URL"));
-				studio.put("EXTRA_DETAILS", firstRow.getString("EXTRA_DETAILS"));
+				studio.put("id", firstRow.getInt("STUDIO_ID"));
+				studio.put("studio_name", firstRow.getString("STUDIO_NAME"));
+				studio.put("address", firstRow.getString("ADDRESS"));
+				studio.put("city_id", firstRow.getInt("CITY_ID"));
+				studio.put("user_id", firstRow.getInt("USER_ID"));
+				studio.put("contact_name", firstRow.getString("CONTACT_NAME"));
+				studio.put("email", firstRow.getString("EMAIL"));
+				studio.put("phone", firstRow.getString("PHONE"));
+				studio.put("site_url", firstRow.getString("SITE_URL"));
+				studio.put("facebook_page", firstRow.getString("FACEBOOK_PAGE"));
+				studio.put("logo_url", firstRow.getString("LOGO_URL"));
+				studio.put("extra_details", firstRow.getString("EXTRA_DETAILS"));
 
 				// Add avg rating
 				JSONArray avg_rating = MainDBHandler.selectWithParameters(
 						"select avg(RATING) as AVG_RATING " + "from REVIEWS "
 								+ "where STUDIO_ID = ?", id);
 
-				studio.put("AVG_RATING",
+				studio.put("avg_rating",
 						avg_rating.getJSONObject(0).getDouble("AVG_RATING"));
 
 				int[] roomIDs = new int[results.length()];
@@ -89,11 +90,11 @@ public class StudiosRequestsAPI {
 					JSONObject room = new JSONObject();
 
 					roomIDs[i] = currentRow.getInt("ROOM_ID");
-					room.put("ID", roomIDs[i]);
-					room.put("RATE", currentRow.getInt("RATE"));
-					room.put("ROOM_NAME", currentRow.getString("ROOM_NAME"));
+					room.put("id", roomIDs[i]);
+					room.put("rate", currentRow.getInt("RATE"));
+					room.put("name", currentRow.getString("ROOM_NAME"));
 
-					studio.append("ROOMS", room);
+					studio.append("rooms", room);
 				}
 
 				// Add bands
@@ -102,15 +103,15 @@ public class StudiosRequestsAPI {
 							.replace("[", "").replace("]", "");
 
 					JSONArray bands = MainDBHandler
-							.select("select distinct b.BAND_NAME "
+							.select("select distinct b.BAND_NAME as name "
 									+ "from BANDS as b join ROOM_SCHEDULE as rs on b.ID = rs.BAND_ID "
 									+ "where rs.ROOM_ID in (" + roomIDsStr
 									+ ")");
-
-					studio.put("PLAYING_BANDS", bands);
+					
+					studio.put("playing_bands", bands);
 				}
 
-				return Response.ok(studio.toString()).build();
+				return Response.ok(studio.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
 			} else {
 				String errorJson = String.format(
 						STUDIO_ID_WAS_NOT_FOUND_ERROR_JSON, id);
@@ -272,16 +273,16 @@ public class StudiosRequestsAPI {
 				JSONObject firstRow = JSONUtils.extractJSONObject(results);
 
 				JSONObject room = new JSONObject();
-				room.put("STUDIO_ID", firstRow.getInt("STUDIO_ID"));
-				room.put("ID", firstRow.getInt("ROOM_ID"));
-				room.put("ROOM_NAME", firstRow.getString("ROOM_NAME"));
-				room.put("RATE", firstRow.getInt("RATE"));
-				room.put("EXTRA_DETAILS", firstRow.getString("EXTRA_DETAILS"));
+				room.put("studio_id", firstRow.getInt("STUDIO_ID"));
+				room.put("id", firstRow.getInt("ROOM_ID"));
+				room.put("name", firstRow.getString("ROOM_NAME"));
+				room.put("rate", firstRow.getInt("RATE"));
+				room.put("extra_details", firstRow.getString("EXTRA_DETAILS"));
 
 				// Add room types
 				for (int i = 0; i < results.length(); i++) {
 					JSONObject currentRow = results.getJSONObject(i);
-					room.append("ROOM_TYPE", currentRow.getInt("TYPE_ID"));
+					room.append("room_type", currentRow.getInt("TYPE_ID"));
 				}
 
 				// Add equipment
@@ -291,10 +292,10 @@ public class StudiosRequestsAPI {
 
 				for (int i = 0; i < equipment.length(); i++) {
 					JSONObject currentRow = equipment.getJSONObject(i);
-					room.append("EQUIPMENT", currentRow);
+					room.append("equipment", currentRow);
 				}
 
-				return Response.ok(room.toString()).build();
+				return Response.ok(room.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
 			} else {
 				String errorJson = String.format(
 						STUDIO_ID_ROOM_ID_WAS_NOT_FOUND_ERROR_JSON, roomID,
@@ -437,20 +438,20 @@ public class StudiosRequestsAPI {
 						// Add the studio
 						studioIDs.add(studioID);
 						currentStudio = new JSONObject();
-						currentStudio.put("ID", studioID);
-						currentStudio.put("STUDIO_NAME",
+						currentStudio.put("id", studioID);
+						currentStudio.put("studio_name",
 								currentRow.getString("STUDIO_NAME"));
-						currentStudio.put("ADDRESS",
+						currentStudio.put("address",
 								currentRow.getString("ADDRESS"));
-						currentStudio.put("CITY_ID",
+						currentStudio.put("city_id",
 								currentRow.getInt("CITY_ID"));
-						currentStudio.put("USER_ID",
+						currentStudio.put("user_id",
 								currentRow.getInt("USER_ID"));
-						currentStudio.put("CONTACT_NAME",
+						currentStudio.put("contact_name",
 								currentRow.getString("CONTACT_NAME"));
-						currentStudio.put("EMAIL",
+						currentStudio.put("email",
 								currentRow.getString("EMAIL"));
-						currentStudio.put("PHONE",
+						currentStudio.put("phone",
 								currentRow.getString("PHONE"));
 
 						// Add avg rating
@@ -461,7 +462,7 @@ public class StudiosRequestsAPI {
 												+ "where STUDIO_ID = ?",
 										studioID);
 
-						currentStudio.put("AVG_RATING", avg_rating
+						currentStudio.put("avg_rating", avg_rating
 								.getJSONObject(0).getDouble("AVG_RATING"));
 
 						arrayResult.put(currentStudio);
@@ -473,14 +474,14 @@ public class StudiosRequestsAPI {
 
 					// Add the room
 					JSONObject room = new JSONObject();
-					room.put("ID", currentRow.getInt("ROOM_ID"));
-					room.put("RATE", currentRow.getInt("RATE"));
-					room.put("ROOM_NAME", currentRow.getString("ROOM_NAME"));
-					currentStudio.append("ROOMS", room);
+					room.put("id", currentRow.getInt("ROOM_ID"));
+					room.put("rate", currentRow.getInt("RATE"));
+					room.put("name", currentRow.getString("ROOM_NAME"));
+					currentStudio.append("rooms", room);
 
 				} 
 				
-				result = arrayResult.toString();
+				result = arrayResult.toString(SPACE_TO_INDENTS_EACH_LEVEL);
 				
 				redisConn.set(queryKey, result);
 				redisConn.expire(queryKey, 300);

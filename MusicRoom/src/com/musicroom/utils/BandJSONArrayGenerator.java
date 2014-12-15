@@ -54,7 +54,7 @@ public class BandJSONArrayGenerator {
 
 		return new JSONObject(new JSONStringer()
 								.object()
-									.key("_id").value(bandID)
+									.key("id").value(bandID)
 									.key("user_id").value(userID)
 									.key("name").value(name)
 									.key("logo").value(logo)
@@ -90,7 +90,7 @@ public class BandJSONArrayGenerator {
 
 		return new JSONObject(new JSONStringer()
 									.object()
-										.key("_id").value(bandMemberID)
+										.key("id").value(bandMemberID)
 										.key("name").value(name)
 										.key("role").value(role)
 										.key("picture").value(picture)
