@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Tuple;
 
 import com.musicroom.database.MainDBHandler;
 import com.musicroom.database.RedisManager;
@@ -111,6 +113,27 @@ public class StudiosResource {
 					studio.put("playing_bands", bands);
 				}
 
+				// Create json for cache - only name and id
+				JSONObject forCache = new JSONObject();
+				forCache.put("id", studio.get("id"));
+				forCache.put("name", studio.get("studio_name"));
+				
+				// increase the views of the stuio
+				int views = RedisManager.getConnection().zincrby("MOST_VIEWED", 1, forCache.toString()).intValue();
+				
+				studio.put("views", views);
+				
+				/////////////////////////////////////////////// TODO////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				// how to get must viewed studios
+				/////////////////////////////////////////////// TODO////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				Set<Tuple> elements = RedisManager.getConnection().zrangeWithScores("MOST_VIEWED", -10, -1);
+				for(Tuple tuple: elements)
+				{
+					JSONObject temp = new JSONObject(tuple.getElement());
+					int score = (int)tuple.getScore();
+				}
+				
 				return Response.ok(studio.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
 			} else {
 				String errorJson = String.format(
@@ -242,9 +265,13 @@ public class StudiosResource {
 				// Set user as logged in session
 				SessionManager.setLoggedInUser(Request, userObj);
 
-				// Add new studio's ID to the NEW_STUDIOS list.
-				RedisManager.getConnection().lpush("NEW_STUDIOS",
-						String.valueOf(studioID));
+				// Create json for cache - only name and id
+				JSONObject forCache = new JSONObject();
+				forCache.put("id", studioObj.get("id"));
+				forCache.put("name", studioObj.get("name"));
+				
+				// Add new studio to the NEW_STUDIOS list.
+				RedisManager.getConnection().lpush("NEW_STUDIOS", forCache.toString());
 				RedisManager.getConnection().ltrim("NEW_STUDIOS", 0, 9);
 
 				return Response.ok("{message: \"success\"}").build();
