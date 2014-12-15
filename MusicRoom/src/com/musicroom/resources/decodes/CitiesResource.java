@@ -20,8 +20,11 @@ public class CitiesResource {
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCitiesByArea(@PathParam("id") int id) throws Exception {
-		JSONArray results = MainDBHandler.selectWithParameters(
-				"select * from CITIES where AREA_ID = ?", id);
+		JSONArray results = MainDBHandler
+				.selectWithParameters(
+						"select CITY_NAME as name, ID as id "
+					  + "from CITIES where AREA_ID = ?",
+						id);
 
 		return Response.ok(results.toString(SPACE_TO_INDENTS_EACH_LEVEL))
 				.build();

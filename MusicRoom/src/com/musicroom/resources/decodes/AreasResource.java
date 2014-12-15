@@ -12,14 +12,16 @@ import com.musicroom.database.MainDBHandler;
 
 @Path("/areas")
 public class AreasResource {
-	
+
 	private static final int SPACE_TO_INDENTS_EACH_LEVEL = 2;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getAreas() throws Exception {
-		JSONArray result = MainDBHandler.select("select * from AREAS");
+		JSONArray result = MainDBHandler
+				.select("select AREA_NAME as name, ID as id from AREAS");
 
-		return Response.ok(result.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
+		return Response.ok(result.toString(SPACE_TO_INDENTS_EACH_LEVEL))
+				.build();
 	}
 }

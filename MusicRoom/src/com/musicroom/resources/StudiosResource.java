@@ -62,7 +62,7 @@ public class StudiosResource {
 
 				JSONObject studio = new JSONObject();
 				studio.put("id", firstRow.getInt("STUDIO_ID"));
-				studio.put("studio_name", firstRow.getString("STUDIO_NAME"));
+				studio.put("name", firstRow.getString("STUDIO_NAME"));
 				studio.put("address", firstRow.getString("ADDRESS"));
 				studio.put("city_id", firstRow.getInt("CITY_ID"));
 				studio.put("user_id", firstRow.getInt("USER_ID"));
@@ -439,7 +439,7 @@ public class StudiosResource {
 						studioIDs.add(studioID);
 						currentStudio = new JSONObject();
 						currentStudio.put("id", studioID);
-						currentStudio.put("studio_name",
+						currentStudio.put("name",
 								currentRow.getString("STUDIO_NAME"));
 						currentStudio.put("address",
 								currentRow.getString("ADDRESS"));

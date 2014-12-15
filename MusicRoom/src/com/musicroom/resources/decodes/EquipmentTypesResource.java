@@ -22,7 +22,7 @@ public class EquipmentTypesResource {
 	public static Response getEquipmentTypes(
 			@PathParam("category") int category) throws Exception {
 		JSONArray result = MainDBHandler.selectWithParameters(
-				"select * from EQUIPMENT_TYPES where CATEGORY_ID = ?",
+				"select EQUIPMENT_NAME as name, ID as id from EQUIPMENT_TYPES where CATEGORY_ID = ?",
 				category);
 
 		return Response.ok(result.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
