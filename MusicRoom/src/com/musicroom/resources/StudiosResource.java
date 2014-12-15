@@ -107,11 +107,13 @@ public class StudiosResource {
 									+ "from BANDS as b join ROOM_SCHEDULE as rs on b.ID = rs.BAND_ID "
 									+ "where rs.ROOM_ID in (" + roomIDsStr
 									+ ")");
-					
+
 					studio.put("playing_bands", bands);
 				}
 
-				return Response.ok(studio.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
+				return Response
+						.ok(studio.toString(SPACE_TO_INDENTS_EACH_LEVEL))
+						.build();
 			} else {
 				String errorJson = String.format(
 						STUDIO_ID_WAS_NOT_FOUND_ERROR_JSON, id);
@@ -295,7 +297,8 @@ public class StudiosResource {
 					room.append("equipment", currentRow);
 				}
 
-				return Response.ok(room.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
+				return Response.ok(room.toString(SPACE_TO_INDENTS_EACH_LEVEL))
+						.build();
 			} else {
 				String errorJson = String.format(
 						STUDIO_ID_ROOM_ID_WAS_NOT_FOUND_ERROR_JSON, roomID,
@@ -312,7 +315,7 @@ public class StudiosResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response searchStuidos(@Context UriInfo info) {
+	public Response searchStudios(@Context UriInfo info) {
 		try {
 			String result;
 			String queryKey = getRedisQueryKey(info.getQueryParameters());
@@ -479,21 +482,38 @@ public class StudiosResource {
 					room.put("name", currentRow.getString("ROOM_NAME"));
 					currentStudio.append("rooms", room);
 
-				} 
-				
+				}
+
 				result = arrayResult.toString(SPACE_TO_INDENTS_EACH_LEVEL);
-				
+
 				redisConn.set(queryKey, result);
 				redisConn.expire(queryKey, 300);
 			} else {
 				result = redisConn.get(queryKey);
 			}
-			
+
 			return Response.ok(result).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.serverError().build();
 		}
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getMostRecentStudios() {
+		List<String> studioStrings = RedisManager.getConnection().lrange(
+				"NEW_STUDIOS", 0, 9);
+
+		JSONArray recentStudios = new JSONArray();
+
+		for (String studioString : studioStrings) {
+			JSONObject studioObject = new JSONObject(studioString);
+			recentStudios.put(studioObject);
+		}
+
+		return Response.ok(recentStudios.toString(SPACE_TO_INDENTS_EACH_LEVEL))
+				.build();
 	}
 
 	private String getRedisQueryKey(MultivaluedMap<String, String> queryMap) {
