@@ -19,8 +19,10 @@ public class EquipmentCategoriesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getEquipmentCategories() throws Exception {
 		JSONArray result = MainDBHandler
-				.select("select * from EQUIPMENT_CATEGORIES");
+				.select("select EQUIP_CAT_NAME as name, ID as id "
+					  + "from EQUIPMENT_CATEGORIES");
 
-		return Response.ok(result.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
+		return Response.ok(result.toString(SPACE_TO_INDENTS_EACH_LEVEL))
+				.build();
 	}
 }

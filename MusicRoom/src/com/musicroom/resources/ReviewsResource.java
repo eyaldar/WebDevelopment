@@ -1,4 +1,4 @@
-package com.musicroom.rest.resources;
+package com.musicroom.resources;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,12 +43,12 @@ public class ReviewsResource {
 				JSONObject curr = reviews.getJSONObject(i);
 
 				JSONObject review = new JSONObject();
-				review.put("STUDIO_ID", curr.getInt("STUDIO_ID"));
-				review.put("COMMENT", curr.getString("COMMENT"));
-				review.put("RATING", curr.getInt("RATING"));
-				review.put("USER_ID", curr.getInt("USER_ID"));
-				review.put("USER_NAME", curr.getString("USER_NAME"));
-				review.put("USER_TYPE_ID", curr.getInt("USER_TYPE_ID"));
+				review.put("studio_id", curr.getInt("STUDIO_ID"));
+				review.put("comment", curr.getString("COMMENT"));
+				review.put("rating", curr.getInt("RATING"));
+				review.put("user_id", curr.getInt("USER_ID"));
+				review.put("user_name", curr.getString("USER_NAME"));
+				review.put("user_type_id", curr.getInt("USER_TYPE_ID"));
 
 				results.put(review);
 			}
@@ -74,8 +74,8 @@ public class ReviewsResource {
 				return Response.status(HttpServletResponse.SC_UNAUTHORIZED)
 						.entity(NOT_LOGGED).build();
 			} else {
-				int userId = loggedUser.getInt("ID");
-				int studioId = data.getInt("STUDIO_ID");
+				int userId = loggedUser.getInt("id");
+				int studioId = data.getInt("studio_id");
 
 				// Get user review count for this studio
 				JSONArray existingReview = MainDBHandler
@@ -84,13 +84,13 @@ public class ReviewsResource {
 								userId, studioId);
 
 				// Check if there is an existing review
-				if (existingReview.getJSONObject(0).getInt("COUNT") > 0) {
+				if (existingReview.getJSONObject(0).getInt("count") > 0) {
 					return Response
 							.status(HttpServletResponse.SC_METHOD_NOT_ALLOWED)
 							.entity(REVIEW_EXISTS).build();
 				} else {
 					// Validate rating
-					int rating = data.getInt("RATING");
+					int rating = data.getInt("rating");
 					if (rating < 0 || rating > 5) {
 						return Response
 								.status(HttpServletResponse.SC_METHOD_NOT_ALLOWED)
@@ -100,7 +100,7 @@ public class ReviewsResource {
 								.selectWithParameters(
 										"INSERT INTO REVIEWS (USER_ID, STUDIO_ID, RATING, COMMENT) VALUES(?, ?, ?, ?)",
 										userId, studioId, rating,
-										data.getString("COMMENT"));
+										data.getString("comment"));
 
 						return Response.ok("{message: \"success\"}").build();
 					}

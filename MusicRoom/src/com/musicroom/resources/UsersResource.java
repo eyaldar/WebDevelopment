@@ -1,4 +1,4 @@
-package com.musicroom.rest.resources;
+package com.musicroom.resources;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,16 +27,19 @@ public class UsersResource {
 	private static final String UNAUTHORIZED_DELETE = "{\"error\":\"Attempt to delete user without being logged-in.\"}";
 	private static final String UNAUTHORIZED_UPDATE = "{\"error\":\"Attempt to update user without being logged-in.\"}";
 	private static final int SPACE_TO_INDENTS_EACH_LEVEL = 2;
-	
+
 	@GET
 	@Path("/types")
 	@Produces(MediaType.APPLICATION_JSON)
 	public static Response getUserTypes() throws Exception {
-		JSONArray result = MainDBHandler.select("select * from USER_TYPES");
+		JSONArray result = MainDBHandler
+				.select("select DESCRIPTION as name, ID as id "
+						+ "from USER_TYPES");
 
-		return Response.ok(result.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
+		return Response.ok(result.toString(SPACE_TO_INDENTS_EACH_LEVEL))
+				.build();
 	}
-	
+
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -48,8 +51,8 @@ public class UsersResource {
 		try {
 			loggedRes = MainDBHandler.selectWithParameters(
 					"select * from USERS where USER_NAME = ? and PASSWORD = ?",
-					loginData.getString("USER_NAME"),
-					loginData.getString("PASSWORD"));
+					loginData.getString("name"),
+					loginData.getString("password"));
 
 			// Check if there is a result
 			if (loggedRes.length() == 0) {
@@ -69,55 +72,50 @@ public class UsersResource {
 			return Response.serverError().build();
 		}
 	}
-	
+
 	@DELETE
 	@Path("/{id}")
-	public Response deleteUser(@PathParam("id") int id, @Context HttpServletRequest Request) throws Exception 
-	{
+	public Response deleteUser(@PathParam("id") int id,
+			@Context HttpServletRequest Request) throws Exception {
 		// Validate user
-		if (!SessionManager.validateUser(Request, id))
-		{
+		if (!SessionManager.validateUser(Request, id)) {
 			// Unauthorized
 			return Response.notModified(UNAUTHORIZED_DELETE).build();
-		}
-		else
-		{
+		} else {
 			// delete
 			MainDBHandler.executeUpdateWithParameters(
 					"delete from USERS where ID = ?", id);
 
 			// log out
 			SessionManager.logoutUser(Request);
-			
+
 			return Response.ok("{message: \"success\"}").build();
 		}
 	}
-	
+
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response updatePassword(String strData, @Context HttpServletRequest Request) throws Exception 
-	{
+	public Response updatePassword(String strData,
+			@Context HttpServletRequest Request) throws Exception {
 		JSONObject data = new JSONObject(strData);
-		
+
 		int userID = data.getInt("ID");
-		
+
 		// Validate user
-		if (!SessionManager.validateUser(Request, userID))
-		{
+		if (!SessionManager.validateUser(Request, userID)) {
 			// Unauthorized
 			return Response.notModified(UNAUTHORIZED_UPDATE).build();
-		}
-		else
-		{
-			String password = data.getString("PASSWORD");
-			
+		} else {
+			String password = data.getString("password");
+
 			// update
 			MainDBHandler.executeUpdateWithParameters(
-					"update USERS set PASSWORD = ? where ID = ?", password, userID);
+					"update USERS set PASSWORD = ? where ID = ?", password,
+					userID);
 
 			// update session
 			SessionManager.updateLoggedUserPassword(Request, password);
-			
+
 			return Response.ok("{message: \"success\"}").build();
 		}
 	}

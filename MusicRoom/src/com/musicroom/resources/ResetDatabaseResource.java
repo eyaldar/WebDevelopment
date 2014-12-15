@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.musicroom.rest.resources;
+package com.musicroom.resources;
 
 import java.sql.Connection;
 import java.sql.SQLException;
