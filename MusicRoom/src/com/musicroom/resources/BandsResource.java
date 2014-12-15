@@ -1,4 +1,4 @@
-package com.musicroom.rest.resources;
+package com.musicroom.resources;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

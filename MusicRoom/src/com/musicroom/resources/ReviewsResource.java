@@ -1,4 +1,4 @@
-package com.musicroom.rest.resources;
+package com.musicroom.resources;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
