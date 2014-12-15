@@ -7,7 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,13 +21,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import redis.clients.jedis.Jedis;
+
 import com.musicroom.database.MainDBHandler;
+import com.musicroom.database.RedisManager;
 import com.musicroom.session.SessionManager;
 import com.musicroom.utils.JSONUtils;
 import com.musicroom.utils.UserType;
@@ -69,12 +75,12 @@ public class StudiosRequestsAPI {
 
 				// Add avg rating
 				JSONArray avg_rating = MainDBHandler.selectWithParameters(
-						"select avg(RATING) as AVG_RATING "
-					  + "from REVIEWS "
-					  + "where STUDIO_ID = ?", id);
-				
-				studio.put("AVG_RATING", avg_rating.getJSONObject(0).getDouble("AVG_RATING"));
-				
+						"select avg(RATING) as AVG_RATING " + "from REVIEWS "
+								+ "where STUDIO_ID = ?", id);
+
+				studio.put("AVG_RATING",
+						avg_rating.getJSONObject(0).getDouble("AVG_RATING"));
+
 				int[] roomIDs = new int[results.length()];
 
 				// Add rooms
@@ -235,6 +241,11 @@ public class StudiosRequestsAPI {
 				// Set user as logged in session
 				SessionManager.setLoggedInUser(Request, userObj);
 
+				// Add new studio's ID to the NEW_STUDIOS list.
+				RedisManager.getConnection().lpush("NEW_STUDIOS",
+						String.valueOf(studioID));
+				RedisManager.getConnection().ltrim("NEW_STUDIOS", 0, 9);
+
 				return Response.ok("{message: \"success\"}").build();
 			}
 		} catch (Exception e) {
@@ -297,168 +308,204 @@ public class StudiosRequestsAPI {
 			return Response.serverError().build();
 		}
 	}
-	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response searchStuidos(@Context UriInfo info) 
-	{
-		try
-		{
-			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			
-			// Get the params
-			Integer areaId = null;
-			Integer cityId = null;
-			Integer roomTypeId = null;
-			Integer equipTypeId = null;
-			Integer equipCatId = null;
-			Integer maxRoomRate = null;
-			Date startTime = null;
-			Date endTime = null;
-			
-			String name = info.getQueryParameters().getFirst("NAME");
-			String areaIdStr = info.getQueryParameters().getFirst("AREA_ID");
-			String cityIdStr = info.getQueryParameters().getFirst("CITY_ID");
-			String roomTypeIdStr = info.getQueryParameters().getFirst("ROOM_TYPE_ID");
-			String equipTypeIdStr = info.getQueryParameters().getFirst("EQUIPMENT_TYPE_ID");
-			String equipCatIdStr = info.getQueryParameters().getFirst("EQUIPMENT_CATEGORY_ID");
-			String maxRoomRateStr = info.getQueryParameters().getFirst("MAX_ROOM_RATE");
-			String startTimeStr = info.getQueryParameters().getFirst("START_TIME");
-			String endTimeStr = info.getQueryParameters().getFirst("END_TIME");
-			
-			if (areaIdStr != null)
-				areaId = Integer.parseInt(areaIdStr);
-			if (cityIdStr != null)
-				cityId = Integer.parseInt(cityIdStr);
-			if (roomTypeIdStr != null)
-				roomTypeId = Integer.parseInt(roomTypeIdStr);
-			if (equipTypeIdStr != null)
-				equipTypeId = Integer.parseInt(equipTypeIdStr);
-			if (equipCatIdStr != null)
-				equipCatId = Integer.parseInt(equipCatIdStr);
-			if (maxRoomRateStr != null)
-				maxRoomRate = Integer.parseInt(maxRoomRateStr);
-			if (startTimeStr != null)
-				startTime = format.parse(startTimeStr);
-			if (endTimeStr != null)
-				endTime = format.parse(endTimeStr);
-		
-			// Build sql query
-			String sqlQuery = "select r.STUDIO_ID, s.STUDIO_NAME, s.ADDRESS, s.CITY_ID, s.USER_ID, s.CONTACT_NAME, s.EMAIL, s.PHONE, "
-							+ "r.ID as ROOM_ID, r.RATE, r.ROOM_NAME "
-							+ "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID "
-							+ "where 1=1 ";
-			
-			if (name != null)
-			{
-				sqlQuery += "and s.NAME = " + name + " ";
-			}
-			
-			if (areaId != null)
-			{
-				sqlQuery += "and exists (select 1 "
-						  + "from CITIES as c "
-			              + "where c.ID = s.CITY_ID and c.AREA_ID = " + areaId + ") ";
-			}
-			
-			if (cityId != null)
-			{
-				sqlQuery += "and s.CITY_ID = " + cityId + " ";
-			}
-			
-			if (maxRoomRate != null)
-			{
-				sqlQuery += "and r.RATE <= " + maxRoomRate + " ";
-			}
-			
-			if (roomTypeId != null)
-			{
-				sqlQuery += "and exists (select 1 "
-						  + "from ROOM_ROOM_TYPES as rrt "
-						  + "where rrt.ROOM_ID = r.ID and rrt.TYPE_ID = " + roomTypeId + ") ";
-			}
-			
-			if (equipTypeId != null)
-			{
-				sqlQuery += "and exists (select 1 "
-						  + "from ROOM_EQUIPMENT as re "
-						  + "where re.ROOM_ID = r.ID and re.EQUIPMENT_TYPE_ID = " + equipTypeId + ") ";
-			}
-			
-			if (equipCatId != null)
-			{
-				sqlQuery += "and exists (select 1 "
-						  + "from ROOM_EQUIPMENT as re, EQUIPMENT_TYPES as et "
-						  + "where re.ROOM_ID = r.ID and re.EQUIPMENT_TYPE_ID =  et.ID and et.CATEGORY_ID = " + equipCatId + ") ";
-			}
-			
-			if (startTime != null && endTime != null)
-			{
-				sqlQuery += "and not exists (select 1 "
-						  + "from ROOM_SCHEDULE as rs "
-						  + "where rs.ROOM_ID = r.ID and rs.START_TIME < " + format.format(endTime)  + " and rs.END_TIME > " + format.format(startTime) + ") ";
-			}
-			
-			JSONArray selectResult = MainDBHandler
-					.select(sqlQuery);
-			
-			JSONArray result = new JSONArray();
-			List<Integer> studioIDs = new ArrayList<Integer>();
+	public Response searchStuidos(@Context UriInfo info) {
+		try {
+			String result;
+			String queryKey = getRedisQueryKey(info.getQueryParameters());
+			Jedis redisConn = RedisManager.getConnection();
 
-			for (int i = 0; i < selectResult.length(); i++) {
-				JSONObject currentRow = selectResult.getJSONObject(i);
-				JSONObject currentStudio;
+			if (!redisConn.exists(queryKey)) {
+				SimpleDateFormat format = new SimpleDateFormat(
+						"yyyy-MM-dd HH:mm:ss");
 
-				int studioID = currentRow.getInt("STUDIO_ID");
+				// Get the params
+				Integer areaId = null;
+				Integer cityId = null;
+				Integer roomTypeId = null;
+				Integer equipTypeId = null;
+				Integer equipCatId = null;
+				Integer maxRoomRate = null;
+				Date startTime = null;
+				Date endTime = null;
 
-				int studioIndex = studioIDs.indexOf(studioID);
+				String name = info.getQueryParameters().getFirst("name");
+				String areaIdStr = info.getQueryParameters()
+						.getFirst("area_id");
+				String cityIdStr = info.getQueryParameters()
+						.getFirst("city_id");
+				String roomTypeIdStr = info.getQueryParameters().getFirst(
+						"room_type_id");
+				String equipTypeIdStr = info.getQueryParameters().getFirst(
+						"equipment_type_id");
+				String equipCatIdStr = info.getQueryParameters().getFirst(
+						"equipment_category_id");
+				String maxRoomRateStr = info.getQueryParameters().getFirst(
+						"max_room_rate");
+				String startTimeStr = info.getQueryParameters().getFirst(
+						"start_time");
+				String endTimeStr = info.getQueryParameters().getFirst(
+						"end_time");
 
-				// If the studio is new in the result
-				if (studioIndex == -1) {
-					// Add the studio
-					studioIDs.add(studioID);
-					currentStudio = new JSONObject();
-					currentStudio.put("ID", studioID);
-					currentStudio.put("STUDIO_NAME",
-							currentRow.getString("STUDIO_NAME"));
-					currentStudio.put("ADDRESS",
-							currentRow.getString("ADDRESS"));
-					currentStudio.put("CITY_ID", currentRow.getInt("CITY_ID"));
-					currentStudio.put("USER_ID", currentRow.getInt("USER_ID"));
-					currentStudio.put("CONTACT_NAME",
-							currentRow.getString("CONTACT_NAME"));
-					currentStudio.put("EMAIL", currentRow.getString("EMAIL"));
-					currentStudio.put("PHONE", currentRow.getString("PHONE"));
+				if (areaIdStr != null)
+					areaId = Integer.parseInt(areaIdStr);
+				if (cityIdStr != null)
+					cityId = Integer.parseInt(cityIdStr);
+				if (roomTypeIdStr != null)
+					roomTypeId = Integer.parseInt(roomTypeIdStr);
+				if (equipTypeIdStr != null)
+					equipTypeId = Integer.parseInt(equipTypeIdStr);
+				if (equipCatIdStr != null)
+					equipCatId = Integer.parseInt(equipCatIdStr);
+				if (maxRoomRateStr != null)
+					maxRoomRate = Integer.parseInt(maxRoomRateStr);
+				if (startTimeStr != null)
+					startTime = format.parse(startTimeStr);
+				if (endTimeStr != null)
+					endTime = format.parse(endTimeStr);
 
-					// Add avg rating
-					JSONArray avg_rating = MainDBHandler.selectWithParameters(
-							"select avg(RATING) as AVG_RATING "
-						  + "from REVIEWS "
-						  + "where STUDIO_ID = ?", studioID);
-					
-					currentStudio.put("AVG_RATING", avg_rating.getJSONObject(0).getDouble("AVG_RATING"));
-					
-					result.put(currentStudio);
+				// Build sql query
+				String sqlQuery = "select r.STUDIO_ID, s.STUDIO_NAME, s.ADDRESS, s.CITY_ID, s.USER_ID, s.CONTACT_NAME, s.EMAIL, s.PHONE, "
+						+ "r.ID as ROOM_ID, r.RATE, r.ROOM_NAME "
+						+ "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID "
+						+ "where 1=1 ";
+
+				if (name != null) {
+					sqlQuery += "and s.STUDIO_NAME like '%" + name + "%' ";
 				}
-				// the studio exists in the result
-				else {
-					currentStudio = result.getJSONObject(studioIndex);
+
+				if (areaId != null) {
+					sqlQuery += "and exists (select 1 " + "from CITIES as c "
+							+ "where c.ID = s.CITY_ID and c.AREA_ID = "
+							+ areaId + ") ";
 				}
+
+				if (cityId != null) {
+					sqlQuery += "and s.CITY_ID = " + cityId + " ";
+				}
+
+				if (maxRoomRate != null) {
+					sqlQuery += "and r.RATE <= " + maxRoomRate + " ";
+				}
+
+				if (roomTypeId != null) {
+					sqlQuery += "and exists (select 1 "
+							+ "from ROOM_ROOM_TYPES as rrt "
+							+ "where rrt.ROOM_ID = r.ID and rrt.TYPE_ID = "
+							+ roomTypeId + ") ";
+				}
+
+				if (equipTypeId != null) {
+					sqlQuery += "and exists (select 1 "
+							+ "from ROOM_EQUIPMENT as re "
+							+ "where re.ROOM_ID = r.ID and re.EQUIPMENT_TYPE_ID = "
+							+ equipTypeId + ") ";
+				}
+
+				if (equipCatId != null) {
+					sqlQuery += "and exists (select 1 "
+							+ "from ROOM_EQUIPMENT as re, EQUIPMENT_TYPES as et "
+							+ "where re.ROOM_ID = r.ID and re.EQUIPMENT_TYPE_ID =  et.ID and et.CATEGORY_ID = "
+							+ equipCatId + ") ";
+				}
+
+				if (startTime != null && endTime != null) {
+					sqlQuery += "and not exists (select 1 "
+							+ "from ROOM_SCHEDULE as rs "
+							+ "where rs.ROOM_ID = r.ID and rs.START_TIME < "
+							+ format.format(endTime) + " and rs.END_TIME > "
+							+ format.format(startTime) + ") ";
+				}
+
+				JSONArray selectResult = MainDBHandler.select(sqlQuery);
+
+				JSONArray arrayResult = new JSONArray();
+				List<Integer> studioIDs = new ArrayList<Integer>();
+
+				for (int i = 0; i < selectResult.length(); i++) {
+					JSONObject currentRow = selectResult.getJSONObject(i);
+					JSONObject currentStudio;
+
+					int studioID = currentRow.getInt("STUDIO_ID");
+
+					int studioIndex = studioIDs.indexOf(studioID);
+
+					// If the studio is new in the result
+					if (studioIndex == -1) {
+						// Add the studio
+						studioIDs.add(studioID);
+						currentStudio = new JSONObject();
+						currentStudio.put("ID", studioID);
+						currentStudio.put("STUDIO_NAME",
+								currentRow.getString("STUDIO_NAME"));
+						currentStudio.put("ADDRESS",
+								currentRow.getString("ADDRESS"));
+						currentStudio.put("CITY_ID",
+								currentRow.getInt("CITY_ID"));
+						currentStudio.put("USER_ID",
+								currentRow.getInt("USER_ID"));
+						currentStudio.put("CONTACT_NAME",
+								currentRow.getString("CONTACT_NAME"));
+						currentStudio.put("EMAIL",
+								currentRow.getString("EMAIL"));
+						currentStudio.put("PHONE",
+								currentRow.getString("PHONE"));
+
+						// Add avg rating
+						JSONArray avg_rating = MainDBHandler
+								.selectWithParameters(
+										"select avg(RATING) as AVG_RATING "
+												+ "from REVIEWS "
+												+ "where STUDIO_ID = ?",
+										studioID);
+
+						currentStudio.put("AVG_RATING", avg_rating
+								.getJSONObject(0).getDouble("AVG_RATING"));
+
+						arrayResult.put(currentStudio);
+					}
+					// the studio exists in the result
+					else {
+						currentStudio = arrayResult.getJSONObject(studioIndex);
+					}
+
+					// Add the room
+					JSONObject room = new JSONObject();
+					room.put("ID", currentRow.getInt("ROOM_ID"));
+					room.put("RATE", currentRow.getInt("RATE"));
+					room.put("ROOM_NAME", currentRow.getString("ROOM_NAME"));
+					currentStudio.append("ROOMS", room);
+
+				} 
 				
-				// Add the room
-				JSONObject room = new JSONObject();
-				room.put("ID", currentRow.getInt("ROOM_ID"));
-				room.put("RATE", currentRow.getInt("RATE"));
-				room.put("ROOM_NAME", currentRow.getString("ROOM_NAME"));
-				currentStudio.append("ROOMS", room);
+				result = arrayResult.toString();
+				
+				redisConn.set(queryKey, result);
+				redisConn.expire(queryKey, 300);
+			} else {
+				result = redisConn.get(queryKey);
 			}
 			
-			return Response.ok(result.toString()).build();
-		} 
-		catch (Exception e) 
-		{
+			return Response.ok(result).build();
+		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.serverError().build();
 		}
+	}
+
+	private String getRedisQueryKey(MultivaluedMap<String, String> queryMap) {
+		StringBuilder stringBuilder = new StringBuilder("QUERY");
+		Iterator<Entry<String, List<String>>> it = queryMap.entrySet()
+				.iterator();
+		while (it.hasNext()) {
+			Entry<String, List<String>> pairs = it.next();
+			stringBuilder.append(":");
+			stringBuilder
+					.append(pairs.getKey() + "=" + pairs.getValue().get(0));
+		}
+
+		return stringBuilder.toString();
 	}
 }
