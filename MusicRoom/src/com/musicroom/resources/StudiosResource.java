@@ -244,9 +244,14 @@ public class StudiosResource {
 				// Set user as logged in session
 				SessionManager.setLoggedInUser(Request, userObj);
 
-				// Add new studio's ID to the NEW_STUDIOS list.
+				// Create JSON for cache - only name and id
+				JSONObject forCache = new JSONObject();
+				forCache.put("id", studioObj.get("id"));
+				forCache.put("name", studioObj.get("name"));
+
+				// Add new studio to the NEW_STUDIOS list.
 				RedisManager.getConnection().lpush("NEW_STUDIOS",
-						String.valueOf(studioID));
+						forCache.toString());
 				RedisManager.getConnection().ltrim("NEW_STUDIOS", 0, 9);
 
 				return Response.ok("{message: \"success\"}").build();
