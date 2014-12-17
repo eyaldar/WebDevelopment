@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Tuple;
 
 import com.musicroom.database.MainDBHandler;
 import com.musicroom.database.RedisManager;
@@ -110,6 +112,18 @@ public class StudiosResource {
 
 					studio.put("playing_bands", bands);
 				}
+
+				// Create JSON for cache - only name and id
+				JSONObject forCache = new JSONObject();
+				forCache.put("id", studio.get("id"));
+				forCache.put("name", studio.get("studio_name"));
+
+				// increase the views of the studio
+				int views = RedisManager.getConnection()
+						.zincrby("MOST_VIEWED", 1, forCache.toString())
+						.intValue();
+
+				studio.put("views", views);
 
 				return Response
 						.ok(studio.toString(SPACE_TO_INDENTS_EACH_LEVEL))
@@ -320,7 +334,7 @@ public class StudiosResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response searchStudios(@Context UriInfo info) {
+	public Response search(@Context UriInfo info) {
 		try {
 			String result;
 			String queryKey = getRedisQueryKey(info.getQueryParameters());
@@ -375,7 +389,7 @@ public class StudiosResource {
 				if (endTimeStr != null)
 					endTime = format.parse(endTimeStr);
 
-				// Build sql query
+				// Build SQL query
 				String sqlQuery = "select r.STUDIO_ID, s.STUDIO_NAME, s.ADDRESS, s.CITY_ID, s.USER_ID, s.CONTACT_NAME, s.EMAIL, s.PHONE, "
 						+ "r.ID as ROOM_ID, r.RATE, r.ROOM_NAME "
 						+ "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID "
@@ -506,7 +520,27 @@ public class StudiosResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMostRecentStudios() {
+	public Response getMostViewed() {
+		Set<Tuple> elements = RedisManager.getConnection().zrangeWithScores(
+				"MOST_VIEWED", -10, -1);
+
+		JSONArray mostViewedArray = new JSONArray();
+
+		for (Tuple tuple : elements) {
+			JSONObject studio = new JSONObject(tuple.getElement());
+			int score = (int) tuple.getScore();
+			studio.put("score", score);
+
+			mostViewedArray.put(studio);
+		}
+
+		return Response.ok(
+				mostViewedArray.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getMostRecent() {
 		List<String> studioStrings = RedisManager.getConnection().lrange(
 				"NEW_STUDIOS", 0, 9);
 
