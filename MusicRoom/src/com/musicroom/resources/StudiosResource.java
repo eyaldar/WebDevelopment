@@ -519,6 +519,7 @@ public class StudiosResource {
 	}
 
 	@GET
+	@Path("/mostviewed")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMostViewed() {
 		Set<Tuple> elements = RedisManager.getConnection().zrangeWithScores(
@@ -539,6 +540,7 @@ public class StudiosResource {
 	}
 
 	@GET
+	@Path("/recent")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMostRecent() {
 		List<String> studioStrings = RedisManager.getConnection().lrange(
