@@ -73,7 +73,7 @@ public class StudiosResource {
 				studio.put("phone", firstRow.getString("PHONE"));
 				studio.put("site_url", firstRow.getString("SITE_URL"));
 				studio.put("facebook_page", firstRow.getString("FACEBOOK_PAGE"));
-				studio.put("logo_url", firstRow.getString("LOGO_URL"));
+				studio.put("logo", firstRow.getString("LOGO_URL"));
 				studio.put("extra_details", firstRow.getString("EXTRA_DETAILS"));
 
 				// Add avg rating
@@ -390,7 +390,7 @@ public class StudiosResource {
 					endTime = format.parse(endTimeStr);
 
 				// Build SQL query
-				String sqlQuery = "select r.STUDIO_ID, s.STUDIO_NAME, s.ADDRESS, s.CITY_ID, s.USER_ID, s.CONTACT_NAME, s.EMAIL, s.PHONE, "
+				String sqlQuery = "select r.STUDIO_ID, s.STUDIO_NAME, s.ADDRESS, s.CITY_ID, s.USER_ID, s.CONTACT_NAME, s.EMAIL, s.PHONE, s.LOGO_URL, "
 						+ "r.ID as ROOM_ID, r.RATE, r.ROOM_NAME "
 						+ "from STUDIOS as s left join ROOMS as r on r.STUDIO_ID = s.ID "
 						+ "where 1=1 ";
@@ -475,6 +475,8 @@ public class StudiosResource {
 								currentRow.getString("EMAIL"));
 						currentStudio.put("phone",
 								currentRow.getString("PHONE"));
+						currentStudio.put("logo",
+								currentRow.getString("LOGO_URL"));
 
 						// Add avg rating
 						JSONArray avg_rating = MainDBHandler
