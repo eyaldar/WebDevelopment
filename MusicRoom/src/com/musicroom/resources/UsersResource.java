@@ -26,8 +26,6 @@ import com.musicroom.utils.JSONUtils;
 public class UsersResource {
 	private static final String SUCCESS = "{ \"message\": \"success\"}";
 	private static final String BAD_LOGIN = "{\"error\":\"Invalid user name or password.\"}";
-	private static final String UNAUTHORIZED_DELETE = "{\"error\":\"Attempt to delete user without being logged-in.\"}";
-	private static final String UNAUTHORIZED_UPDATE = "{\"error\":\"Attempt to update user without being logged-in.\"}";
 	private static final int SPACE_TO_INDENTS_EACH_LEVEL = 2;
 
 	@GET

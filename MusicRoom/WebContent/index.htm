@@ -28,21 +28,21 @@
 </head>
 <body class="container" ng-controller="MainController">
 	<header class="top" role="header">
-	    <div class="container">
-			<a ui-sref="home" class="navbar-brand pull-left">
-	      		<img src="images/musicRoom_logo.gif" height="20em"/>
-	      	</a>
-	        <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-	            <span class="glyphicon glyphicon-align-justify"></span>
-	        </button>
-	        <nav class="navbar-collapse collapse" role="navigation">
-			<ul class="navbar-nav nav">
-		        <li><a ui-sref="home" ng-click="checkLoginState()">Home</a></li>
-		        <li><a ui-sref="bands" ng-click="checkLoginState()">Bands</a></li>
-		        <li><a ui-sref="studios" ng-click="checkLoginState()">Studios</a></li>
-			</ul>
-	        </nav>
-	    </div>
+	    	<div class="navbar-header">
+				<a ui-sref="home" class="navbar-brand pull-left">
+		      		<img src="images/musicRoom_logo.gif" height="20em"/>
+		      	</a>
+		        <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		            <span class="glyphicon glyphicon-align-justify"></span>
+		        </button>
+	        </div>
+	        <div class="navbar-collapse collapse" role="navigation">
+				<ul class="navbar-nav nav">
+			        <li><a ui-sref="home" ng-click="checkLoginState()">Home</a></li>
+			        <li><a ui-sref="bands" ng-click="checkLoginState()">Bands</a></li>
+			        <li><a ui-sref="studios" ng-click="checkLoginState()">Studios</a></li>
+				</ul>
+	        </div>
 	</header>	
     <div height="1000px">
 		<div ui-view="view"></div>

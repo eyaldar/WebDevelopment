@@ -22,7 +22,6 @@ import com.musicroom.session.SessionManager;
 @Path("/reviews")
 public class ReviewsResource {
 
-	private static final String NOT_LOGGED = "{\"error\":\"You must log in to add a review.\"}";
 	private static final String REVIEW_EXISTS = "{\"error\":\"You can only add one review per studio.\"}";
 	private static final String BAD_RATE = "{\"error\":\"The rating of the review must be between 1 and 5.\"}";
 
