@@ -10,6 +10,9 @@
     	
 	<link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
 	<link rel="stylesheet" href="css/bootstrap-theme.min.css" media="screen">
+	<link rel="stylesheet" href="css/bootstrap-responsive.min.css" media="screen">
+	<link rel="stylesheet" href="css/validation_styles.css">
+	<link rel="stylesheet" href="css/text_sizes.css">
 	<script src="lib/bootstrap.min.js"></script>
     <script src="lib/ui-bootstrap-tpls-0.12.0.min.js"></script>
     
@@ -24,20 +27,23 @@
     <script src="scripts/directives.js"></script>	
 </head>
 <body class="container" ng-controller="MainController">
-   	<nav class="navbar navbar-default" role="navigation">
-	  	<div>
-	      <a class="navbar-brand" ui-sref="home"><img src="images/musicRoom_logo.gif" height="20em"/></a>
-	      <ul class="nav navbar-nav">
-	        <li ><a ui-sref="home" ng-click="checkLoginState()">Home</a></li>
-	        <li ><a ui-sref="bands" ng-click="checkLoginState()">Bands</a></li>
-	        <li ><a ui-sref="studios" ng-click="checkLoginState()">Studios</a></li>
-	      </ul>
-         <ul class="nav navbar-nav pull-right">
-    	    <li ><a ui-sref="login" ng-hide="logged">Login</a></li>
-       	    <li ><a role="button" ng-click="logout()" ng-show="logged">Logout</a></li>
-	    </ul>
+	<header class="top" role="header">
+	    <div class="container">
+			<a ui-sref="home" class="navbar-brand pull-left">
+	      		<img src="images/musicRoom_logo.gif" height="20em"/>
+	      	</a>
+	        <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	            <span class="glyphicon glyphicon-align-justify"></span>
+	        </button>
+	        <nav class="navbar-collapse collapse" role="navigation">
+			<ul class="navbar-nav nav">
+		        <li><a ui-sref="home" ng-click="checkLoginState()">Home</a></li>
+		        <li><a ui-sref="bands" ng-click="checkLoginState()">Bands</a></li>
+		        <li><a ui-sref="studios" ng-click="checkLoginState()">Studios</a></li>
+			</ul>
+	        </nav>
 	    </div>
-	</nav>	
+	</header>	
     <div height="1000px">
 		<div ui-view="view"></div>
 	</div>
