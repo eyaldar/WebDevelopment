@@ -22,18 +22,18 @@
     
    	<nav class="navbar navbar-default" role="navigation">
 	  	<div class="container">
-	      <a class="navbar-brand" ui-sref="home">Music Room</a>
+	      <a class="navbar-brand" ui-sref="home"><img src="images/musicRoom_logo.gif" height="20em"/></a>
 	      <ul class="nav navbar-nav">
 	        <li ><a ui-sref="home">Home</a></li>
-	        <li ><a ui-sref="bands">Bands List</a></li>
-	        <li ><a ui-sref="studios">Studios List</a></li>
+	        <li ><a ui-sref="bands">Bands</a></li>
+	        <li ><a ui-sref="studios">Studios</a></li>
 	      </ul>
 	    </div>
 	</nav>		
 </head>
 <body>
-    <div class="row" height="1000px">
-		<div ui-view="view" style="margin: 6em"></div>
+    <div height="1000px">
+		<div ui-view="view"></div>
 	</div>
 </body>
 </html>
