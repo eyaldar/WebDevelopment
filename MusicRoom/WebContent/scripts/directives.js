@@ -8,7 +8,7 @@
 	        var linker = function(scope, element, attrs) {
 	            element.hover(
 	                function () {
-	                    $(this).transition({ scale: 1.1 });
+	                    $(this).transition({ scale: 1.05 });
 	                },
 	                function () {
 	                    $(this).transition({ scale: 1 });
