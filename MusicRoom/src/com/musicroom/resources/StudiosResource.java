@@ -116,7 +116,7 @@ public class StudiosResource {
 				// Create JSON for cache - only name and id
 				JSONObject forCache = new JSONObject();
 				forCache.put("id", studio.get("id"));
-				forCache.put("name", studio.get("studio_name"));
+				forCache.put("name", studio.get("name"));
 
 				// increase the views of the studio
 				int views = RedisManager.getConnection()
@@ -171,8 +171,8 @@ public class StudiosResource {
 				}
 				;
 
-				userObj.put("USER_TYPE_ID", UserType.STUDIO.toInt());
-				userObj.put("ID", userID);
+				userObj.put("user_type_id", UserType.STUDIO.toInt());
+				userObj.put("id", userID);
 
 				// Add studio
 				JSONObject studioObj = data.getJSONObject("studio");

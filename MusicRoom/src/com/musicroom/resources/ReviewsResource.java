@@ -16,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.musicroom.database.MainDBHandler;
+import com.musicroom.resources.filters.RequireLoggedBand;
 import com.musicroom.session.SessionManager;
 
 @Path("/reviews")
@@ -61,6 +62,7 @@ public class ReviewsResource {
 	}
 
 	@POST
+	@RequireLoggedBand
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response AddReview(String dataStr,
@@ -69,41 +71,35 @@ public class ReviewsResource {
 			JSONObject data = new JSONObject(dataStr);
 			JSONObject loggedUser = SessionManager.getLoggedInUser(Request);
 
-			// Check if there is no logged user
-			if (loggedUser == null) {
-				return Response.status(HttpServletResponse.SC_UNAUTHORIZED)
-						.entity(NOT_LOGGED).build();
+			int userId = loggedUser.getInt("id");
+			int studioId = data.getInt("studio_id");
+
+			// Get user review count for this studio
+			JSONArray existingReview = MainDBHandler
+					.selectWithParameters(
+							"select count(*) as COUNT from REVIEWS where USER_ID = ? and STUDIO_ID = ?",
+							userId, studioId);
+
+			// Check if there is an existing review
+			if (existingReview.getJSONObject(0).getInt("count") > 0) {
+				return Response
+						.status(HttpServletResponse.SC_METHOD_NOT_ALLOWED)
+						.entity(REVIEW_EXISTS).build();
 			} else {
-				int userId = loggedUser.getInt("id");
-				int studioId = data.getInt("studio_id");
-
-				// Get user review count for this studio
-				JSONArray existingReview = MainDBHandler
-						.selectWithParameters(
-								"select count(*) as COUNT from REVIEWS where USER_ID = ? and STUDIO_ID = ?",
-								userId, studioId);
-
-				// Check if there is an existing review
-				if (existingReview.getJSONObject(0).getInt("count") > 0) {
+				// Validate rating
+				int rating = data.getInt("rating");
+				if (rating < 0 || rating > 5) {
 					return Response
 							.status(HttpServletResponse.SC_METHOD_NOT_ALLOWED)
-							.entity(REVIEW_EXISTS).build();
+							.entity(BAD_RATE).build();
 				} else {
-					// Validate rating
-					int rating = data.getInt("rating");
-					if (rating < 0 || rating > 5) {
-						return Response
-								.status(HttpServletResponse.SC_METHOD_NOT_ALLOWED)
-								.entity(BAD_RATE).build();
-					} else {
-						MainDBHandler
-								.selectWithParameters(
-										"INSERT INTO REVIEWS (USER_ID, STUDIO_ID, RATING, COMMENT) VALUES(?, ?, ?, ?)",
-										userId, studioId, rating,
-										data.getString("comment"));
+					MainDBHandler
+							.selectWithParameters(
+									"INSERT INTO REVIEWS (USER_ID, STUDIO_ID, RATING, COMMENT) VALUES(?, ?, ?, ?)",
+									userId, studioId, rating,
+									data.getString("comment"));
 
-						return Response.ok("{message: \"success\"}").build();
-					}
+					return Response.ok("{message: \"success\"}").build();
 				}
 			}
 		} catch (Exception e) {

@@ -160,6 +160,8 @@ public class BandsResource {
 				conn.commit();
 				conn.setAutoCommit(true);
 
+				userObj.put("user_type_id", UserType.BAND.toInt());
+				userObj.put("id", userID);
 				// Set user as logged in session
 				SessionManager.setLoggedInUser(Request, userObj);
 

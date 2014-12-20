@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.musicroom.database.MainDBHandler;
+import com.musicroom.resources.filters.RequireLogin;
 import com.musicroom.session.SessionManager;
 import com.musicroom.utils.JSONUtils;
 
@@ -62,6 +63,7 @@ public class UsersResource {
 	}
 	
 	@GET
+	@RequireLogin
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)
 	public static Response logoutUser(@Context HttpServletRequest request) throws Exception {
@@ -105,49 +107,39 @@ public class UsersResource {
 	}
 
 	@DELETE
+	@RequireLogin
 	@Path("/{id}")
 	public Response deleteUser(@PathParam("id") int id,
 			@Context HttpServletRequest Request) throws Exception {
-		// Validate user
-		if (!SessionManager.validateUser(Request, id)) {
-			// Unauthorized
-			return Response.notModified(UNAUTHORIZED_DELETE).build();
-		} else {
-			// delete
-			MainDBHandler.executeUpdateWithParameters(
-					"delete from USERS where ID = ?", id);
+		
+		// delete
+		MainDBHandler.executeUpdateWithParameters(
+				"delete from USERS where ID = ?", id);
 
-			// log out
-			SessionManager.logoutUser(Request);
+		// log out
+		SessionManager.logoutUser(Request);
 
-			return Response.ok(SUCCESS).build();
-		}
+		return Response.ok(SUCCESS).build();
 	}
 
 	@PUT
+	@RequireLogin
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updatePassword(String strData,
 			@Context HttpServletRequest Request) throws Exception {
 		JSONObject data = new JSONObject(strData);
 
 		int userID = data.getInt("ID");
+		String password = data.getString("password");
 
-		// Validate user
-		if (!SessionManager.validateUser(Request, userID)) {
-			// Unauthorized
-			return Response.notModified(UNAUTHORIZED_UPDATE).build();
-		} else {
-			String password = data.getString("password");
+		// update
+		MainDBHandler.executeUpdateWithParameters(
+				"update USERS set PASSWORD = ? where ID = ?", password,
+				userID);
 
-			// update
-			MainDBHandler.executeUpdateWithParameters(
-					"update USERS set PASSWORD = ? where ID = ?", password,
-					userID);
+		// update session
+		SessionManager.updateLoggedUserPassword(Request, password);
 
-			// update session
-			SessionManager.updateLoggedUserPassword(Request, password);
-
-			return Response.ok(SUCCESS).build();
-		}
+		return Response.ok(SUCCESS).build();
 	}
 }
