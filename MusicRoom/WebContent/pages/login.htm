@@ -1,0 +1,37 @@
+<div class="jumbotron text-center">
+    <h2>Login</h2> 
+</div>
+
+<form name="loginForm" class="form-horizontal" role="form" novalidate>
+
+	<!-- USERNAME -->
+	<div class="form-group has-feedback" style="margin: 2em"
+		 ng-class="{ 'has-error' : loginForm.username.$invalid, 'has-success' : loginForm.username.$valid }">
+	    <label>Username</label>
+  		<input type="text" name="username" class="form-control" ng-model="credentials.name" 
+	   	   	   placeholder="Username" required/>
+	   	<i class="glyphicon glyphicon-ok form-control-feedback"
+	   		ng-show="loginForm.username.$valid"></i>	    	   	   
+	   	<i class="glyphicon glyphicon-remove form-control-feedback"
+	   		ng-show="loginForm.username.$invalid"></i>
+   	    <p ng-show="loginForm.username.$invalid" class="help-block">Username is required.</p>
+	</div>
+	
+	 <!-- PASSWORD -->
+	<div class="form-group has-feedback" style="margin: 2em" 
+		ng-class="{ 'has-error' : loginForm.password.$invalid, 'has-success' : loginForm.password.$valid }">
+	    <label>Password</label>
+	    <input type="password" name="password" class="form-control" ng-model="credentials.password" 
+	    	   placeholder="Password" required/>
+   	   	<i class="glyphicon glyphicon-ok form-control-feedback"
+	   		ng-show="loginForm.password.$valid"></i>	    	   	   
+	   	<i class="glyphicon glyphicon-remove form-control-feedback"
+	   		ng-show="loginForm.password.$invalid"></i>
+   	    <p ng-show="loginForm.password.$invalid" class="help-block">Password is required.</p>
+	</div>
+     
+	<button type="submit" ng-click="login()" style="margin-left: 2em"  
+		id="button-login" class="btn btn-primary" ng-disabled="loginForm.$invalid">Login</button>
+
+	<p ng-show="errorText" ng-class="{ 'has-error' : true }" style="margin-top: 2em; margin-left: 2em">{{errorText}}</p>
+</form>

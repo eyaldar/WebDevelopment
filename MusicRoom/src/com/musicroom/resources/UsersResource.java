@@ -23,6 +23,7 @@ import com.musicroom.utils.JSONUtils;
 
 @Path("/users")
 public class UsersResource {
+	private static final String SUCCESS = "{ \"message\": \"success\"}";
 	private static final String BAD_LOGIN = "{\"error\":\"Invalid user name or password.\"}";
 	private static final String UNAUTHORIZED_DELETE = "{\"error\":\"Attempt to delete user without being logged-in.\"}";
 	private static final String UNAUTHORIZED_UPDATE = "{\"error\":\"Attempt to update user without being logged-in.\"}";
@@ -39,11 +40,41 @@ public class UsersResource {
 		return Response.ok(result.toString(SPACE_TO_INDENTS_EACH_LEVEL))
 				.build();
 	}
+	
+	@GET
+	@Path("/state")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response getLoggedInUser(@Context HttpServletRequest request) throws Exception {
+		JSONObject loggedUser = SessionManager.getLoggedInUser(request);
+		JSONObject result = new JSONObject();
+		
+		if (loggedUser == null) {
+			result.put("name", "Anonymous");
+			result.put("logged", false);
+		} else {
+			result.put("name", loggedUser.getString("USER_NAME"));
+			result.put("user", loggedUser);
+			result.put("logged", true);
+		}
+		
+		return Response.ok(result.toString(SPACE_TO_INDENTS_EACH_LEVEL))
+				.build();
+	}
+	
+	@GET
+	@Path("/logout")
+	@Produces(MediaType.APPLICATION_JSON)
+	public static Response logoutUser(@Context HttpServletRequest request) throws Exception {
+		// log out
+		SessionManager.logoutUser(request);
+
+		return Response.ok(SUCCESS).build();
+	}
 
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response Login(String dataStr, @Context HttpServletRequest Request) {
+	public Response login(String dataStr, @Context HttpServletRequest request) {
 		JSONObject loginData = new JSONObject(dataStr);
 
 		// Get user by name and password
@@ -63,7 +94,7 @@ public class UsersResource {
 				JSONObject loggedUser = JSONUtils.extractJSONObject(loggedRes);
 
 				// Set user as logged in session
-				SessionManager.setLoggedInUser(Request, loggedUser);
+				SessionManager.setLoggedInUser(request, loggedUser);
 
 				return Response.ok(loggedUser.toString()).build();
 			}
@@ -89,7 +120,7 @@ public class UsersResource {
 			// log out
 			SessionManager.logoutUser(Request);
 
-			return Response.ok("{message: \"success\"}").build();
+			return Response.ok(SUCCESS).build();
 		}
 	}
 
@@ -116,7 +147,7 @@ public class UsersResource {
 			// update session
 			SessionManager.updateLoggedUserPassword(Request, password);
 
-			return Response.ok("{message: \"success\"}").build();
+			return Response.ok(SUCCESS).build();
 		}
 	}
 }

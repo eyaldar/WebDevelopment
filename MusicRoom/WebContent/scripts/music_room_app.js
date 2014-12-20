@@ -3,6 +3,9 @@
 (function() {
     var musicRoom = angular.module('musicRoom', ['restangular', 'ui.router', 'musicRoom']);
     musicRoom.config(function($stateProvider, $urlRouterProvider){
+    	
+    	
+    	
     	$urlRouterProvider.otherwise('/home');
     	
         $stateProvider
@@ -29,6 +32,15 @@
                     "view": {
                     	templateUrl: "pages/studios.htm",
                 		controller: "StudioListController"
+                    }
+                }
+            })            
+            .state('login', {
+                url: "/login",
+                views: {
+                    "view": {
+                    	templateUrl: "pages/login.htm",
+                		controller: "LoginController"
                     }
                 }
             });
