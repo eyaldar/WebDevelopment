@@ -46,7 +46,7 @@ public class ResetDatabaseResource {
 			return FAILED_RESPONSE_STRING;
 		}
 	}
-
+ 
 	private void createAndFillDB() {
 		Connection con = MainDBHandler.getConnection();
 		try {
