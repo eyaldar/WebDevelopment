@@ -45,6 +45,7 @@ public class StudiosResource {
 	private static final int SPACE_TO_INDENTS_EACH_LEVEL = 2;
 	private static final String STUDIO_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Studio with id '%d' was not found\"}";
 	private static final String STUDIO_ID_ROOM_ID_WAS_NOT_FOUND_ERROR_JSON = "{\"error\":\"Room with id %d in studio with id '%d' was not found\"}";
+	private static final String APPIONTMENT_UNAVAILABLE_ERROR_JSON = "{\"error\":\"Room with id %d is not available in the wanted time\"}";
 
 	@GET
 	@Path("/{id}")
@@ -140,6 +141,60 @@ public class StudiosResource {
 		}
 	}
 
+	@POST
+	@Path("/Schedule")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response setAppointment(String dataStr, @Context HttpServletRequest Request) 
+	{
+		try 
+		{
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			
+			// Get request data
+			JSONObject data = new JSONObject(dataStr);
+			int roomId = data.getInt("roomId");
+			Date start = format.parse(data.getString("start"));
+			Date end = format.parse(data.getString("end"));
+			
+			// Get user data
+			JSONObject user = SessionManager.getLoggedInUser(Request);
+			JSONArray queryRes =
+					MainDBHandler.selectWithParameters("select ID from BANDS where USER_ID = ?", user.getInt("ID"));
+			int bandId = queryRes.getInt(0);
+			
+			// Check that room is clear
+			queryRes =
+					MainDBHandler.selectWithParameters("select count(*) from ROOM_SCHEDULE "
+											 		 + "where ROOM_ID = ? and START_TIME < ? and END_TIME > ?",
+											 		 	roomId, format.format(end), format.format(start));
+			
+			// if there are appointments in the wanted time
+			if (queryRes.getInt(0) > 0)
+			{
+				String errorJson = String.format(
+						APPIONTMENT_UNAVAILABLE_ERROR_JSON,
+						roomId);
+				return Response.status(HttpServletResponse.SC_CONFLICT)
+						.entity(errorJson).build();
+			}
+			else
+			{
+				// insert the appointment
+				MainDBHandler.insertWithAutoKey("insert into ROOM_SCHEDULE (ROOM_ID, BAND_ID, START_TIME, END_TIME) "
+											  + "values(?,?,?,?)", PreparedStatement.NO_GENERATED_KEYS, 
+											  roomId, bandId, format.format(start), format.format(end));
+				
+				return Response.ok("{message: \"success\"}").build();
+			}
+		}
+		catch(Exception e) 
+		{
+			e.printStackTrace();
+			return Response.serverError().build();
+		}
+	}
+	
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
