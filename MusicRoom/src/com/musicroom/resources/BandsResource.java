@@ -102,9 +102,6 @@ public class BandsResource {
 					return Response.serverError().build();
 				}
 
-				userObj.put("USER_TYPE_ID", UserType.BAND.toInt());
-				userObj.put("ID", userID);
-
 				// Add band
 				JSONObject bandObj = data.getJSONObject("band");
 
@@ -168,10 +165,11 @@ public class BandsResource {
 				return Response.ok("{\"message\": \"success\"}").build();
 			}
 		} catch (Exception e) {
+			// rollback
+			try {MainDBHandler.getConnection().rollback();}catch(Exception e1){}
+			
 			e.printStackTrace();
-
-			MainDBHandler.getConnection().rollback();
-			throw e;
+			return Response.serverError().build();
 		}
 	}
 }

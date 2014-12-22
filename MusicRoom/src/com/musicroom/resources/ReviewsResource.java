@@ -43,12 +43,11 @@ public class ReviewsResource {
 				JSONObject curr = reviews.getJSONObject(i);
 
 				JSONObject review = new JSONObject();
-				review.put("studio_id", curr.getInt("STUDIO_ID"));
-				review.put("comment", curr.getString("COMMENT"));
-				review.put("rating", curr.getInt("RATING"));
-				review.put("user_id", curr.getInt("USER_ID"));
-				review.put("user_name", curr.getString("USER_NAME"));
-				review.put("user_type_id", curr.getInt("USER_TYPE_ID"));
+				review.put("studio_id", curr.getInt("studio_id"));
+				review.put("comment", curr.getString("comment"));
+				review.put("rating", curr.getInt("rating"));
+				review.put("user_id", curr.getInt("user_id"));
+				review.put("user_name", curr.getString("user_name"));
 
 				results.put(review);
 			}

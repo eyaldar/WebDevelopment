@@ -51,7 +51,7 @@ public class UsersResource {
 			result.put("name", "Anonymous");
 			result.put("logged", false);
 		} else {
-			result.put("name", loggedUser.getString("USER_NAME"));
+			result.put("name", loggedUser.getString("user_name"));
 			result.put("user", loggedUser);
 			result.put("logged", true);
 		}

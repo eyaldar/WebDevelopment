@@ -32,7 +32,7 @@ public class SessionManager {
 
 	public static void setLoggedInUser(HttpServletRequest request, JSONObject userJSON) 
 	{
-		Integer id = userJSON.getInt("ID");
+		Integer id = userJSON.getInt("id");
 		
 		// set json in redis
 		Jedis redisConn = RedisManager.getConnection();
@@ -74,7 +74,7 @@ public class SessionManager {
 		else
 		{
 			// update and return success
-			userObj.put("PASSWORD", password);
+			userObj.put("password", password);
 			setLoggedInUser(request, userObj);
 			return true;
 		}

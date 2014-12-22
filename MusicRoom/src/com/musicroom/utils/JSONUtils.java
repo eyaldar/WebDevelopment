@@ -17,7 +17,7 @@ public class JSONUtils {
 			JSONObject obj = new JSONObject();
 			for (int i = 0; i < total_col_count; i++) 
 			{
-				obj.put(resultSet.getMetaData().getColumnLabel(i + 1), resultSet.getObject(i + 1));
+				obj.put(resultSet.getMetaData().getColumnLabel(i + 1).toLowerCase(), resultSet.getObject(i + 1));
 			}
 			jsonArray.put(obj);
 		}

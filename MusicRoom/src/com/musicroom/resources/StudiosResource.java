@@ -65,18 +65,18 @@ public class StudiosResource {
 				JSONObject firstRow = JSONUtils.extractJSONObject(results);
 
 				JSONObject studio = new JSONObject();
-				studio.put("id", firstRow.getInt("STUDIO_ID"));
-				studio.put("name", firstRow.getString("STUDIO_NAME"));
-				studio.put("address", firstRow.getString("ADDRESS"));
-				studio.put("city_id", firstRow.getInt("CITY_ID"));
-				studio.put("user_id", firstRow.getInt("USER_ID"));
-				studio.put("contact_name", firstRow.getString("CONTACT_NAME"));
-				studio.put("email", firstRow.getString("EMAIL"));
-				studio.put("phone", firstRow.getString("PHONE"));
-				studio.put("site_url", firstRow.getString("SITE_URL"));
-				studio.put("facebook_page", firstRow.getString("FACEBOOK_PAGE"));
-				studio.put("logo", firstRow.getString("LOGO_URL"));
-				studio.put("extra_details", firstRow.getString("EXTRA_DETAILS"));
+				studio.put("id", firstRow.getInt("studio_id"));
+				studio.put("name", firstRow.getString("studio_name"));
+				studio.put("address", firstRow.getString("address"));
+				studio.put("city_id", firstRow.getInt("city_id"));
+				studio.put("user_id", firstRow.getInt("user_id"));
+				studio.put("contact_name", firstRow.getString("contact_name"));
+				studio.put("email", firstRow.getString("email"));
+				studio.put("phone", firstRow.getString("phone"));
+				studio.put("site_url", firstRow.getString("site_url"));
+				studio.put("facebook_page", firstRow.getString("facebook_page"));
+				studio.put("logo", firstRow.getString("logo_url"));
+				studio.put("extra_details", firstRow.getString("extra_details"));
 
 				// Add avg rating
 				JSONArray avg_rating = MainDBHandler.selectWithParameters(
@@ -95,8 +95,8 @@ public class StudiosResource {
 
 					roomIDs[i] = currentRow.getInt("ROOM_ID");
 					room.put("id", roomIDs[i]);
-					room.put("rate", currentRow.getInt("RATE"));
-					room.put("name", currentRow.getString("ROOM_NAME"));
+					room.put("rate", currentRow.getInt("rate"));
+					room.put("name", currentRow.getString("room_name"));
 
 					studio.append("rooms", room);
 				}
@@ -177,8 +177,8 @@ public class StudiosResource {
 				queryRes = MainDBHandler
 						.selectWithParameters(
 								"select ID from BANDS where USER_ID = ?",
-								user.getInt("ID"));
-				int bandId = queryRes.getJSONObject(0).getInt("ID");
+								user.getInt("id"));
+				int bandId = queryRes.getJSONObject(0).getInt("id");
 				
 				// insert the appointment
 				MainDBHandler.insertWithAutoKey(
@@ -234,8 +234,8 @@ public class StudiosResource {
 				rs = MainDBHandler
 						.insertWithAutoKey(
 								"INSERT INTO STUDIOS (STUDIO_NAME, CITY_ID, ADDRESS, EMAIL, CONTACT_NAME, PHONE, USER_ID, EXTRA_DETAILS, "
-										+ " FACEBOOK_PAGE, SITE_URL, LOGO_URL, VOTES_SUM, VOTES_COUNT) "
-										+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)",
+										+ " FACEBOOK_PAGE, SITE_URL, LOGO_URL) "
+										+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 								PreparedStatement.RETURN_GENERATED_KEYS,
 								studioObj.getString("name"),
 								studioObj.getInt("city_id"),
@@ -306,15 +306,12 @@ public class StudiosResource {
 					}
 				}
 
-				MainDBHandler.getConnection().commit();
-				MainDBHandler.getConnection().setAutoCommit(true);
-
 				// Set user as logged in session
 				SessionManager.setLoggedInUser(Request, userObj);
 
 				// Create JSON for cache - only name and id
 				JSONObject forCache = new JSONObject();
-				forCache.put("id", studioObj.get("id"));
+				forCache.put("id", studioID);
 				forCache.put("name", studioObj.get("name"));
 
 				// Add new studio to the NEW_STUDIOS list.
@@ -322,9 +319,16 @@ public class StudiosResource {
 						forCache.toString());
 				RedisManager.getConnection().ltrim("NEW_STUDIOS", 0, 9);
 
+				MainDBHandler.getConnection().commit();
+				MainDBHandler.getConnection().setAutoCommit(true);
+				
 				return Response.ok("{\"message\": \"success\"}").build();
 			}
 		} catch (Exception e) {
+			
+			// rollback
+			try {MainDBHandler.getConnection().rollback();}catch(Exception e1){}
+			
 			e.printStackTrace();
 			return Response.serverError().build();
 		}
@@ -348,16 +352,16 @@ public class StudiosResource {
 				JSONObject firstRow = JSONUtils.extractJSONObject(results);
 
 				JSONObject room = new JSONObject();
-				room.put("studio_id", firstRow.getInt("STUDIO_ID"));
-				room.put("id", firstRow.getInt("ROOM_ID"));
-				room.put("name", firstRow.getString("ROOM_NAME"));
-				room.put("rate", firstRow.getInt("RATE"));
-				room.put("extra_details", firstRow.getString("EXTRA_DETAILS"));
+				room.put("studio_id", firstRow.getInt("studio_id"));
+				room.put("id", firstRow.getInt("room_id"));
+				room.put("name", firstRow.getString("room_name"));
+				room.put("rate", firstRow.getInt("rate"));
+				room.put("extra_details", firstRow.getString("extra_details"));
 
 				// Add room types
 				for (int i = 0; i < results.length(); i++) {
 					JSONObject currentRow = results.getJSONObject(i);
-					room.append("room_type", currentRow.getInt("TYPE_ID"));
+					room.append("room_type", currentRow.getInt("type_id"));
 				}
 
 				// Add equipment
@@ -505,7 +509,7 @@ public class StudiosResource {
 					JSONObject currentRow = selectResult.getJSONObject(i);
 					JSONObject currentStudio;
 
-					int studioID = currentRow.getInt("STUDIO_ID");
+					int studioID = currentRow.getInt("studio_id");
 
 					int studioIndex = studioIDs.indexOf(studioID);
 
@@ -516,21 +520,21 @@ public class StudiosResource {
 						currentStudio = new JSONObject();
 						currentStudio.put("id", studioID);
 						currentStudio.put("name",
-								currentRow.getString("STUDIO_NAME"));
+								currentRow.getString("studio_name"));
 						currentStudio.put("address",
-								currentRow.getString("ADDRESS"));
+								currentRow.getString("address"));
 						currentStudio.put("city_id",
-								currentRow.getInt("CITY_ID"));
+								currentRow.getInt("city_id"));
 						currentStudio.put("user_id",
-								currentRow.getInt("USER_ID"));
+								currentRow.getInt("user_id"));
 						currentStudio.put("contact_name",
-								currentRow.getString("CONTACT_NAME"));
+								currentRow.getString("contact_name"));
 						currentStudio.put("email",
-								currentRow.getString("EMAIL"));
+								currentRow.getString("email"));
 						currentStudio.put("phone",
-								currentRow.getString("PHONE"));
+								currentRow.getString("phone"));
 						currentStudio.put("logo",
-								currentRow.getString("LOGO_URL"));
+								currentRow.getString("logo_url"));
 
 						// Add avg rating
 						JSONArray avg_rating = MainDBHandler
@@ -552,9 +556,9 @@ public class StudiosResource {
 
 					// Add the room
 					JSONObject room = new JSONObject();
-					room.put("id", currentRow.getInt("ROOM_ID"));
-					room.put("rate", currentRow.getInt("RATE"));
-					room.put("name", currentRow.getString("ROOM_NAME"));
+					room.put("id", currentRow.getInt("room_id"));
+					room.put("rate", currentRow.getInt("rate"));
+					room.put("name", currentRow.getString("room_name"));
 					currentStudio.append("rooms", room);
 
 				}

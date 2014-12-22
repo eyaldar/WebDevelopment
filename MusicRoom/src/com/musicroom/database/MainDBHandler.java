@@ -62,8 +62,8 @@ public class MainDBHandler {
 			throws JSONException, Exception {
 		String selectionString = "select * from USERS where USER_NAME = ? and PASSWORD = ?";
 		JSONArray results = selectWithParameters(selectionString,
-				loginData.getString("USER_NAME"),
-				loginData.getString("PASSWORD"));
+				loginData.getString("user_name"),
+				loginData.getString("passwrod"));
 		JSONObject result = JSONUtils.extractJSONObject(results);
 
 		return result.toString();
