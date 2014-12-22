@@ -33,7 +33,7 @@ public class BandJSONArrayGenerator {
 
 	private JSONObject getOrCreateBand(JSONObject currentRow,
 			JSONArray bandsArray) {
-		int bandID = currentRow.getInt("BAND_ID");
+		int bandID = currentRow.getInt("band_id");
 		JSONObject bandObject = bandIDToObject.getOrDefault(bandID, null);
 
 		if (bandObject == null) {
@@ -46,11 +46,11 @@ public class BandJSONArrayGenerator {
 	}
 
 	private JSONObject createBandObject(JSONObject currentRow) {
-		Integer bandID = currentRow.getInt("BAND_ID");
-		Integer userID = currentRow.getInt("USER_ID");
-		String name = currentRow.getString("BAND_NAME");
-		String logo = currentRow.getString("LOGO_URL");
-		String genre = currentRow.getString("GENRE");
+		Integer bandID = currentRow.getInt("band_id");
+		Integer userID = currentRow.getInt("user_id");
+		String name = currentRow.getString("band_name");
+		String logo = currentRow.getString("logo_url");
+		String genre = currentRow.getString("genre");
 
 		return new JSONObject(new JSONStringer()
 								.object()
@@ -69,7 +69,7 @@ public class BandJSONArrayGenerator {
 
 	private JSONObject getOrCreateBandMember(JSONObject currentRow,
 			JSONObject bandObject) {
-		Integer bandMemberID = currentRow.getInt("MEMBER_ID");
+		Integer bandMemberID = currentRow.getInt("member_id");
 		JSONObject bandMemberObject = bandMemberIDToObject.getOrDefault(
 				bandMemberID, null);
 
@@ -83,10 +83,10 @@ public class BandJSONArrayGenerator {
 	}
 
 	private JSONObject createBandMemberObject(JSONObject currentRow) {
-		Integer bandMemberID = currentRow.getInt("MEMBER_ID");
-		String name = currentRow.getString("MEMBER_NAME");
-		String role = currentRow.getString("ROLE");
-		String picture = currentRow.getString("PICTURE_URL");
+		Integer bandMemberID = currentRow.getInt("member_id");
+		String name = currentRow.getString("member_name");
+		String role = currentRow.getString("role");
+		String picture = currentRow.getString("picture_url");
 
 		return new JSONObject(new JSONStringer()
 									.object()
@@ -103,7 +103,7 @@ public class BandJSONArrayGenerator {
 	
 	private void addInstrument(JSONObject currentRow,
 			JSONObject currentBandMember) {
-		String instrument = currentRow.getString("EQUIPMENT_NAME");		
+		String instrument = currentRow.getString("equipment_name");		
 		currentBandMember.getJSONArray("instruments").put(instrument);
 	}
 
