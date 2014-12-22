@@ -143,7 +143,7 @@ public class StudiosResource {
 	}
 
 	@POST
-	@Path("/Schedule")
+	@Path("/schedule")
 	@RequireLoggedBand
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -159,36 +159,34 @@ public class StudiosResource {
 			Date start = format.parse(data.getString("start"));
 			Date end = format.parse(data.getString("end"));
 
-			// Get user data
-			JSONObject user = SessionManager.getLoggedInUser(Request);
-			JSONArray queryRes = MainDBHandler
-					.selectWithParameters(
-							"select ID from BANDS where USER_ID = ?",
-							user.getInt("id"));
-			int bandId = queryRes.getInt(0);
-
 			// Check that room is clear
-			queryRes = MainDBHandler
-					.selectWithParameters(
-							"select count(*) from ROOM_SCHEDULE "
-									+ "where ROOM_ID = ? and START_TIME < ? and END_TIME > ?",
-							roomId, format.format(end), format.format(start));
+			JSONArray queryRes = MainDBHandler
+					.select("select count(*) as count from ROOM_SCHEDULE "
+						  + "where ROOM_ID = "+roomId+" and START_TIME < '"+format.format(end)+"' and END_TIME > '"+format.format(start)+"'");
 
 			// if there are appointments in the wanted time
-			if (queryRes.getInt(0) > 0) {
+			if (queryRes.getJSONObject(0).getInt("count") > 0) {
 				String errorJson = String.format(
 						APPIONTMENT_UNAVAILABLE_ERROR_JSON, roomId);
 				return Response.status(HttpServletResponse.SC_CONFLICT)
 						.entity(errorJson).build();
 			} else {
+				
+				// Get user data
+				JSONObject user = SessionManager.getLoggedInUser(Request);
+				queryRes = MainDBHandler
+						.selectWithParameters(
+								"select ID from BANDS where USER_ID = ?",
+								user.getInt("ID"));
+				int bandId = queryRes.getJSONObject(0).getInt("ID");
+				
 				// insert the appointment
 				MainDBHandler.insertWithAutoKey(
 						"insert into ROOM_SCHEDULE (ROOM_ID, BAND_ID, START_TIME, END_TIME) "
-								+ "values(?,?,?,?)",
-						PreparedStatement.NO_GENERATED_KEYS, roomId, bandId,
-						format.format(start), format.format(end));
+								+ "values("+roomId+","+bandId+",'"+format.format(start)+"','"+format.format(end)+"')",
+						PreparedStatement.NO_GENERATED_KEYS);
 
-				return Response.ok("{message: \"success\"}").build();
+				return Response.ok("{\"message\": \"success\"}").build();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -324,7 +322,7 @@ public class StudiosResource {
 						forCache.toString());
 				RedisManager.getConnection().ltrim("NEW_STUDIOS", 0, 9);
 
-				return Response.ok("{message: \"success\"}").build();
+				return Response.ok("{\"message\": \"success\"}").build();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -493,9 +491,9 @@ public class StudiosResource {
 				if (startTime != null && endTime != null) {
 					sqlQuery += "and not exists (select 1 "
 							+ "from ROOM_SCHEDULE as rs "
-							+ "where rs.ROOM_ID = r.ID and rs.START_TIME < "
-							+ format.format(endTime) + " and rs.END_TIME > "
-							+ format.format(startTime) + ") ";
+							+ "where rs.ROOM_ID = r.ID and rs.START_TIME < '"
+							+ format.format(endTime) + "' and rs.END_TIME > '"
+							+ format.format(startTime) + "') ";
 				}
 
 				JSONArray selectResult = MainDBHandler.select(sqlQuery);

@@ -165,7 +165,7 @@ public class BandsResource {
 				// Set user as logged in session
 				SessionManager.setLoggedInUser(Request, userObj);
 
-				return Response.ok("{message: \"success\"}").build();
+				return Response.ok("{\"message\": \"success\"}").build();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

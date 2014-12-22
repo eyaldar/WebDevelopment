@@ -98,7 +98,7 @@ public class ReviewsResource {
 									userId, studioId, rating,
 									data.getString("comment"));
 
-					return Response.ok("{message: \"success\"}").build();
+					return Response.ok("{\"message\": \"success\"}").build();
 				}
 			}
 		} catch (Exception e) {
