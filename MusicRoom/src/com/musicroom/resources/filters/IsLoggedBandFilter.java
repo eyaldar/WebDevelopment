@@ -15,7 +15,7 @@ public class IsLoggedBandFilter extends IsLoggedFilter {
 	public boolean isAuthorized(JSONObject loggedUser) {
 		
 		return super.isAuthorized(loggedUser) && 
-			   loggedUser.getInt("USER_TYPE_ID") == UserType.BAND.toInt();
+			   loggedUser.getInt("user_type_id") == UserType.BAND.toInt();
 	}
 	
 	@Override

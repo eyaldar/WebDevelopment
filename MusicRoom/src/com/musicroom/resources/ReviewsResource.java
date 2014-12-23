@@ -1,5 +1,7 @@
 package com.musicroom.resources;
 
+import java.sql.PreparedStatement;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -92,8 +94,8 @@ public class ReviewsResource {
 							.entity(BAD_RATE).build();
 				} else {
 					MainDBHandler
-							.selectWithParameters(
-									"INSERT INTO REVIEWS (USER_ID, STUDIO_ID, RATING, COMMENT) VALUES(?, ?, ?, ?)",
+							.insertWithAutoKey(
+									"INSERT INTO REVIEWS (USER_ID, STUDIO_ID, RATING, COMMENT) VALUES(?, ?, ?, ?)", PreparedStatement.NO_GENERATED_KEYS,
 									userId, studioId, rating,
 									data.getString("comment"));
 

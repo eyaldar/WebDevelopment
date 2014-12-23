@@ -80,11 +80,11 @@ public class StudiosResource {
 
 				// Add avg rating
 				JSONArray avg_rating = MainDBHandler.selectWithParameters(
-						"select avg(RATING) as AVG_RATING " + "from REVIEWS "
+						"select avg(RATING) as avg_rating " + "from REVIEWS "
 								+ "where STUDIO_ID = ?", id);
 
 				studio.put("avg_rating",
-						avg_rating.getJSONObject(0).getDouble("AVG_RATING"));
+						avg_rating.getJSONObject(0).getDouble("avg_rating"));
 
 				int[] roomIDs = new int[results.length()];
 
@@ -93,7 +93,7 @@ public class StudiosResource {
 					JSONObject currentRow = results.getJSONObject(i);
 					JSONObject room = new JSONObject();
 
-					roomIDs[i] = currentRow.getInt("ROOM_ID");
+					roomIDs[i] = currentRow.getInt("room_id");
 					room.put("id", roomIDs[i]);
 					room.put("rate", currentRow.getInt("rate"));
 					room.put("name", currentRow.getString("room_name"));
