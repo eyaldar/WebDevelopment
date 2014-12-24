@@ -35,9 +35,7 @@ public class BandsResource {
 			+ "left join BAND_MEMBERS as bm "
 			+ "on b.ID = bm.BAND_ID "
 			+ "left join MEMBER_INSTRUMENT as bi "
-			+ "on bm.ID = bi.MEMBER_ID "
-			+ "left join EQUIPMENT_TYPES as et "
-			+ "on et.ID = bi.EQUIPMENT_TYPE_ID";
+			+ "on bm.ID = bi.MEMBER_ID";
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

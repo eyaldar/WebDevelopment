@@ -103,7 +103,7 @@ public class BandJSONArrayGenerator {
 	
 	private void addInstrument(JSONObject currentRow,
 			JSONObject currentBandMember) {
-		String instrument = currentRow.getString("equipment_name");		
+		int instrument = currentRow.getInt("equipment_type_id");		
 		currentBandMember.getJSONArray("instruments").put(instrument);
 	}
 
