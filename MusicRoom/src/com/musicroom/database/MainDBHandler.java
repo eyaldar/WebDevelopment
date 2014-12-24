@@ -20,6 +20,7 @@ public class MainDBHandler {
 		if (connection != null) {
 			try {
 				connection.close();
+				connection = null;
 				System.out.println("Database connection terminated");
 			} catch (Exception e) {
 				System.err.println("Errors closing the DB connection");

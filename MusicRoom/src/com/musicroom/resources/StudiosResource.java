@@ -83,8 +83,16 @@ public class StudiosResource {
 						"select avg(RATING) as avg_rating " + "from REVIEWS "
 								+ "where STUDIO_ID = ?", id);
 
-				studio.put("avg_rating",
-						avg_rating.getJSONObject(0).getDouble("avg_rating"));
+				if (avg_rating.getJSONObject(0).has("avg_rating")) 
+				{
+					// Add avg
+					studio.put("avg_rating", avg_rating.getJSONObject(0).getDouble("avg_rating"));
+				}
+				else
+				{
+					// no avg
+					studio.put("avg_rating", "no reviews");
+				}
 
 				int[] roomIDs = new int[results.length()];
 
