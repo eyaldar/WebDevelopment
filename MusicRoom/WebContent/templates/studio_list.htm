@@ -2,5 +2,15 @@
 	<li ng-repeat="item in items" transit>
 		<a ng-include src="'templates/studio_list_info.htm'" ng-href="studio/{{item.id}}" class="list-group-item">
 	   </a>
+	   <div class="collapse in">
+	   		<ul class="media-list list group">
+				<li ng-repeat="room in item.rooms">
+					<a ng-href="room/{{room.id}}" class="list-group-item">
+						{{room.name}}
+						<span class="badge pull-right">{{room.rate}} NIS</span>
+	    			</a>
+				</li>
+	   		</ul>
+	   </div>
 	</li>
 </ul>
