@@ -2,7 +2,11 @@
 	<li ng-repeat="item in items" transit>
 		<a ng-include src="'templates/studio_list_info.htm'" ng-href="studio/{{item.id}}" class="list-group-item">
 	   </a>
-	   <div class="collapse in">
+	   <button class="btn" type="button" data-toggle="collapse" style="display: block; width: 100%"
+	   		   data-target="#rooms-list-div-{{item.id}}" aria-expended="false" aria-controls="rooms-list-div-{{item.id}}">
+	   		   Rooms
+ 	   </button>
+	   <div id="rooms-list-div-{{item.id}}" class="collapse">
 	   		<ul class="media-list list group">
 				<li ng-repeat="room in item.rooms">
 					<a ng-href="room/{{room.id}}" class="list-group-item">
