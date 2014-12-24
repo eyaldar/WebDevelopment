@@ -539,14 +539,22 @@ public class StudiosResource {
 						// Add avg rating
 						JSONArray avg_rating = MainDBHandler
 								.selectWithParameters(
-										"select avg(RATING) as AVG_RATING "
+										"select avg(RATING) as avg_rating "
 												+ "from REVIEWS "
 												+ "where STUDIO_ID = ?",
 										studioID);
 
-						currentStudio.put("avg_rating", avg_rating
-								.getJSONObject(0).getDouble("AVG_RATING"));
-
+						if (avg_rating.getJSONObject(0).has("avg_rating")) 
+						{
+							// Add avg
+							currentStudio.put("avg_rating", avg_rating.getJSONObject(0).getDouble("avg_rating"));
+						}
+						else
+						{
+							// no avg
+							currentStudio.put("avg_rating", "no reviews");
+						}
+							
 						arrayResult.put(currentStudio);
 					}
 					// the studio exists in the result
