@@ -161,9 +161,9 @@ public class StudiosResource {
 		// Check that room is clear
 		JSONArray queryRes = MainDBHandler
 				.selectWithParameters("select rs.* " 
-						+ " from musicroomdb.ROOM_SCHEDULE as rs"
-						+ " left join musicroomdb.rooms as r on r.ID = rs.ROOM_ID"
-						+ " left join musicroomdb.studios as s on s.ID = r.STUDIO_ID"
+						+ " from ROOM_SCHEDULE as rs"
+						+ " left join ROOMS as r on r.ID = rs.ROOM_ID"
+						+ " left join STUDIOS as s on s.ID = r.STUDIO_ID"
 						+ " where rs.ROOM_ID = ? and s.USER_ID = ?", 
 						roomId, user.getInt("id"));
 		
