@@ -160,7 +160,12 @@ public class BandsResource {
 				// Set user as logged in session
 				SessionManager.setLoggedInUser(Request, userObj);
 
-				return Response.ok("{\"message\": \"success\"}").build();
+				JSONObject resultResponse = new JSONObject();
+				resultResponse.put("message", "succees");
+				resultResponse.put("band_id", bandID);
+				resultResponse.put("user_id", userID);
+				
+				return Response.ok(resultResponse.toString()).build();
 			}
 		} catch (Exception e) {
 			// rollback

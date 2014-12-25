@@ -330,7 +330,12 @@ public class StudiosResource {
 				MainDBHandler.getConnection().commit();
 				MainDBHandler.getConnection().setAutoCommit(true);
 				
-				return Response.ok("{\"message\": \"success\"}").build();
+				JSONObject resultResponse = new JSONObject();
+				resultResponse.put("message", "succees");
+				resultResponse.put("studio_id", studioID);
+				resultResponse.put("user_id", userID);
+				
+				return Response.ok(resultResponse.toString()).build();
 			}
 		} catch (Exception e) {
 			
