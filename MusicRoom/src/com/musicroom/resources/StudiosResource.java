@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import redis.clients.jedis.Jedis;
@@ -35,6 +36,7 @@ import redis.clients.jedis.Tuple;
 import com.musicroom.database.MainDBHandler;
 import com.musicroom.database.RedisManager;
 import com.musicroom.resources.filters.RequireLoggedBand;
+import com.musicroom.resources.filters.RequireLoggedStudio;
 import com.musicroom.session.SessionManager;
 import com.musicroom.utils.JSONUtils;
 import com.musicroom.utils.UserType;
@@ -83,13 +85,11 @@ public class StudiosResource {
 						"select avg(RATING) as avg_rating " + "from REVIEWS "
 								+ "where STUDIO_ID = ?", id);
 
-				if (avg_rating.getJSONObject(0).has("avg_rating")) 
-				{
+				if (avg_rating.getJSONObject(0).has("avg_rating")) {
 					// Add avg
-					studio.put("avg_rating", avg_rating.getJSONObject(0).getDouble("avg_rating"));
-				}
-				else
-				{
+					studio.put("avg_rating", avg_rating.getJSONObject(0)
+							.getDouble("avg_rating"));
+				} else {
 					// no avg
 					studio.put("avg_rating", "no reviews");
 				}
@@ -150,13 +150,33 @@ public class StudiosResource {
 		}
 	}
 
+	@GET
+	@RequireLoggedStudio
+	@Path("/schedule/{roomId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAppointment(@PathParam("roomId") int roomId,
+			@Context HttpServletRequest request) throws JSONException, Exception {
+		JSONObject user = SessionManager.getLoggedInUser(request);
+
+		// Check that room is clear
+		JSONArray queryRes = MainDBHandler
+				.selectWithParameters("select rs.* " 
+						+ " from musicroomdb.ROOM_SCHEDULE as rs"
+						+ " left join musicroomdb.rooms as r on r.ID = rs.ROOM_ID"
+						+ " left join musicroomdb.studios as s on s.ID = r.STUDIO_ID"
+						+ " where rs.ROOM_ID = ? and s.USER_ID = ?", 
+						roomId, user.getInt("id"));
+		
+		return Response.ok(queryRes.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
+	}
+
 	@POST
 	@Path("/schedule")
 	@RequireLoggedBand
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setAppointment(String dataStr,
-			@Context HttpServletRequest Request) {
+			@Context HttpServletRequest request) {
 		try {
 			SimpleDateFormat format = new SimpleDateFormat(
 					"yyyy-MM-dd HH:mm:ss");
@@ -170,7 +190,9 @@ public class StudiosResource {
 			// Check that room is clear
 			JSONArray queryRes = MainDBHandler
 					.select("select count(*) as count from ROOM_SCHEDULE "
-						  + "where ROOM_ID = "+roomId+" and START_TIME < '"+format.format(end)+"' and END_TIME > '"+format.format(start)+"'");
+							+ "where ROOM_ID = " + roomId
+							+ " and START_TIME < '" + format.format(end)
+							+ "' and END_TIME > '" + format.format(start) + "'");
 
 			// if there are appointments in the wanted time
 			if (queryRes.getJSONObject(0).getInt("count") > 0) {
@@ -179,19 +201,20 @@ public class StudiosResource {
 				return Response.status(HttpServletResponse.SC_CONFLICT)
 						.entity(errorJson).build();
 			} else {
-				
+
 				// Get user data
-				JSONObject user = SessionManager.getLoggedInUser(Request);
-				queryRes = MainDBHandler
-						.selectWithParameters(
-								"select ID from BANDS where USER_ID = ?",
-								user.getInt("id"));
+				JSONObject user = SessionManager.getLoggedInUser(request);
+				queryRes = MainDBHandler.selectWithParameters(
+						"select ID from BANDS where USER_ID = ?",
+						user.getInt("id"));
 				int bandId = queryRes.getJSONObject(0).getInt("id");
-				
+
 				// insert the appointment
 				MainDBHandler.insertWithAutoKey(
 						"insert into ROOM_SCHEDULE (ROOM_ID, BAND_ID, START_TIME, END_TIME) "
-								+ "values("+roomId+","+bandId+",'"+format.format(start)+"','"+format.format(end)+"')",
+								+ "values(" + roomId + "," + bandId + ",'"
+								+ format.format(start) + "','"
+								+ format.format(end) + "')",
 						PreparedStatement.NO_GENERATED_KEYS);
 
 				return Response.ok("{\"message\": \"success\"}").build();
@@ -329,19 +352,22 @@ public class StudiosResource {
 
 				MainDBHandler.getConnection().commit();
 				MainDBHandler.getConnection().setAutoCommit(true);
-				
+
 				JSONObject resultResponse = new JSONObject();
 				resultResponse.put("message", "succees");
 				resultResponse.put("studio_id", studioID);
 				resultResponse.put("user_id", userID);
-				
+
 				return Response.ok(resultResponse.toString()).build();
 			}
 		} catch (Exception e) {
-			
+
 			// rollback
-			try {MainDBHandler.getConnection().rollback();}catch(Exception e1){}
-			
+			try {
+				MainDBHandler.getConnection().rollback();
+			} catch (Exception e1) {
+			}
+
 			e.printStackTrace();
 			return Response.serverError().build();
 		}
@@ -557,17 +583,15 @@ public class StudiosResource {
 												+ "where STUDIO_ID = ?",
 										studioID);
 
-						if (avg_rating.getJSONObject(0).has("avg_rating")) 
-						{
+						if (avg_rating.getJSONObject(0).has("avg_rating")) {
 							// Add avg
-							currentStudio.put("avg_rating", avg_rating.getJSONObject(0).getDouble("avg_rating"));
-						}
-						else
-						{
+							currentStudio.put("avg_rating", avg_rating
+									.getJSONObject(0).getDouble("avg_rating"));
+						} else {
 							// no avg
 							currentStudio.put("avg_rating", "no reviews");
 						}
-							
+
 						arrayResult.put(currentStudio);
 					}
 					// the studio exists in the result

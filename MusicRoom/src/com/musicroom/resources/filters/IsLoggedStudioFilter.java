@@ -7,20 +7,20 @@ import org.json.JSONObject;
 import com.musicroom.utils.UserType;
 
 @Provider
-@RequireLoggedBand
-public class IsLoggedBandFilter extends IsLoggedFilter {
-	private static final String NOT_LOGGED_AS_BAND = "{\"error\":\"Access denied! please login as band first.\"}";
+@RequireLoggedStudio
+public class IsLoggedStudioFilter extends IsLoggedFilter {
+	private static final String NOT_LOGGED_AS_STUDIO = "{\"error\":\"Access denied! please login as studio first.\"}";
 	
 	@Override
 	public boolean isAuthorized(JSONObject loggedUser) {
 		
 		return super.isAuthorized(loggedUser) && 
-			   loggedUser.getInt("user_type_id") == UserType.BAND.toInt();
+			   loggedUser.getInt("user_type_id") == UserType.STUDIO.toInt();
 	}
 	
 	@Override
 	public String getErrorObject()
 	{
-		return NOT_LOGGED_AS_BAND;
+		return NOT_LOGGED_AS_STUDIO;
 	}
 }

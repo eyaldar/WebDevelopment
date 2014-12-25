@@ -165,7 +165,7 @@ public class BandsResource {
 				resultResponse.put("band_id", bandID);
 				resultResponse.put("user_id", userID);
 				
-				return Response.ok(resultResponse.toString()).build();
+				return Response.ok(resultResponse.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
 			}
 		} catch (Exception e) {
 			// rollback
