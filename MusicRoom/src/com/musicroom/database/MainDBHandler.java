@@ -28,8 +28,27 @@ public class MainDBHandler {
 		}
 	}
 
-	public static Connection getConnection() {
-		if (connection == null) {
+	public static Connection getConnection()
+	{
+
+		if (connection != null)
+		{
+			try 
+			{
+				if (connection.isClosed())
+				{
+					connection = null;
+				}
+			} 
+			catch (SQLException e) 
+			{
+				connection = null;
+				e.printStackTrace();
+			}
+		}
+		
+		if (connection == null)
+		{
 			try {
 				String userName = "root";
 				String password = "";
@@ -41,16 +60,21 @@ public class MainDBHandler {
 
 				System.out.println("Connected to database");
 
-			} catch (Exception e) {
+			} 
+			catch (Exception e) 
+			{
 				System.err.println("Cannot connect to database server");
 				System.err.println(e.getMessage());
 			}
 
-			try {
+			try 
+			{
 				Statement stmt = connection.createStatement();
 				stmt.executeUpdate("USE musicRoomDB");
 
-			} catch (Exception e) {
+			} 
+			catch (Exception e) 
+			{
 				System.err.println("Database doesn't exist!");
 				System.err.println(e.getMessage());
 			}
