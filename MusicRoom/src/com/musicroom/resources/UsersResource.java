@@ -127,7 +127,7 @@ public class UsersResource {
 			@Context HttpServletRequest Request) throws Exception {
 		JSONObject data = new JSONObject(strData);
 
-		int userID = data.getInt("ID");
+		int userID = data.getInt("id");
 		String password = data.getString("password");
 
 		// update
