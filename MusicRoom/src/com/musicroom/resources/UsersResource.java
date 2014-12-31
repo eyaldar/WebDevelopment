@@ -124,19 +124,20 @@ public class UsersResource {
 	@RequireLogin
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updatePassword(String strData,
-			@Context HttpServletRequest Request) throws Exception {
+			@Context HttpServletRequest request) throws Exception {
 		JSONObject data = new JSONObject(strData);
-
-		int userID = data.getInt("id");
+		JSONObject loggedUser = SessionManager.getLoggedInUser(request);
+		
+		int userId = loggedUser.getInt("id");
 		String password = data.getString("password");
 
 		// update
 		MainDBHandler.executeUpdateWithParameters(
 				"update USERS set PASSWORD = ? where ID = ?", password,
-				userID);
+				userId);
 
 		// update session
-		SessionManager.updateLoggedUserPassword(Request, password);
+		SessionManager.updateLoggedUserPassword(request, password);
 
 		return Response.ok(SUCCESS).build();
 	}
