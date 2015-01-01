@@ -1,0 +1,21 @@
+<div>
+	<img ng-src="{{band.logo}}" class="img-thumbnail img-responsive center-block" 
+		 style="margin: 0 auto;" width="400em"></img>
+	<label><strong>Genre:</strong></label>
+	<label>{{band.genre}}</label>
+
+	<table align="left" width="100%">
+		<tr>
+			<td><label><strong>Band Members:</strong></label></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<ul class="list-group" id="playing-bands-list">
+						<li ng-repeat="band_member in band.band_members" class="media-list list-group-item" 
+							ng-include src="'templates/band_member_info.htm'">
+						</li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+</div>
