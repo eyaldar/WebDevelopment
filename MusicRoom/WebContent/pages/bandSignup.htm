@@ -1,0 +1,73 @@
+<div class="jumbotron">
+    <h2 class="text-center">Sign up as a band user</h2> 
+    <form class="text-center" name="bandSignupForm" class="form-horizontal" role="form" novalidate>
+
+
+                <article>
+                    <p>
+                        <h1>User Info</h1>
+                        <label for="txtBandUserName" class="mandatory-field">Username: </label>
+                        <input id="txtBandUserName" type="text" />
+                        <label for="txtBandPassword" class="mandatory-field">Password: </label>
+                        <input id="txtBandPassword" type="password" />
+
+                        <br />
+
+                        <h1>Band Info</h1>
+                        <label for="txtBandName" class="mandatory-field">Band Name: </label>
+                        <input id="txtBandName" type="text" />
+                        <label for="txtBandLogo">Logo URL: </label>
+                        <input id="txtBandLogo" type="url" />
+                        <img id="imgBandLogoPreview" src="#" alt="your image will appear here" style="width:256px; height:256px" />
+
+                        <div data-role="fieldcontain">
+                            <label for="select_genres">Genre:</label>
+                            <select id="select_genres"></select>
+                        </div>
+
+                        <br />
+
+                        <h1>Band Members</h1>
+                        
+                        <label for="txtMemberName">Member Name: </label>
+                        <input id="txtMemberName" type="text" />
+
+                        <div data-role="fieldcontain">
+                            <label for="select_bandmemberroles">Band Member Role (Instrument):</label>
+                            <select id="select_bandmemberroles"></select>
+                            
+                            <label for="txtMemberPicture">Member Picture URL: </label>
+                            <input id="txtMemberPicture" type="url" />
+                            <br/>
+                            <img id="imgMemberPicturePreview" src="#" alt="your image will appear here" style="width:256px; height:256px" />
+                            
+                            <br />
+                            <br />
+
+                            <label for="select_bandmembers">Members:</label>
+                            <select id="select_bandmembers"></select>
+                            <br />
+                            <div data-role="controlgroup" data-type="horizontal">
+                                <button id="button_bandmember_add" data-role="button" data-icon="plus" class="bandmember_button">Add</button>
+                                <button id="button_bandmember_remove" data-role="button" data-icon="minus" class="bandmember_button">Remove</button>
+                            </div>
+
+                        </div>
+                    </p>
+
+                    <div>
+                        <center>
+                            <br />
+                            <br />
+                            <a data-role="button" onclick="BandSignUp()">Signup</a>
+                            <br />
+                            <p id="bandSignupResult" style='color:red'>  </p>
+                        </center>
+                    </div>
+
+                </article>
+            
+            <p id="band-signup-page-errors" style="color:red; text-align: center"></p>
+	
+	</form>
+</div>

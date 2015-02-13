@@ -41,6 +41,7 @@
 	        <div class="navbar-collapse collapse" role="navigation">
 				<ul class="navbar-nav nav">
 			        <li><a ui-sref="home" ng-click="checkLoginState()">Home</a></li>
+			        <li ng-hide="logged"><a ui-sref="signup" ng-click="checkLoginState()">Sign Up</a></li>
 			        <li><a ui-sref="bands" ng-click="checkLoginState()">Bands</a></li>
 			        <li><a ui-sref="studios" ng-click="checkLoginState()">Studios</a></li>
 				</ul>

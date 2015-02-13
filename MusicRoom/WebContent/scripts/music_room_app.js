@@ -50,6 +50,29 @@
 					controller : "LoginController"
 				}
 			}
+		}).state('signup', {
+			url : "/signup",
+			views : {
+				"view" : {
+					templateUrl : "pages/signup.htm"
+				}
+			}
+		}).state('bandSignup', {
+			url : "/bandSignup",
+			views : {
+				"view" : {
+					templateUrl : "pages/bandSignup.htm",
+					controller : "BandSignupController"
+				}
+			}
+		}).state('studioSignup', {
+			url : "/studioSignup",
+			views : {
+				"view" : {
+					templateUrl : "pages/studioSignup.htm",
+					controller : "StudioSignupController"
+				}
+			}
 		});
 	});
 }());
