@@ -1,0 +1,55 @@
+	<div>
+		<table align="left" width="100%">
+			<tr>
+				<td><label><strong>Rate:</strong></label></td>
+				<td><label>{{room.rate}}</label></td>
+			<tr>
+			<tr>
+				<td><label><strong>Extra Details:</strong></label></td>
+				<td><label>{{room.extra_details}}</label></td>
+			</tr>
+			<tr>
+				<td><label><strong>Type:</strong></label></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<ul class="media-list list group" id="room-type-list">
+						<li ng-repeat="room_type in room.room_type">
+							<div class="list-group-item"><label><strong>{{room_type}}</strong></label></div>
+						</li>
+					</ul>
+				</td>
+			</tr>
+			<tr>
+				<td><label><strong>Equipment:</strong></label></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<ul class="media-list list group" id="playing-bands-list">
+							<li ng-repeat="equipment in room.equipment" 
+								ng-include src="'templates/equipment_info.htm'"
+								class="list-group-item">
+							</li>
+					</ul>
+				</td>
+			</tr>
+			<tr id="order-schedule-label-tr">
+				<td><strong>Order Room:</strong></td>
+			</tr>
+			<tr id="order-schedule-tr">
+				<td colspan="2">
+					<div data-role="fieldcontain" data-type="horizontal">
+						<label for="input-order-schedule-from">From:</label>
+						<input type="datetime" ng-model="fromTime" id="input-order-schedule-from"/>
+						<label for="input-order-schedule-to">To:</label>
+						<input type="datetime" ng-model="toTime" id="input-order-schedule-to"/>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td id="order-schedule-button-tr" colspan="2">
+					<button id="button-order-schedule" class="btn" ng-click="orderRoom()">Order</button>
+				</td>
+			</tr>
+			
+	</div>

@@ -1,6 +1,7 @@
 <ul class="media-list list-group">
 	<li ng-repeat="item in items" transit>
-		<a ng-include src="'templates/room_list_info.htm'" ng-href="room/{{item.id}}" class="list-group-item">
+		<a ng-include src="'templates/room_list_info.htm'" 
+			ui-sref="roomDetails({studioId: '{{item.studio_id}}', id: '{{item.id}}'})" class="list-group-item">
 	    </a>
 	</li>
 </ul>

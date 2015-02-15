@@ -73,6 +73,22 @@
 					controller : "StudioSignupController"
 				}
 			}
+		}).state('roomDetails', {
+			url : "/studios/:studioId/:id",
+			views : {
+				"view" : {
+					templateUrl : "pages/room_details.htm",
+					controller : "RoomDetailsController"
+				}
+			}
+		}).state('studioDetails', {
+			url : "/studios/:id",
+			views : {
+				"view" : {
+					templateUrl : "pages/studio_details.htm",
+					controller : "StudioDetailsController"
+				}
+			}
 		});
 	});
 }());

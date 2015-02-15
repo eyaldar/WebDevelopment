@@ -1,0 +1,67 @@
+<div>
+	<img ng-src="{{studio.logo}}" class="img-thumbnail img-responsive center-block" 
+	 	style="margin: 0 auto;" width="400em"></img>
+		<table align="left" width="100%">
+			<tr>
+				<td><label><strong>City:</strong></label></td>
+				<td><label>{{studio.city}}</label></td>
+			<tr>
+			<tr>
+				<td><label><strong>Address:</strong></label></td>
+				<td><label>{{studio.address}}</label></td>
+			</tr>
+			<tr>
+				<td><label><strong>Contact Name:</strong></label></td>
+				<td><label>{{studio.contact_name}}</label></td>
+			</tr>
+			<tr>
+				<td><label><strong>Phone Numbers:</strong></label></td>
+				<td><label>{{studio.phone}}</label></td>
+			</tr>
+			<tr>
+				<td><label><strong>Email:</strong></label></td>
+				<td><label>{{studio.email}}</label></td>
+			</tr>
+			<tr>
+				<td><label><strong>Site:</strong></label></td>
+				<td><a href="{{studio.site}}">{{studio.site}}</a></td>
+			</tr>
+			<tr>
+				<td><label><strong>Facebook:</strong></label></td>
+				<td><a href="{{studio.facebook_page}}">{{studio.facebook_page}}</a></td>
+			</tr>
+			<tr>
+				<td><label><strong>Extra details:</strong></label></td>
+				<td><p>{{studio.extra_details}}</p></td>
+			</tr>
+			<tr>
+				<td><label><strong>Rooms:</strong></label></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+			   		<ul class="media-list list group">
+						<li ng-repeat="room in studio.rooms">
+							<a ui-sref="roomDetails({studioId: '{{studio.id}}', id: '{{room.id}}'})" class="list-group-item">
+								{{room.name}}
+								<span class="badge pull-right">{{room.rate}} NIS</span>
+			    			</a>
+						</li>
+			   		</ul>
+				</td>
+			</tr>
+			<tr>
+				<td><label><strong>Playing Bands:</strong></label></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+			   		<ul class="media-list list group">
+						<li ng-repeat="band in studio.playing_bands">
+							<a class="list-group-item">
+								{{band.name}}
+			    			</a>
+						</li>
+			   		</ul>
+				</td>
+			</tr>
+		</table>
+	</div>

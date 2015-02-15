@@ -1,6 +1,6 @@
 <ul class="media-list list-group">
 	<li ng-repeat="item in items" transit>
-		<a ng-include src="'templates/studio_list_info.htm'" ng-href="studio/{{item.id}}" class="list-group-item">
+		<a ng-include src="'templates/studio_list_info.htm'" ui-sref="studioDetails({id: '{{item.id}}'})" class="list-group-item">
 	   </a>
 	   <button class="btn" type="button" data-toggle="collapse" style="display: block; width: 100%"
 	   		   data-target="#rooms-list-div-{{item.id}}" aria-expended="false" aria-controls="rooms-list-div-{{item.id}}">
@@ -9,7 +9,7 @@
 	   <div id="rooms-list-div-{{item.id}}" class="collapse">
 	   		<ul class="media-list list group">
 				<li ng-repeat="room in item.rooms">
-					<a ng-href="room/{{room.id}}" class="list-group-item">
+					<a ui-sref="roomDetails({studioId: '{{item.id}}', id: '{{room.id}}'})" class="list-group-item">
 						{{room.name}}
 						<span class="badge pull-right">{{room.rate}} NIS</span>
 	    			</a>
