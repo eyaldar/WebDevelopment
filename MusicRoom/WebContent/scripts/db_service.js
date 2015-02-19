@@ -81,7 +81,7 @@ var createDB = function(){
 					[],function(tx,result){},function(tx,error){});
 
 		tx.executeSql('CREATE TABLE ROOMS('
-				+ '    ID 				INTEGER PRIMARY KEY AUTO_INCREMENT,'
+				+ '    ID 				INTEGER PRIMARY KEY,'
 				+ '	   STUDIO_ID	 	INTEGER NOT NULL,'
 				+ '	   RATE		 		INTEGER NOT NULL,'
 				+ '	   ROOM_NAME 		TEXT NOT NULL,'
@@ -98,14 +98,14 @@ var createDB = function(){
 				[],function(tx,result){},function(tx,error){});
 		
 		tx.executeSql('CREATE TABLE BANDS('
-				+ '    ID			INTEGER PRIMARY KEY AUTO_INCREMENT,'
+				+ '    ID			INTEGER PRIMARY KEY,'
 				+ '	   BAND_NAME 	TEXT NOT NULL,'
 				+ '	   LOGO_URL	 	TEXT NOT NULL,'
 				+ '	   GENRE	 	TEXT NOT NULL,'
 				,[],function(tx,result){},function(tx,error){});
 		
 		tx.executeSql('CREATE TABLE BAND_MEMBERS('
-				+ '    ID			INTEGER PRIMARY KEY AUTO_INCREMENT,'
+				+ '    ID			INTEGER PRIMARY KEY,'
 				+ '	   MEMBER_NAME 	TEXT NOT NULL,'
 				+ '	   ROLE		 	TEXT NOT NULL,'
 				+ '	   PICTURE_URL 	TEXT NOT NULL,'
@@ -142,6 +142,11 @@ var createDB = function(){
 				+ '	   Foreign Key (ROOM_ID) references ROOMS(ID) on delete cascade);',
 				[],function(tx,result){},function(tx,error){});
 		
+		tx.executeSql('CREATE TABLE MY_QUERIES('
+				+ '    QUERY				TEXT PRIMARY KEY,'
+				+ '	   LAST_SERVER_CHECK 	INTEGER NOT NULL);',
+				[],function(tx,result){},function(tx,error){});
+		
 		tx.executeSql('CREATE INDEX STD_CT_IDX 		ON STUDIOS 			(CITY_ID)',[],function(tx,result){},function(tx,error){});
 		tx.executeSql('CREATE INDEX CT_AREA_IDX 	ON CITIES 			(AREA_ID)',[],function(tx,result){},function(tx,error){});
 		tx.executeSql('CREATE INDEX STD_NAME_IDX 	ON STUDIOS 			(STUDIO_NAME)',[],function(tx,result){},function(tx,error){});
@@ -155,7 +160,54 @@ var createDB = function(){
 
 var populateDB = function(){
 	
-	
+	Restangular.setBaseUrl("rest/");
+    var areasService = Restangular.all("areas");
+    
+    areasService.getList().then(function(areas) {
+    	for (var i = 0; i < areas.length; i++) {
+    		executeQuery("insert into AREAS values " + areas[i].id +"," + areas[i].name, null, null, true);
+    		
+    	    var citiesService = Restangular.all("cities", areas[i].id);
+    	    
+    	    citiesService.getList().then(function(cities) {
+    	    	for (var j = 0; j < cities.length; j++) {
+    	    		executeQuery("insert into CITIES values " + cities[j].id +"," + cities[j].name + ',' + areas[i].id, null, null, true);
+    	    	}
+    	    });
+    	}
+    });
+    
+    var room_typesService = Restangular.all("room_types");
+    
+    room_typesService.getList().then(function(types) {
+    	for (var i = 0; i < types.length; i++) {
+    		executeQuery("insert into ROOM_TYPES values " + types[i].id +"," + types[i].name, null, null, true);
+    	}
+    });
+    
+    var user_typesService = Restangular.all("user_types");
+    
+    user_typesService.getList().then(function(types) {
+    	for (var i = 0; i < types.length; i++) {
+    		executeQuery("insert into USER_TYPES values " + types[i].id +"," + types[i].name, null, null, true);
+    	}
+    });
+    
+    var equipment_categoriesService = Restangular.all("equipment_categories");
+    
+    equipment_categoriesService.getList().then(function(cats) {
+    	for (var i = 0; i < cats.length; i++) {
+    		executeQuery("insert into EQUIPMENT_CATEGORIES values " + cats[i].id +"," + cats[i].name, null, null, true);
+    		
+    	    var equipment_typesService = Restangular.all("equipment_types", cats[i].id);
+    	    
+    	    equipment_typesService.getList().then(function(types) {
+    	    	for (var j = 0; j < types.length; j++) {
+    	    		executeQuery("insert into EQUIPMENT_TYPES values " + types[j].id +"," + types[j].name + ',' + cats[i].id, null, null, true);
+    	    	}
+    	    });
+    	}
+    });
 }
 
 var executeQuery = function (query,callback,callbackerror,isOpen){
