@@ -43,12 +43,6 @@
 			toggleEndTimePrompt : function(value) {
 				formMessages.showEndTimePrompt = value;
 			},
-			showMessages : function(form, field) {
-				return form[field].$touched || form.$submitted;
-			},
-			hasErrorClass : function(form, field) {
-				return form[field].$touched && form[field].$invalid;
-			},
 			orderRoom : function(form) {
 				Restangular.all("studios/schedule").post({
 					roomId: $scope.room.id,

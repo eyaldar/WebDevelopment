@@ -37,7 +37,7 @@ public class ReviewsResource {
 		reviews = MainDBHandler
 				.selectWithParameters(
 						"select * "
-								+ "from REVIEWS as r left join USERS as u on r.USER_ID = u.ID "
+								+ "from REVIEWS as r left join BANDS as b on r.USER_ID = b.USER_ID "
 								+ "where r.STUDIO_ID = ?", id);
 
 		JSONArray results = new JSONArray();
@@ -50,8 +50,9 @@ public class ReviewsResource {
 			review.put("comment", curr.getString("comment"));
 			review.put("rating", curr.getInt("rating"));
 			review.put("user_id", curr.getInt("user_id"));
-			review.put("user_name", curr.getString("user_name"));
-
+			review.put("user_name", curr.getString("band_name"));
+			review.put("user_logo", curr.getString("logo_url"));
+			
 			results.put(review);
 		}
 

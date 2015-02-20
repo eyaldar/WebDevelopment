@@ -7,9 +7,9 @@
     	$scope.items = {};
     	
         Restangular.setBaseUrl("rest/");
-        var bandsService = Restangular.all("studios");
+        var studiosService = Restangular.all("studios");
         
-        bandsService.getList().then(function(studios) {
+        studiosService.getList().then(function(studios) {
             $scope.items = studios;
         });
     };

@@ -48,7 +48,7 @@
 				style="display: block" ng-if="messages.showSubmittedError">{{errorText}}</div>
 		</div>
 		<div class="form-group"
-			ng-class="{'has-error': funcs.hasErrorClass(orderForm, 'startTimePicker') }">
+			ng-class="{'has-error': formFuncs.hasErrorClass(orderForm, 'startTimePicker') }">
 			<label for="start-time-picker">Start:</label> <input date-time-picker
 				id="start-time-picker" name="startTimePicker" type="text"
 				min-date="orderData.nowTime" date="orderData.startTime"
@@ -66,7 +66,7 @@
 			</div>
 			<div class="my-messages"
 				ng-messages="orderForm.startTimePicker.$error"
-				ng-if="funcs.showMessages(orderForm, 'startTimePicker')">
+				ng-if="formFuncs.showMessages(orderForm, 'startTimePicker')">
 				<div class="message-animation" ng-message="required">
 					<strong>This field is required.</strong>
 				</div>
@@ -74,7 +74,7 @@
 		</div>
 
 		<div class="form-group"
-			ng-class="{'has-error': funcs.hasErrorClass(orderForm, 'endTimePicker') }">
+			ng-class="{'has-error': formFuncs.hasErrorClass(orderForm, 'endTimePicker') }">
 			<label for="end-time-picker">End:</label> <input date-time-picker
 				id="end-time-picker" name="endTimePicker" type="text"
 				min-date="orderData.startTime" date="orderData.endTime"
@@ -93,7 +93,7 @@
 					the room?</div>
 			</div>
 			<div class="my-messages" ng-messages="orderForm.endTimePicker.$error"
-				ng-if="funcs.showMessages(orderForm, 'endTimePicker')">
+				ng-if="formFuncs.showMessages(orderForm, 'endTimePicker')">
 				<div class="message-animation" ng-message="required">
 					<strong>This field is required.</strong>
 				</div>
