@@ -2,7 +2,7 @@
 
 (function() {
 	var musicRoom = angular.module('musicRoom', [ 'restangular', 'ui.router',
-			'musicRoom' ]);
+			'ui.bootstrap', 'ngMessages', 'ngAnimate', 'musicRoom' ]);
 	musicRoom.config(function($stateProvider, $urlRouterProvider) {
 
 		$urlRouterProvider.otherwise('/home');
@@ -24,9 +24,7 @@
 					templateUrl : "pages/main_page.htm"
 				}
 			}
-		})
-		.state('bands', bandsState)
-		.state('bandDetails', {
+		}).state('bands', bandsState).state('bandDetails', {
 			url : "/band/:id",
 			views : {
 				"view" : {
@@ -78,7 +76,7 @@
 			views : {
 				"view" : {
 					templateUrl : "pages/room_details.htm",
-					controller : "RoomDetailsController"
+					controller : "RoomDetailsController",
 				}
 			}
 		}).state('studioDetails', {

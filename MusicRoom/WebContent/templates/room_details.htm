@@ -1,55 +1,114 @@
-	<div>
-		<table align="left" width="100%">
-			<tr>
-				<td><label><strong>Rate:</strong></label></td>
-				<td><label>{{room.rate}}</label></td>
-			<tr>
-			<tr>
-				<td><label><strong>Extra Details:</strong></label></td>
-				<td><label>{{room.extra_details}}</label></td>
-			</tr>
-			<tr>
-				<td><label><strong>Type:</strong></label></td>
-			</tr>
-			<tr>
-				<td colspan="2">
-					<ul class="media-list list group" id="room-type-list">
-						<li ng-repeat="room_type in room.room_type">
-							<div class="list-group-item"><label><strong>{{room_type}}</strong></label></div>
-						</li>
-					</ul>
-				</td>
-			</tr>
-			<tr>
-				<td><label><strong>Equipment:</strong></label></td>
-			</tr>
-			<tr>
-				<td colspan="2">
-					<ul class="media-list list group" id="playing-bands-list">
-							<li ng-repeat="equipment in room.equipment" 
-								ng-include src="'templates/equipment_info.htm'"
-								class="list-group-item">
-							</li>
-					</ul>
-				</td>
-			</tr>
-			<tr id="order-schedule-label-tr">
-				<td><strong>Order Room:</strong></td>
-			</tr>
-			<tr id="order-schedule-tr">
-				<td colspan="2">
-					<div data-role="fieldcontain" data-type="horizontal">
-						<label for="input-order-schedule-from">From:</label>
-						<input type="datetime" ng-model="fromTime" id="input-order-schedule-from"/>
-						<label for="input-order-schedule-to">To:</label>
-						<input type="datetime" ng-model="toTime" id="input-order-schedule-to"/>
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td id="order-schedule-button-tr" colspan="2">
-					<button id="button-order-schedule" class="btn" ng-click="orderRoom()">Order</button>
-				</td>
-			</tr>
-			
-	</div>
+<div>
+	<table align="left" width="100%">
+		<tr>
+			<td><label><strong>Rate:</strong></label></td>
+			<td><label>{{room.rate}}</label></td>
+		<tr>
+		<tr>
+			<td><label><strong>Extra Details:</strong></label></td>
+			<td><label>{{room.extra_details}}</label></td>
+		</tr>
+		<tr>
+			<td><label><strong>Type:</strong></label></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<ul class="media-list list group" id="room-type-list">
+					<li ng-repeat="room_type in room.room_type">
+						<div class="list-group-item">
+							<label><strong>{{room_type}}</strong></label>
+						</div>
+					</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td><label><strong>Equipment:</strong></label></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<ul class="media-list list group" id="playing-bands-list">
+					<li ng-repeat="equipment in room.equipment" ng-include
+						src="'templates/equipment_info.htm'" class="list-group-item">
+					</li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+	<h4>
+		<strong>Order Room:</strong>
+	</h4>
+	<form name="orderForm" ng-submit="funcs.orderRoom(orderForm)"
+		novalidate>
+		<div class="my-messages">
+			<div class="message-animation alert alert-success" role="alert"
+				style="display: block" ng-if="messages.showSubmittedPrompt">Thank
+				you! Your order has been placed.</div>
+			<div class="message-animation alert alert-danger" role="alert"
+				style="display: block" ng-if="messages.showSubmittedError">{{errorText}}</div>
+		</div>
+		<div class="form-group"
+			ng-class="{'has-error': funcs.hasErrorClass(orderForm, 'startTimePicker') }">
+			<label for="start-time-picker">Start:</label> <input date-time-picker
+				id="start-time-picker" name="startTimePicker" type="text"
+				min-date="orderData.nowTime" date="orderData.startTime"
+				ng-focus="funcs.toggleStartTimePrompt(true)"
+				ng-blur="funcs.toggleStartTimePrompt(false)"
+				ng-model="orderData.startTimeText"
+				ng-model-options="{ updateOn: 'default blur' }"
+				is-valid-period-id="order-room"
+				is-valid-period-link
+				class="form-control pointer" required readonly />
+			<div class="my-messages">
+				<div class="prompt message-animation"
+					ng-if="messages.showStartTimePrompt">When will you want to
+					start using the room?</div>
+			</div>
+			<div class="my-messages"
+				ng-messages="orderForm.startTimePicker.$error"
+				ng-if="funcs.showMessages(orderForm, 'startTimePicker')">
+				<div class="message-animation" ng-message="required">
+					<strong>This field is required.</strong>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group"
+			ng-class="{'has-error': funcs.hasErrorClass(orderForm, 'endTimePicker') }">
+			<label for="end-time-picker">End:</label> <input date-time-picker
+				id="end-time-picker" name="endTimePicker" type="text"
+				min-date="orderData.startTime" date="orderData.endTime"
+				ng-model-options="{ updateOn: 'default blur' }"
+				ng-focus="funcs.toggleEndTimePrompt(true)"
+				ng-blur="funcs.toggleEndTimePrompt(false)"
+				ng-model="orderData.endTimeText"
+				ng-model-options="{ updateOn: 'default blur' }"
+				is-valid-period-id="order-room"
+				is-valid-period-data="orderData"
+				is-valid-period
+				class="form-control pointer" required readonly />
+			<div class="my-messages">
+				<div class="prompt message-animation"
+					ng-if="messages.showEndTimePrompt">When will you finish using
+					the room?</div>
+			</div>
+			<div class="my-messages" ng-messages="orderForm.endTimePicker.$error"
+				ng-if="funcs.showMessages(orderForm, 'endTimePicker')">
+				<div class="message-animation" ng-message="required">
+					<strong>This field is required.</strong>
+				</div>
+				<div class="message-animation" ng-message="isValidPeriod">
+					<strong>End time is earlier than start time.</strong>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-offset-5 col-sm-2 text-center">
+				<button type="submit" id="button-order"
+					class="btn btn-block btn-primary center-block"
+					ng-disabled="orderForm.$invalid">Order</button>
+			</div>
+		</div>
+	</form>
+
+</div>

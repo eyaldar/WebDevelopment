@@ -179,7 +179,7 @@ public class StudiosResource {
 			@Context HttpServletRequest request) {
 		try {
 			SimpleDateFormat format = new SimpleDateFormat(
-					"yyyy-MM-dd HH:mm:ss");
+					"yyyy-MM-dd HH:mm");
 
 			// Get request data
 			JSONObject data = new JSONObject(dataStr);

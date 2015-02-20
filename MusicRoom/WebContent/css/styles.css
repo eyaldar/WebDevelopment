@@ -96,3 +96,27 @@ html {
 .navbar-nav {
     margin: 0;
 }
+
+.prompt {
+    margin-top: 10px;
+    white-space: normal;
+    word-wrap: break-word;
+    width: 100%;
+    max-width: 550px;
+    position: relative;
+    color: #959595;
+}
+
+div[ng-messages] {
+    margin-top: 10px;
+    white-space: normal;
+    word-wrap: break-word;
+    width: 100%;
+    max-width: 550px;
+    position: relative;
+    color: #FF0000;
+}
+
+input[readonly].pointer {
+	cursor: pointer;
+}
