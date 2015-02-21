@@ -6,7 +6,6 @@
 	var commentSystemController = function($scope, Restangular, $stateParams) {
 		$scope.items = {};  
 			
-		Restangular.setBaseUrl("rest/");
 		var reviewsService = Restangular.one("reviews", $stateParams.id);
 
 		reviewsService.getList().then(function(reviews) {

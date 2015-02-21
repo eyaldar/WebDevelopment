@@ -7,12 +7,12 @@
 		</div>
 		<div class="form-group"
 			ng-class="{'has-error': formFuncs.hasErrorClass(commentForm, 'comment') }">
-			<input id="comment" name="comment" type="text"
+			<textarea id="comment" name="comment" type="text"
 				ng-focus="newComment.toggleCommentPrompt(true)"
 				ng-blur="newComment.toggleCommentPrompt(false)"
 				ng-model="newComment.data.comment"
 				ng-model-options="{ updateOn: 'default blur' }"
-				class="form-control input-lg" required />
+				class="form-control" required rows="3"></textarea>
 			<div class="my-messages">
 				<div class="prompt message-animation"
 					ng-if="newComment.messages.showStartTimePrompt">How was your

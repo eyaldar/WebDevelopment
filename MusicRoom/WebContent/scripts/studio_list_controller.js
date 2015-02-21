@@ -5,8 +5,7 @@
 
     var studioListController = function($scope, Restangular) {
     	$scope.items = {};
-    	
-        Restangular.setBaseUrl("rest/");
+    
         var studiosService = Restangular.all("studios");
         
         studiosService.getList().then(function(studios) {

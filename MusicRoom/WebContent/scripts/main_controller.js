@@ -6,6 +6,7 @@
 	var mainController = function($rootScope, $scope, Restangular, $state) {
 
 		Restangular.setBaseUrl("rest/");
+		
 		var userStateService = Restangular.one("users");
 
 		$rootScope.checkLoginState = function() {

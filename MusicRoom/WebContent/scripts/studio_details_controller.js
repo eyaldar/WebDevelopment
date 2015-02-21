@@ -5,7 +5,6 @@
 
     var studioDetailsController = function($scope, Restangular, $stateParams) {
     	
-        Restangular.setBaseUrl("rest/");
         var studioService = Restangular.one("studios", $stateParams.id);
         
         studioService.get().then(function(studio) {

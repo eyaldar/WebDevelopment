@@ -5,9 +5,8 @@
 
     var studioUpdatesListController = function($rootScope, $scope, Restangular) {
     	
-        Restangular.setBaseUrl("rest/studios");
-        var mostViewedService = Restangular.all("mostviewed");
-        var recentService = Restangular.all("recent");
+        var mostViewedService = Restangular.all("studios/mostviewed");
+        var recentService = Restangular.all("studios/recent");
         
         mostViewedService.getList().then(function(studios) {
             $scope.mostViewedStudios = studios;

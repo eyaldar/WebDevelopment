@@ -5,7 +5,6 @@
 
     var bandDetailsController = function($scope, Restangular, $stateParams) {
     	
-        Restangular.setBaseUrl("rest/");
         var bandService = Restangular.one("bands", $stateParams.id);
         
         bandService.get().then(function(band) {

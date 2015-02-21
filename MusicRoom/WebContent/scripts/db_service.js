@@ -248,7 +248,6 @@
 
 	var populateDB = function() {
 
-		Restangular.setBaseUrl("rest/");
 		var areasService = Restangular.all("areas");
 
 		areasService.getList().then(

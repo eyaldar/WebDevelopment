@@ -6,7 +6,6 @@
     var bandListController = function($scope, Restangular) {
     	$scope.items = {};
     	
-        Restangular.setBaseUrl("rest/");
         var bandsService = Restangular.all("bands");
         
         bandsService.getList().then(function(bands) {
