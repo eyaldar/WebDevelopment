@@ -2,7 +2,7 @@
 
 (function() {
 	var musicRoom = angular.module('musicRoom', [ 'restangular', 'ui.router',
-			'ui.bootstrap', 'ngMessages', 'ngAnimate', 'ngDialog', 'ngSanitize', 'ui.select', 'musicRoom' ]);
+			'ui.bootstrap', 'ngMessages', 'ngAnimate', 'ngDialog', 'ngSanitize', 'musicRoom' ]);
 	
 	musicRoom.config(['ngDialogProvider', function (ngDialogProvider) {
 		ngDialogProvider.setDefaults({
