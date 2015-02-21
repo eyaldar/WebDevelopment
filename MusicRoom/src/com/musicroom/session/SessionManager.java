@@ -22,6 +22,7 @@ public class SessionManager {
 			// Get user from redis
 			Jedis redisConn = RedisManager.getConnection();
 			String userJson = redisConn.get(USERID+id);
+			RedisManager.returnResource(redisConn);
 			return new JSONObject(userJson);
 		}
 		else
@@ -37,6 +38,7 @@ public class SessionManager {
 		// set json in redis
 		Jedis redisConn = RedisManager.getConnection();
 		redisConn.set(USERID+id, userJSON.toString());
+		RedisManager.returnResource(redisConn);
 		
 		// set key in session
 		request.getSession().setAttribute(USERID,  id);
@@ -57,6 +59,8 @@ public class SessionManager {
 			// Remove from redis and from session
 			Jedis redisConn = RedisManager.getConnection();
 			redisConn.del(USERID+id);
+			RedisManager.returnResource(redisConn);
+			
 			request.getSession().removeAttribute(USERID);
 		}
 	}

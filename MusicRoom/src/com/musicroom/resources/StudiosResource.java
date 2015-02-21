@@ -129,9 +129,10 @@ public class StudiosResource {
 				forCache.put("name", studio.get("name"));
 
 				// increase the views of the studio
-				int views = RedisManager.getConnection()
-						.zincrby("MOST_VIEWED", 1, forCache.toString())
-						.intValue();
+				Jedis redisConn = RedisManager.getConnection();
+				int views = redisConn.zincrby("MOST_VIEWED", 1,
+						forCache.toString()).intValue();
+				RedisManager.returnResource(redisConn);
 
 				studio.put("views", views);
 
@@ -155,19 +156,20 @@ public class StudiosResource {
 	@Path("/schedule/{roomId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAppointment(@PathParam("roomId") int roomId,
-			@Context HttpServletRequest request) throws JSONException, Exception {
+			@Context HttpServletRequest request) throws JSONException,
+			Exception {
 		JSONObject user = SessionManager.getLoggedInUser(request);
 
 		// Check that room is clear
-		JSONArray queryRes = MainDBHandler
-				.selectWithParameters("select rs.* " 
-						+ " from ROOM_SCHEDULE as rs"
-						+ " left join ROOMS as r on r.ID = rs.ROOM_ID"
-						+ " left join STUDIOS as s on s.ID = r.STUDIO_ID"
-						+ " where rs.ROOM_ID = ? and s.USER_ID = ?", 
-						roomId, user.getInt("id"));
-		
-		return Response.ok(queryRes.toString(SPACE_TO_INDENTS_EACH_LEVEL)).build();
+		JSONArray queryRes = MainDBHandler.selectWithParameters("select rs.* "
+				+ " from ROOM_SCHEDULE as rs"
+				+ " left join ROOMS as r on r.ID = rs.ROOM_ID"
+				+ " left join STUDIOS as s on s.ID = r.STUDIO_ID"
+				+ " where rs.ROOM_ID = ? and s.USER_ID = ?", roomId,
+				user.getInt("id"));
+
+		return Response.ok(queryRes.toString(SPACE_TO_INDENTS_EACH_LEVEL))
+				.build();
 	}
 
 	@POST
@@ -178,8 +180,7 @@ public class StudiosResource {
 	public Response setAppointment(String dataStr,
 			@Context HttpServletRequest request) {
 		try {
-			SimpleDateFormat format = new SimpleDateFormat(
-					"yyyy-MM-dd HH:mm");
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 			// Get request data
 			JSONObject data = new JSONObject(dataStr);
@@ -346,9 +347,12 @@ public class StudiosResource {
 				forCache.put("name", studioObj.get("name"));
 
 				// Add new studio to the NEW_STUDIOS list.
-				RedisManager.getConnection().lpush("NEW_STUDIOS",
-						forCache.toString());
-				RedisManager.getConnection().ltrim("NEW_STUDIOS", 0, 9);
+				Jedis redisConn = RedisManager.getConnection();
+
+				redisConn.lpush("NEW_STUDIOS", forCache.toString());
+				redisConn.ltrim("NEW_STUDIOS", 0, 9);
+
+				RedisManager.returnResource(redisConn);
 
 				MainDBHandler.getConnection().commit();
 				MainDBHandler.getConnection().setAutoCommit(true);
@@ -432,10 +436,11 @@ public class StudiosResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response search(@Context UriInfo info) {
+		Jedis redisConn = RedisManager.getConnection();
+		
 		try {
 			String result;
 			String queryKey = getRedisQueryKey(info.getQueryParameters());
-			Jedis redisConn = RedisManager.getConnection();
 
 			if (!redisConn.exists(queryKey)) {
 				SimpleDateFormat format = new SimpleDateFormat(
@@ -620,6 +625,8 @@ public class StudiosResource {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.serverError().build();
+		}finally {
+			RedisManager.returnResource(redisConn);
 		}
 	}
 
@@ -627,8 +634,10 @@ public class StudiosResource {
 	@Path("/mostviewed")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMostViewed() {
-		Set<Tuple> elements = RedisManager.getConnection().zrangeWithScores(
-				"MOST_VIEWED", -10, -1);
+		Jedis redisConn = RedisManager.getConnection();
+		Set<Tuple> elements = redisConn
+				.zrangeWithScores("MOST_VIEWED", -10, -1);
+		RedisManager.returnResource(redisConn);
 
 		JSONArray mostViewedArray = new JSONArray();
 
@@ -648,8 +657,10 @@ public class StudiosResource {
 	@Path("/recent")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMostRecent() {
-		List<String> studioStrings = RedisManager.getConnection().lrange(
-				"NEW_STUDIOS", 0, 9);
+
+		Jedis redisConn = RedisManager.getConnection();
+		List<String> studioStrings = redisConn.lrange("NEW_STUDIOS", 0, 9);
+		RedisManager.returnResource(redisConn);
 
 		JSONArray recentStudios = new JSONArray();
 
