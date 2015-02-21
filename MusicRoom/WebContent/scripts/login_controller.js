@@ -39,9 +39,13 @@
 			},
 			togglePasswordPrompt : function(value) {
 				formMessages.showPasswordPrompt = value;
+			},
+			getPasswordType : function() {
+				return $scope.showPassword ? 'text' : 'password';
 			}
 		};
-
+		
+		$scope.showPassword = false;
 		$scope.funcs = formFuncs;
 		$scope.messages = formMessages;
 	};

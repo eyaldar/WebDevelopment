@@ -26,16 +26,22 @@
 		<!-- PASSWORD -->
 		<div class="form-group has-feedback" style="margin: 2em"
 			ng-class="{ 'has-error' : formFuncs.hasErrorClass(loginForm, 'password'), 'has-success' : formFuncs.hasSuccessClass(loginForm, 'password') }">
-			<label>Password</label> <input type="password" name="password"
-				class="form-control" ng-model="credentials.password" required
-				ng-focus="funcs.togglePasswordPrompt(true)"
-				ng-blur="funcs.togglePasswordPrompt(false)"
-				ng-model-options="{ updateOn: 'default blur' }" />
+			<label>Password</label>
+			<div class="input-group">
+				<input type="{{funcs.getPasswordType()}}" name="password" class="form-control"
+					ng-model="credentials.password" required
+					ng-focus="funcs.togglePasswordPrompt(true)"
+					ng-blur="funcs.togglePasswordPrompt(false)"
+					ng-model-options="{ updateOn: 'default blur' }" /> <span
+					class="input-group-addon"> <input type="checkbox"
+					ng-model="showPassword" />
+				</span>
+			</div>
 			<div class="my-messages">
 				<div class="prompt message-animation"
 					ng-if="messages.showPasswordPrompt">Insert your password.</div>
 			</div>
-			<div class="my-messages" ng-messages="loginForm.username.$error"
+			<div class="my-messages" ng-messages="loginForm.password.$error"
 				ng-if="formFuncs.showMessages(loginForm, 'password')">
 				<div class="message-animation" ng-message="required">
 					<strong>This field is required.</strong>
