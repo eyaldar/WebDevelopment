@@ -11,7 +11,11 @@
 
 		$rootScope.checkLoginState = function() {
 
-			userStateService.one("state").get().then(function(result) {			
+			userStateService.one("state").get().then(function(result) {	
+				if(result.user) {
+					$rootScope.loggedUserId = result.user.id;
+				}
+				
 				$rootScope.loggedUserName = result.name;
 				$rootScope.logged = result.logged;
 			});

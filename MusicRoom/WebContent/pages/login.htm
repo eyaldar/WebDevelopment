@@ -47,12 +47,14 @@
 			<div class="col-sm-offset-5 col-sm-2 text-center">
 				<button type="submit" id="button-order"
 					class="btn btn-block btn-primary center-block"
-					ng-disabled="commentForm.$invalid">Login</button>
+					ng-disabled="loginForm.$invalid">Login</button>
 			</div>
 		</div>
 
-		<p ng-show="errorText" ng-class="{ 'has-error' : true }"
-			style="margin-top: 2em; margin-left: 2em">{{errorText}}</p>
+		<div class="my-messages" style="margin-top: 1em">
+			<div class="message-animation alert alert-danger" role="alert"
+				style="display: block" ng-if="messages.showSubmittedError">{{errorText}}</div>
+		</div>
 	</form>
 </div>
 

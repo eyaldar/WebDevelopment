@@ -17,11 +17,18 @@
 				$rootScope.checkLoginState();
 				$state.go('home');
 			}, function(reason) {
-				$scope.errorText = reason.data.error;
+				$scope.messages.showSubmittedError = true;
+
+				if (reason.data.error) {
+					$scope.errorText = reason.data.error;
+				} else {
+					$scope.errorText = "Error occured!"
+				}
 			});
 		};
 
 		var formMessages = {
+			showSubmittedError : false,
 			showUserNamePrompt : false,
 			showPasswordPrompt : false,
 		};
@@ -34,7 +41,7 @@
 				formMessages.showPasswordPrompt = value;
 			}
 		};
-		
+
 		$scope.funcs = formFuncs;
 		$scope.messages = formMessages;
 	};

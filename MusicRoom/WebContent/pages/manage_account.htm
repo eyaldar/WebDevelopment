@@ -1,0 +1,98 @@
+<div class="jumbotron">
+	<h2 class="text-center">Manage Account</h2>
+</div>
+
+<h4 class="alert alert-danger" ng-hide="logged">This page is only
+	available to a logged user!</h4>
+
+<div>
+	<form name="updateForm" class="form-horizontal" ng-submit="update()"
+		ng-show="logged" role="form" novalidate>
+
+		<!-- PASSWORD -->
+		<div class="form-group has-feedback" style="margin: 2em"
+			ng-class="{ 'has-error' : formFuncs.hasErrorClass(updateForm, 'newPassword'), 'has-success' : formFuncs.hasSuccessClass(updateForm, 'newPassword') }">
+			<label>New Password</label>
+			<div class="input-group">
+				<input type="{{funcs.getPasswordType('newPassword')}}"
+					name="newPassword" class="form-control"
+					ng-model="newCredentials.password" required
+					ng-focus="funcs.toggleNewPasswordPrompt(true)"
+					ng-blur="funcs.toggleNewPasswordPrompt(false)"
+					ng-model-options="{ updateOn: 'default blur' }" /> <span
+					class="input-group-addon"> <input type="checkbox"
+					ng-model="inputType.showNewPassword" />
+				</span>
+			</div>
+			<div class="my-messages">
+				<div class="prompt message-animation"
+					ng-if="messages.showNewPasswordPrompt">Enter your new
+					password.</div>
+			</div>
+			<div class="my-messages" ng-messages="updateForm.newPassword.$error"
+				ng-if="formFuncs.showMessages(updateForm, 'newPassword')">
+				<div class="message-animation" ng-message="required">
+					<strong>This field is required.</strong>
+				</div>
+			</div>
+		</div>
+
+		<!-- CONFIRM PASSWORD -->
+		<div class="form-group has-feedback" style="margin: 2em"
+			ng-class="{ 'has-error' : formFuncs.hasErrorClass(updateForm, 'confirmNewPassword'), 'has-success' : formFuncs.hasSuccessClass(updateForm, 'confirmNewPassword') }">
+			<label>Confirm Password</label>
+			<div class="input-group">
+				<input type="{{funcs.getPasswordType('confirmNewPassword')}}"
+					name="confirmNewPassword" class="form-control"
+					ng-model="confirmNewPassword" required
+					ng-focus="funcs.toggleConfirmNewPasswordPrompt(true)"
+					ng-blur="funcs.toggleConfirmNewPasswordPrompt(false)"
+					ng-model-options="{ updateOn: 'default blur' }"
+					ng-match="newCredentials.password" /> <span
+					class="input-group-addon"> <input type="checkbox"
+					ng-model="inputType.showConfirmNewPassword" />
+				</span>
+			</div>
+			<div class="my-messages">
+				<div class="prompt message-animation"
+					ng-if="messages.showConfirmNewPasswordPrompt">Confirm the new
+					password.</div>
+			</div>
+			<div class="my-messages"
+				ng-messages="updateForm.confirmNewPassword.$error"
+				ng-if="formFuncs.showMessages(updateForm, 'confirmNewPassword')">
+				<div class="message-animation" ng-message="required">
+					<strong>This field is required.</strong>
+				</div>
+				<div class="message-animation" ng-message="match">
+					<strong>Passwords do not match.</strong>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-offset-5 col-sm-2 text-center">
+				<button type="submit" id="button-order"
+					class="btn btn-block btn-primary center-block"
+					ng-disabled="updateForm.$invalid">Change Password</button>
+			</div>
+		</div>
+	</form>
+
+	<div style="margin-top: 1em">
+		<div class="row">
+			<div class="col-sm-offset-5 col-sm-2 text-center">
+				<button ng-click="openConfirm()" id="button-delete"
+					class="btn btn-block btn-danger center-block">Delete User</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="my-messages" style="margin-top: 1em">
+		<div class="message-animation alert alert-success" role="alert"
+			style="display: block" ng-if="messages.showSubmittedPrompt">Password
+			was changed successfully!</div>
+		<div class="message-animation alert alert-danger" role="alert"
+			style="display: block" ng-if="messages.showSubmittedError">{{errorText}}</div>
+	</div>
+</div>

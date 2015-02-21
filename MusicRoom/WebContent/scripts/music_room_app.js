@@ -2,7 +2,19 @@
 
 (function() {
 	var musicRoom = angular.module('musicRoom', [ 'restangular', 'ui.router',
-			'ui.bootstrap', 'ngMessages', 'ngAnimate', 'musicRoom' ]);
+			'ui.bootstrap', 'ngMessages', 'ngAnimate', 'ngDialog', 'musicRoom' ]);
+	
+	musicRoom.config(['ngDialogProvider', function (ngDialogProvider) {
+		ngDialogProvider.setDefaults({
+			className: 'ngdialog-theme-default',
+			plain: false,
+			showClose: true,
+			closeByDocument: true,
+			closeByEscape: true,
+			appendTo: false,
+		});
+	}]);
+	
 	musicRoom.config(function($stateProvider, $urlRouterProvider) {
 
 		$urlRouterProvider.otherwise('/home');
@@ -85,6 +97,14 @@
 				"view" : {
 					templateUrl : "pages/studio_details.htm",
 					controller : "StudioDetailsController"
+				}
+			}
+		}).state('manageAccount', {
+			url : "/account",
+			views : {
+				"view" : {
+					templateUrl : "pages/manage_account.htm",
+					controller : "ManageAccountController"
 				}
 			}
 		});

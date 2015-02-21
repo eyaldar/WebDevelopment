@@ -1,0 +1,8 @@
+<div class="ngdialog-message">
+	<h3>{{confirmDialog.header}}</h3>
+	<p>{{confirmDialog.message}}</p>
+</div>
+<div class="ngdialog-buttons">
+	<button type="button" class="ngdialog-button ngdialog-button-primary" ng-click="confirmDialog.onConfirm()">Confirm</button>
+	<button type="button" class="ngdialog-button ngdialog-button-secondary" ng-click="closeThisDialog('button')">Cancel</button>
+</div>
