@@ -23,7 +23,8 @@
     <script src="lib/restangular.js"></script>
     <script src="lib/jquery.datetimepicker.js"></script>
     <script src="lib/ngDialog.min.js"></script>
-    
+   	<script src="lib/rzSlider.min.js"></script>
+        
     <script src="scripts/music_room_app.js"></script>
     <script src="scripts/main_controller.js"></script>
     <script src="scripts/login_controller.js"></script>
@@ -37,6 +38,7 @@
 	<script src="scripts/comment_system_controller.js"></script>
 	<script src="scripts/studio_updates_lists_controller.js"></script>	
 	<script src="scripts/manage_account_controller.js"></script>	
+	<script src="scripts/search_controller.js"></script>	
     <script src="scripts/directives.js"></script>
     <script src="scripts/db_service.js"></script>
     
@@ -48,6 +50,7 @@
 	<link rel="stylesheet" href="css/ngDialog.min.css">
 	<link rel="stylesheet" href="css/ngDialog-theme-default.min.css">
 	<link rel="stylesheet" href="css/ngDialog-theme-plain.min.css">
+	<link rel="stylesheet" href="css/rzslider.css">
 	<link rel="stylesheet" href="css/animations.css">
 	<link rel="stylesheet" href="css/styles.css">
 </head>
@@ -67,13 +70,13 @@
 			        <li ng-hide="logged"><a ui-sref="signup" ng-click="checkLoginState()">Sign Up</a></li>
 			        <li><a ui-sref="bands" ng-click="checkLoginState()">Bands</a></li>
 			        <li><a ui-sref="studios" ng-click="checkLoginState()">Studios</a></li>
-    			    <li><a ui-sref="manageAccount" ng-show="logged">Manage Account</a></li>
+    			    <li><a ui-sref="manageAccount" ng-click="checkLoginState()" ng-show="logged">Manage Account</a></li>
 			        <li><a ui-sref="login" ng-hide="logged">Login</a></li>
     			    <li><a ng-click="logout()" ng-show="logged" style="cursor: pointer">Logout</a></li>
 				</ul>
 	        </div>
 	</header>	
-    <div height="1000px">
+    <div>
 		<div ui-view="view"></div>
 	</div>
 </body>

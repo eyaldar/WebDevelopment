@@ -12,18 +12,10 @@
 			$scope.room = room;
 		});
 
-		var initDate = function() {
-			var date = new Date();
-			var roundedMinutes = 15 * Math.round(date.getMinutes() / 15);
-			date.setMinutes(roundedMinutes, 0, 0);
-
-			return date;
-		};
-
 		var orderData = {
-			nowTime : initDate(),
-			startTime : initDate(),
-			endTime : initDate(),
+			nowTime : $scope.initDate(),
+			startTime : $scope.initDate(),
+			endTime : $scope.initDate(),
 			startTimeText : "",
 			endTimeText : ""
 		};

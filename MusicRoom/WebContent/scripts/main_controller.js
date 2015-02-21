@@ -43,6 +43,14 @@
 				return form[field].$touched && form[field].$valid;
 			}
 		};
+		
+		$rootScope.initDate = function() {
+			var date = new Date();
+			var roundedMinutes = 15 * Math.round(date.getMinutes() / 15);
+			date.setMinutes(roundedMinutes, 0, 0);
+
+			return date;
+		};
 	};
 
 	musicRoom.controller('MainController', mainController);

@@ -83,7 +83,7 @@
 										endTime) {
 									var dataFieldName = attributes.isValidPeriodData;
 
-									return scope[dataFieldName].endTime
+									return endTime == '' || scope[dataFieldName].endTime
 											- scope[dataFieldName].startTime > 0;
 								};
 							}

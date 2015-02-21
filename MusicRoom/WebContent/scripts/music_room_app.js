@@ -1,7 +1,8 @@
 'use strict';
+'use strict';
 
 (function() {
-	var musicRoom = angular.module('musicRoom', [ 'restangular', 'ui.router',
+	var musicRoom = angular.module('musicRoom', [ 'restangular', 'rzModule', 'ui.router', 
 			'ui.bootstrap', 'ngMessages', 'ngAnimate', 'ngDialog', 'ngSanitize', 'musicRoom' ]);
 	
 	musicRoom.config(['ngDialogProvider', function (ngDialogProvider) {
