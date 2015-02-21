@@ -1,73 +1,199 @@
 <div class="jumbotron">
-    <h2 class="text-center">Sign up as a band user</h2> 
-    <form class="text-center" name="bandSignupForm" class="form-horizontal" role="form" novalidate>
+    <h2 class="text-center">Create A New Band User</h2> 
+    <form name="bandSignupForm" class="form-horizontal" ng-submit="signup()"
+    	role="form" novalidate>
 
-
-                <article>
-                    <p>
-                        <h1>User Info</h1>
-                        <label for="txtBandUserName" class="mandatory-field">Username: </label>
-                        <input id="txtBandUserName" type="text" />
-                        <label for="txtBandPassword" class="mandatory-field">Password: </label>
-                        <input id="txtBandPassword" type="password" />
-
-                        <br />
-
-                        <h1>Band Info</h1>
-                        <label for="txtBandName" class="mandatory-field">Band Name: </label>
-                        <input id="txtBandName" type="text" />
-                        <label for="txtBandLogo">Logo URL: </label>
-                        <input id="txtBandLogo" type="url" />
-                        <img id="imgBandLogoPreview" src="#" alt="your image will appear here" style="width:256px; height:256px" />
-
-                        <div data-role="fieldcontain">
-                            <label for="select_genres">Genre:</label>
-                            <select id="select_genres"></select>
-                        </div>
-
-                        <br />
-
-                        <h1>Band Members</h1>
-                        
-                        <label for="txtMemberName">Member Name: </label>
-                        <input id="txtMemberName" type="text" />
-
-                        <div data-role="fieldcontain">
-                            <label for="select_bandmemberroles">Band Member Role (Instrument):</label>
-                            <select id="select_bandmemberroles"></select>
-                            
-                            <label for="txtMemberPicture">Member Picture URL: </label>
-                            <input id="txtMemberPicture" type="url" />
-                            <br/>
-                            <img id="imgMemberPicturePreview" src="#" alt="your image will appear here" style="width:256px; height:256px" />
-                            
-                            <br />
-                            <br />
-
-                            <label for="select_bandmembers">Members:</label>
-                            <select id="select_bandmembers"></select>
-                            <br />
-                            <div data-role="controlgroup" data-type="horizontal">
-                                <button id="button_bandmember_add" data-role="button" data-icon="plus" class="bandmember_button">Add</button>
-                                <button id="button_bandmember_remove" data-role="button" data-icon="minus" class="bandmember_button">Remove</button>
-                            </div>
-
-                        </div>
-                    </p>
-
-                    <div>
-                        <center>
-                            <br />
-                            <br />
-                            <a data-role="button" onclick="BandSignUp()">Signup</a>
-                            <br />
-                            <p id="bandSignupResult" style='color:red'>  </p>
-                        </center>
-                    </div>
-
-                </article>
-            
-            <p id="band-signup-page-errors" style="color:red; text-align: center"></p>
+		<div name="user-info" class="form-group has-feedback" style=margin:1px>
+			 <!-- ng-class="{ 'has-error' : loginForm.username.$invalid, 'has-success' : loginForm.username.$valid }">-->
+		
+			<!-- USERNAME -->
+		    <label>User Name</label>
+	  		<input id="username" name="username" 
+				class="form-control" type="text" required
+			   	ng-model="ctrl.signupForm.username" 
+			   	ng-model-options="{ updateOn : 'default blur' }"
+			   	ng-focus="ctrl.toggleUsernamePrompt(true)" 
+			   	ng-blur="ctrl.toggleUsernamePrompt(false)"/>
+	   	    
+	   	    <!-- <label ng-show="ctrl.signupForm.username.$error" class="help-block validation-text">Username is required.</label>-->
+	   	    
+			<div class="my-messages" style=margin:2px>
+			    <div class="prompt message-animation" ng-if="ctrl.showUsernamePrompt">
+			        Enter your band's user name
+			    </div>
+			</div>
 	
+	
+			<!-- PASSWORD -->
+			<label>Password</label>
+			<div class="input-group">
+			   <input id="password" name="password" class="form-control" required
+			      type="{{ctrl.getPasswordType()}}"
+			      ng-model-options="{ updateOn : 'default blur' }"
+			      ng-model="ctrl.signupForm.password"
+			      validate-password-characters />
+			    <span class="input-group-addon">
+			        <input type="checkbox" ng-model="ctrl.showPassword"> Show
+			    </span>
+			</div>
+			<!-- PASSWORD REQUIREMENTS -->
+			<div class="password-requirements" ng-if="!ctrl.signupForm.password.$valid">
+	    		<ul class="float-left">
+		        	<li ng-class="{'completed':!ctrl.signupForm.password.$error.lowerCase}">
+		            	One lowercase character
+			        </li>
+			        <li ng-class="{'completed':!ctrl.signupForm.password.$error.upperCase}">
+			            One uppercase character
+			        </li>
+			        <li ng-class="{'completed':!ctrl.signupForm.password.$error.number}">
+			            One number
+			        </li>
+			        <li ng-class="{'completed':!ctrl.signupForm.password.$error.specialCharacter}">
+	            		One special character
+	        		</li>
+	        		<li ng-class="{'completed':!ctrl.signupForm.password.$error.eightCharacters}">
+	            		Eight characters minimum
+	        		</li>
+	    		</ul>
+	    		<!-- <ul class="selfclear clearfix">-->
+			</div>
+			
+		</div>
+
+		<div name="band-info" class="form-group has-feedback" style=margin:3px>
+		<h3>Band Info</h3>
+			<!-- BAND NAME -->
+			<label>Band Name</label>
+	  		<input id="band-name" name="band-name" 
+				class="form-control" type="text" required
+			   	ng-model="ctrl.signupForm.band.name" />
+			<br>
+			
+			<!-- LOGO -->
+			<label>Band Logo</label>
+	  		<input id="band-logo" name="band-logo" 
+				class="form-control" type="url" required
+			   	ng-model="ctrl.signupForm.band.logo"
+			   	ng-model-options="{ updateOn : 'default blur' }"
+			   	ng-focus="ctrl.toggleLogoPrompt(true)" 
+			   	ng-blur="ctrl.toggleLogoPrompt(false)"/>
+			<div class="my-messages" style=margin:2px>
+			    <div class="prompt message-animation" ng-if="ctrl.showLogoPrompt">
+			        Enter a URL of an image, it will be shown on the preview below
+			    </div>
+			</div>
+			   	
+			<label>Logo preview:</label>
+			<img ng-src="{{ctrl.signupForm.band.logo}}"
+				width="200em"
+		 		class="img-responsive img-thumbnail"/>	
+			<br>
+			
+			<!-- GENRE -->
+			<div class="container">
+				<label>Band Genre</label>
+				<select class="form-control" ng-model="ctrl.signupForm.band.genre" required>
+	    			<option ng-selected="{{genre == ctrl.signupForm.band.genre}}"
+	            			ng-repeat="genre in ctrl.genres"
+	            			value="{{genre}}">
+	      				{{genre}}
+	    			</option>
+				</select>
+			</div>
+			<br>
+			<br>
+		</div>
+	<!-- </form>-->
+		
+	<ng-form name="bandMembersForm" class="form-horizontal" role="form" novalidate>
+		<!-- BAND MEMBERS -->
+		<div name="band-members" style=margin:2px>
+		<h4>Band Members</h4>
+			<!-- MEMBER NAME -->
+			<label>Member Name</label>
+  			<input id="band-name" name="band-name" 
+				class="form-control" type="text" required
+		   		ng-model="ctrl.newMember.name" />
+			<br>
+			
+			<!-- BAND MEMBER ROLE -->
+			<div class="container">
+				<label>Member Role</label>
+				<select class="form-control" ng-model="ctrl.newMember.role" required>
+	    			<option ng-selected="{{role == ctrl.newMember.role}}"
+	            			ng-repeat="role in ctrl.roles"
+	            			value="{{role}}">
+	      				{{role}}
+	    			</option>
+				</select>
+			</div>
+			
+			<!-- MEMBER PICTURE -->
+			<label>Member Picture</label>
+	  		<input id="member-picture" name="member-picture" 
+				class="form-control" type="url" required
+			   	ng-model="ctrl.newMember.picture"
+			   	ng-model-options="{ updateOn : 'default blur' }"
+			   	ng-focus="ctrl.togglePicturePrompt (true)" 
+			   	ng-blur="ctrl.togglePicturePrompt (false)"/>
+			<div class="my-messages" style=margin:2px>
+			    <div class="prompt message-animation" ng-if="ctrl.showPicturePrompt">
+			        Enter a URL of an image, it will be shown on the preview below
+			    </div>
+			</div>
+			   	
+			<label>Picture preview:</label>
+			<img ng-src="{{ctrl.newMember.picture}}"
+				width="150em"
+	 			class="img-responsive img-thumbnail"/>		 		
+			<br>
+			<br>
+			
+			<!-- ADD MEMBER BUTTON -->
+			<div class="row">
+				<div class="col-sm-offset-5 col-sm-2 text-center">
+					<button type="button" id="button-order"
+						class="btn btn-block btn-primary center-block"
+						ng-click="ctrl.addMember()"
+						ng-disabled="bandMembersForm.$invalid">Add Member</button>
+				</div>
+			</div>
+			<br>					
+			
+			<!-- MEMBERS LIST -->
+			<div name="band-members-list" style=margin:1px>
+				<table align="left" width="100%">
+					<tr>
+						<td><label><strong>Member List:</strong></label></td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<ul class="list-group" id="playing-bands-list">
+									<li ng-repeat="band_member in ctrl.signupForm.band.band_members" class="media-list list-group-item" 
+										ng-include src="'templates/band_member_info.htm'">
+									</li>
+							</ul>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</ng-form>
+		
+		<!-- SIGNUP SUBMIT -->
+		<div class="row">
+			<div class="col-sm-offset-5 col-sm-2 text-center">
+				<button type="submit" id="button-order"
+					class="btn btn-block btn-primary center-block"
+					ng-disabled="bandSignupForm.$invalid">Sign Up</button>
+			</div>
+		</div>
+	
+		<!-- ERROR MESSAGES -->
+		<div class="my-messages" style="margin-top: 1em">
+			<div class="message-animation alert alert-danger" role="alert"
+				style="display: block" ng-if="showSubmittedError">{{errorText}}</div>
+		</div>
+		
 	</form>
 </div>
