@@ -13,32 +13,42 @@
 		<strong> Welcome {{loggedUserName}} </strong>
 	</h4>
 
-	<div ng-controller="StudioUpdatesListController" style="margin-top: 3em">
+	<div ng-controller="StudioUpdatesListController"
+		style="margin-top: 3em">
 		<div class="row outer">
 			<div class="col-md-6">
-				<button class="btn" type="button" data-toggle="collapse"
-					style="display: block; width: 100%" data-target="#recent-list-div"
-					aria-expended="false" aria-controls="recent-list-div">Recently
-					Added Studios</button>
-				<div id="recent-list-div" class="collapse">
-					<ul class="media-list list group">
-						<li ng-repeat="studio in recentStudios"><a
-							ui-sref="studioDetails({id: '{{studio.id}}'})"
-							class="list-group-item"> {{studio.name}} </a></li>
-					</ul>
+				<div class="panel panel-default flex-col">
+					<div class="panel-header">
+						<button class="btn" type="button" data-toggle="collapse"
+							style="display: block; width: 100%"
+							data-target="#recent-list-div" aria-expended="false"
+							aria-controls="recent-list-div">Recently Added Studios</button>
+					</div>
+					<div id="recent-list-div" class="collapse panel-body flex-grow">
+						<ul class="media-list list group">
+							<li ng-repeat="studio in recentStudios"><a
+								ui-sref="studioDetails({id: '{{studio.id}}'})"
+								class="list-group-item"> {{studio.name}} </a></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 			<div class="col-md-6">
-				<button class="btn" type="button" data-toggle="collapse"
-					style="display: block; width: 100%"
-					data-target="#most-viewed-list-div" aria-expended="false"
-					aria-controls="most-viewed-list-div">Most Viewed Studios</button>
-				<div id="most-viewed-list-div" class="collapse">
-					<ul class="media-list list group">
-						<li ng-repeat="studio in mostViewedStudios"><a
-							ui-sref="studioDetails({id: '{{studio.id}}'})"
-							class="list-group-item"> {{studio.name}} </a></li>
-					</ul>
+				<div class="panel panel-default flex-col">
+					<div class="panel-header">
+						<button class="btn" type="button" data-toggle="collapse"
+							style="display: block; width: 100%"
+							data-target="#most-viewed-list-div" aria-expended="false"
+							aria-controls="most-viewed-list-div">Most Viewed Studios</button>
+					</div>
+					<div id="most-viewed-list-div"
+						class="collapse panel-body flex-grow">
+						<ul class="media-list list group">
+							<li ng-repeat="studio in mostViewedStudios"><a
+								ui-sref="studioDetails({id: '{{studio.id}}'})"
+								class="list-group-item"> {{studio.name}} </a></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 		</div>
