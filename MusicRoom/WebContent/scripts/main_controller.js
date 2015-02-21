@@ -34,6 +34,9 @@
 			},
 			hasErrorClass : function(form, field) {
 				return form[field].$touched && form[field].$invalid;
+			},
+			hasSuccessClass : function(form, field) {
+				return form[field].$touched && form[field].$valid;
 			}
 		};
 	};

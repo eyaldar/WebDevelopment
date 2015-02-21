@@ -56,6 +56,8 @@
 			        <li ng-hide="logged"><a ui-sref="signup" ng-click="checkLoginState()">Sign Up</a></li>
 			        <li><a ui-sref="bands" ng-click="checkLoginState()">Bands</a></li>
 			        <li><a ui-sref="studios" ng-click="checkLoginState()">Studios</a></li>
+			        <li><a ui-sref="login" ng-hide="logged">Login</a></li>
+    			    <li><a ng-click="logout()" ng-show="logged" style="cursor: pointer">Logout</a></li>
 				</ul>
 	        </div>
 	</header>	

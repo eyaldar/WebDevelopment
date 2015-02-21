@@ -1,37 +1,58 @@
 <div class="jumbotron">
-    <h2 class="text-center">Login</h2> 
-    <form name="loginForm" class="form-horizontal" role="form" novalidate>
+	<h2 class="text-center">Login</h2>
+	<form name="loginForm" class="form-horizontal" ng-submit="login()"
+		role="form" novalidate>
 
-	<!-- USERNAME -->
-	<div class="form-group has-feedback" style="margin: 2em"
-		 ng-class="{ 'has-error' : loginForm.username.$invalid, 'has-success' : loginForm.username.$valid }">
-	    <label>Username</label>
-  		<input type="text" name="username" class="form-control" ng-model="credentials.name" 
-	   	   	   placeholder="Username" required/>
-	   	<i class="glyphicon glyphicon-ok form-control-feedback"
-	   		ng-show="loginForm.username.$valid"></i>	    	   	   
-	   	<i class="glyphicon glyphicon-remove form-control-feedback"
-	   		ng-show="loginForm.username.$invalid"></i>
-   	    <label ng-show="loginForm.username.$invalid" class="help-block validation-text">Username is required.</label>
-	</div>
-	
-	 <!-- PASSWORD -->
-	<div class="form-group has-feedback" style="margin: 2em" 
-		ng-class="{ 'has-error' : loginForm.password.$invalid, 'has-success' : loginForm.password.$valid }">
-	    <label>Password</label>
-	    <input type="password" name="password" class="form-control" ng-model="credentials.password" 
-	    	   placeholder="Password" required/>
-   	   	<i class="glyphicon glyphicon-ok form-control-feedback"
-	   		ng-show="loginForm.password.$valid"></i>	    	   	   
-	   	<i class="glyphicon glyphicon-remove form-control-feedback"
-	   		ng-show="loginForm.password.$invalid"></i>
-   	    <label ng-show="loginForm.password.$invalid" class="validation-text help-block">Password is required.</label>
-	</div>
-     
-	<button type="submit" ng-click="login()" style="margin-left: 2em"  
-		id="button-login" class="btn btn-primary" ng-disabled="loginForm.$invalid">Login</button>
+		<!-- USERNAME -->
+		<div class="form-group has-feedback" style="margin: 2em"
+			ng-class="{ 'has-error' : formFuncs.hasErrorClass(loginForm, 'username'), 'has-success' : formFuncs.hasSuccessClass(loginForm, 'username') }">
+			<label>Username</label> <input type="text" name="username"
+				class="form-control" ng-model="credentials.name" required
+				ng-focus="funcs.toggleUserNamePrompt(true)"
+				ng-blur="funcs.toggleUserNamePrompt(false)"
+				ng-model-options="{ updateOn: 'default blur' }" />
+			<div class="my-messages">
+				<div class="prompt message-animation"
+					ng-if="messages.showUserNamePrompt">Insert your username.</div>
+			</div>
+			<div class="my-messages" ng-messages="loginForm.username.$error"
+				ng-if="formFuncs.showMessages(loginForm, 'username')">
+				<div class="message-animation" ng-message="required">
+					<strong>This field is required.</strong>
+				</div>
+			</div>
+		</div>
 
-	<p ng-show="errorText" ng-class="{ 'has-error' : true }" style="margin-top: 2em; margin-left: 2em">{{errorText}}</p>
-</form>
+		<!-- PASSWORD -->
+		<div class="form-group has-feedback" style="margin: 2em"
+			ng-class="{ 'has-error' : formFuncs.hasErrorClass(loginForm, 'password'), 'has-success' : formFuncs.hasSuccessClass(loginForm, 'password') }">
+			<label>Password</label> <input type="password" name="password"
+				class="form-control" ng-model="credentials.password" required
+				ng-focus="funcs.togglePasswordPrompt(true)"
+				ng-blur="funcs.togglePasswordPrompt(false)"
+				ng-model-options="{ updateOn: 'default blur' }" />
+			<div class="my-messages">
+				<div class="prompt message-animation"
+					ng-if="messages.showPasswordPrompt">Insert your password.</div>
+			</div>
+			<div class="my-messages" ng-messages="loginForm.username.$error"
+				ng-if="formFuncs.showMessages(loginForm, 'password')">
+				<div class="message-animation" ng-message="required">
+					<strong>This field is required.</strong>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-offset-5 col-sm-2 text-center">
+				<button type="submit" id="button-order"
+					class="btn btn-block btn-primary center-block"
+					ng-disabled="commentForm.$invalid">Login</button>
+			</div>
+		</div>
+
+		<p ng-show="errorText" ng-class="{ 'has-error' : true }"
+			style="margin-top: 2em; margin-left: 2em">{{errorText}}</p>
+	</form>
 </div>
 
