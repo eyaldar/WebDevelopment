@@ -16,14 +16,20 @@
 			ng-model="selected.selectedType"
 			ng-options="type.name for type in equipmentTypes">
 				<option value="">{{noSelectionText}}</option>
-		</select></span> 
-		<div class="btn-group" style="margin: 1em 0 1em 0">
-			<button id="button_equipment_search_add" class="btn"
-				ng-click="onAdd()" class="btn"><i class="glyphicon glyphicon-plus"></i>Add</button>
-			<button id="button_equipment_search_remove" ng-click="onRemove()"
-				class="btn">
-				<i class="glyphicon glyphicon-minus"></i>Remove
-			</button>
+		</select></span>
+		<div class="row" style="margin: 1em 0 1em 0">
+			<div style="text-align: center">
+				<div class="btn-group">
+					<button id="button_equipment_search_add" class="btn"
+						ng-click="onAdd()">
+						<i class="glyphicon glyphicon-plus"></i>Add
+					</button>
+					<button id="button_equipment_search_remove" ng-click="onRemove()"
+						class="btn">
+						<i class="glyphicon glyphicon-minus"></i>Remove
+					</button>
+				</div>
+			</div>
 		</div>
 		<h4>Required Equipment:</h4>
 		<div id="select_equipment_div" class="panel panel-default flex-col">

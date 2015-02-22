@@ -1,106 +1,111 @@
 <div class="panel panel-default flex-col">
 	<div id="studio-list-div" class="collapse panel-footer flex-grow">
 		<form name="searchForm" ng-submit="funcs.search()" novalidate>
-			<div class="form-group">
-				<label for="input_name">Name:</label> <input class="form-control"
-					id="input_name" ng-model="searchData.name"></input>
-			</div>
-			<div data-role="field-group">
-				<label for="select_roomtypes">Room type:</label> <span
-					class="nullable"><select class="form-control"
-					ng-model="searchData.roomType"
-					ng-options="roomType as roomType.name for roomType in roomTypes">
-						<option value="">{{noSelectionText}}</option>
-				</select></span>
-			</div>
-			<div data-role="field-group">
-				<label for="select_areas">Area:</label> <span class="nullable">
-					<select class="form-control" ng-model="searchData.area"
-					ng-options="area as area.name for area in areas"
-					ng-change="onAreaChanged()">
-						<option value="">{{noSelectionText}}</option>
-				</select>
-				</span> <label for="select_cities">City:</label> <span class="nullable"><select
-					class="form-control" ng-model="searchData.city"
-					ng-options="city as city.name for city in cities">
-						<option value="">{{noSelectionText}}</option>
-				</select></span>
+			<div class="row outer">
+				<div class="col-md-6">
+					<div class="form-group">
+						<label for="input_name">Name:</label> <input class="form-control"
+							id="input_name" ng-model="searchData.name"></input>
+					</div>
+					<div data-role="field-group">
+						<label for="select_roomtypes">Room type:</label> <span
+							class="nullable"><select class="form-control"
+							ng-model="searchData.roomType"
+							ng-options="roomType as roomType.name for roomType in roomTypes">
+								<option value="">{{noSelectionText}}</option>
+						</select></span>
+					</div>
+					<div data-role="field-group">
+						<label for="select_areas">Area:</label> <span class="nullable">
+							<select class="form-control" ng-model="searchData.area"
+							ng-options="area as area.name for area in areas"
+							ng-change="onAreaChanged()">
+								<option value="">{{noSelectionText}}</option>
+						</select>
+						</span> <label for="select_cities">City:</label> <span class="nullable"><select
+							class="form-control" ng-model="searchData.city"
+							ng-options="city as city.name for city in cities">
+								<option value="">{{noSelectionText}}</option>
+						</select></span>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<!-- MAX ROOM RATE -->
+					<div class="form-group"
+						ng-class="{'has-error': formFuncs.hasErrorClass(searchForm, 'maxRoomRate') }">
+						<label for="input_max_room_rate"> Max Room Rate:</label> <input
+							type="number" name="maxRoomRate" min="0"
+							ng-model="searchData.maxRoomRate" class="form-control"
+							ng-model-options="{ updateOn: 'default blur' }"></input>
+						<div class="my-messages">
+							<div class="prompt message-animation"
+								ng-if="messages.showEndTimePrompt">What is your maximum
+								allowed rate? (0 for any rate)</div>
+						</div>
+						<div class="my-messages"
+							ng-messages="searchForm.maxRoomRate.$error"
+							ng-if="formFuncs.showMessages(searchForm, 'maxRoomRate')">
+							<div class="message-animation" ng-message="min">
+								<strong>Rate must be a positive number.</strong>
+							</div>
+							<div class="message-animation" ng-message="number">
+								<strong>This field only accept numbers.</strong>
+							</div>
+						</div>
+					</div>
+					<h4>Available Time:</h4>
+					<!-- AVAILABLE START TIME -->
+					<div class="form-group"
+						ng-class="{'has-error': formFuncs.hasErrorClass(searchForm, 'startTimePicker') }">
+						<label for="start-time-picker">Start:</label> <input
+							date-time-picker id="start-time-picker" name="startTimePicker"
+							type="text" min-date="nowTime" date="searchData.startTime"
+							ng-focus="funcs.toggleStartTimePrompt(true)"
+							ng-blur="funcs.toggleStartTimePrompt(false)"
+							ng-model="searchData.startTimeText"
+							ng-model-options="{ updateOn: 'default blur' }"
+							is-valid-period-id="available-room" is-valid-period-link
+							class="form-control pointer" readonly />
+						<div class="my-messages">
+							<div class="prompt message-animation"
+								ng-if="messages.showStartTimePrompt">From what time should
+								the room be available?</div>
+						</div>
+					</div>
+
+					<!-- AVAILABLE END TIME -->
+					<div class="form-group"
+						ng-class="{'has-error': formFuncs.hasErrorClass(searchForm, 'endTimePicker') }">
+						<label for="end-time-picker">End:</label> <input date-time-picker
+							id="end-time-picker" name="endTimePicker" type="text"
+							min-date="searchData.startTime" date="searchData.endTime"
+							ng-model-options="{ updateOn: 'default blur' }"
+							ng-focus="funcs.toggleEndTimePrompt(true)"
+							ng-blur="funcs.toggleEndTimePrompt(false)"
+							ng-model="searchData.endTimeText"
+							ng-model-options="{ updateOn: 'default blur' }"
+							is-valid-period-id="available-room"
+							is-valid-period-data="searchData" is-valid-period
+							class="form-control pointer" readonly />
+						<div class="my-messages">
+							<div class="prompt message-animation"
+								ng-if="messages.showEndTimePrompt">To what time should the
+								room be available?</div>
+						</div>
+						<div class="my-messages"
+							ng-messages="searchForm.endTimePicker.$error"
+							ng-if="formFuncs.showMessages(searchForm, 'endTimePicker')">
+							<div class="message-animation" ng-message="isValidPeriod">
+								<strong>End time is earlier than start time.</strong>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div style="margin-top: 2em">
 				<div ng-include src="'templates/add_required_equipment.htm'"
 					ng-controller="RequiredEquipmentController"></div>
 			</div>
-
-			<!-- MAX ROOM RATE -->
-			<div class="form-group"
-				ng-class="{'has-error': formFuncs.hasErrorClass(searchForm, 'maxRoomRate') }">
-				<label for="input_max_room_rate"> Max Room Rate:</label> <input
-					type="number" name="maxRoomRate" min="0"
-					ng-model="searchData.maxRoomRate" class="form-control"
-					ng-model-options="{ updateOn: 'default blur' }"></input>
-				<div class="my-messages">
-					<div class="prompt message-animation"
-						ng-if="messages.showEndTimePrompt">What is your maximum
-						allowed rate? (0 for any rate)</div>
-				</div>
-				<div class="my-messages" ng-messages="searchForm.maxRoomRate.$error"
-					ng-if="formFuncs.showMessages(searchForm, 'maxRoomRate')">
-					<div class="message-animation" ng-message="min">
-						<strong>Rate must be a positive number.</strong>
-					</div>
-					<div class="message-animation" ng-message="number">
-						<strong>This field only accept numbers.</strong>
-					</div>
-				</div>
-			</div>
-
-			<!-- AVAILABLE START TIME -->
-			<div class="form-group"
-				ng-class="{'has-error': formFuncs.hasErrorClass(searchForm, 'startTimePicker') }">
-				<label for="start-time-picker">Start:</label> <input
-					date-time-picker id="start-time-picker" name="startTimePicker"
-					type="text" min-date="nowTime" date="searchData.startTime"
-					ng-focus="funcs.toggleStartTimePrompt(true)"
-					ng-blur="funcs.toggleStartTimePrompt(false)"
-					ng-model="searchData.startTimeText"
-					ng-model-options="{ updateOn: 'default blur' }"
-					is-valid-period-id="available-room" is-valid-period-link
-					class="form-control pointer" readonly />
-				<div class="my-messages">
-					<div class="prompt message-animation"
-						ng-if="messages.showStartTimePrompt">From what time should
-						the room be available?</div>
-				</div>
-			</div>
-
-			<!-- AVAILABLE END TIME -->
-			<div class="form-group"
-				ng-class="{'has-error': formFuncs.hasErrorClass(searchForm, 'endTimePicker') }">
-				<label for="end-time-picker">End:</label> <input date-time-picker
-					id="end-time-picker" name="endTimePicker" type="text"
-					min-date="searchData.startTime" date="searchData.endTime"
-					ng-model-options="{ updateOn: 'default blur' }"
-					ng-focus="funcs.toggleEndTimePrompt(true)"
-					ng-blur="funcs.toggleEndTimePrompt(false)"
-					ng-model="searchData.endTimeText"
-					ng-model-options="{ updateOn: 'default blur' }"
-					is-valid-period-id="available-room"
-					is-valid-period-data="searchData" is-valid-period
-					class="form-control pointer" readonly />
-				<div class="my-messages">
-					<div class="prompt message-animation"
-						ng-if="messages.showEndTimePrompt">To what time should the
-						room be available?</div>
-				</div>
-				<div class="my-messages"
-					ng-messages="searchForm.endTimePicker.$error"
-					ng-if="formFuncs.showMessages(searchForm, 'endTimePicker')">
-					<div class="message-animation" ng-message="isValidPeriod">
-						<strong>End time is earlier than start time.</strong>
-					</div>
-				</div>
-			</div>
-
 			<div class="row">
 				<div class="col-sm-offset-5 col-sm-2 text-center">
 					<div class="btn-group">
