@@ -180,7 +180,7 @@ public class StudiosResource {
 	public Response setAppointment(String dataStr,
 			@Context HttpServletRequest request) {
 		try {
-			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 			// Get request data
 			JSONObject data = new JSONObject(dataStr);

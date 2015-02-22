@@ -54,7 +54,7 @@
 						scope.$watch('minDate', function(minDate) {
 							if (scope.minDate && scope.date) {
 								element.datetimepicker({
-									format : "Y-m-d h:i",
+									format : "Y-m-d h:i:s",
 									dayOfWeekStart : 1,
 									lang : 'en',
 									minDate : scope.minDate,
@@ -83,8 +83,9 @@
 										endTime) {
 									var dataFieldName = attributes.isValidPeriodData;
 
-									return endTime == '' || scope[dataFieldName].endTime
-											- scope[dataFieldName].startTime > 0;
+									return endTime == ''
+											|| scope[dataFieldName].endTime
+													- scope[dataFieldName].startTime > 0;
 								};
 							}
 						}
@@ -108,41 +109,36 @@
 												})
 							}
 						}
-					})
-			.directive(
-					"ngMatch",
-					[
-							'$parse',
-							function($parse) {
-								var directiveId = "ngMatch";
-								
-								return {
-									restrict : 'A',
-									require : '?ngModel',
-									link : function(scope, elem, attrs, ctrl) {
-										// if ngModel is not defined, we don't
-										// need to do anything
-										if (!ctrl)
-											return;
-										if (!attrs[directiveId])
-											return;
+					}).directive("ngMatch", [ '$parse', function($parse) {
+				var directiveId = "ngMatch";
 
-										var firstPassword = $parse(attrs[directiveId]);
+				return {
+					restrict : 'A',
+					require : '?ngModel',
+					link : function(scope, elem, attrs, ctrl) {
+						// if ngModel is not defined, we don't
+						// need to do anything
+						if (!ctrl)
+							return;
+						if (!attrs[directiveId])
+							return;
 
-										var validator = function(value) {
-											var temp = firstPassword(scope); 
-											var isValid = value === temp;
-											ctrl.$setValidity('match', isValid);
-											return value;
-										}
+						var firstPassword = $parse(attrs[directiveId]);
 
-										ctrl.$parsers.unshift(validator);
-										ctrl.$formatters.push(validator);
-										attrs.$observe(directiveId, function() {
-											validator(ctrl.$viewValue);
-										});
+						var validator = function(value) {
+							var temp = firstPassword(scope);
+							var isValid = value === temp;
+							ctrl.$setValidity('match', isValid);
+							return value;
+						}
 
-									}
-								}
-							} ]);
+						ctrl.$parsers.unshift(validator);
+						ctrl.$formatters.push(validator);
+						attrs.$observe(directiveId, function() {
+							validator(ctrl.$viewValue);
+						});
+
+					}
+				}
+			} ]);
 }());

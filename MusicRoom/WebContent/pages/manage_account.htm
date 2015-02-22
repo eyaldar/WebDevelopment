@@ -5,9 +5,9 @@
 <h4 class="alert alert-danger" ng-hide="logged">This page is only
 	available to a logged user!</h4>
 
-<div>
+<div ng-show="logged">
 	<form name="updateForm" class="form-horizontal" ng-submit="update()"
-		ng-show="logged" role="form" novalidate>
+		role="form" novalidate>
 
 		<!-- PASSWORD -->
 		<div class="form-group has-feedback" style="margin: 2em"

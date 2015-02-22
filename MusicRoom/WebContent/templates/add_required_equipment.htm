@@ -1,0 +1,50 @@
+<div class="panel panel-default flex-col">
+	<button class="btn panel-header" data-toggle="collapse"
+		style="display: block; width: 100%; cursor: pointer; outline: none"
+		data-target="#equipment-list-div" aria-expended="false"
+		aria-controls="equipment-list-div-div">Required Equipment</button>
+	<div id="equipment-list-div" class="collapse panel-footer flex-grow">
+		<label for="select_equipmentcategories">Equipment Category:</label> <span
+			class="nullable"> <select class="form-control"
+			ng-model="selected.selectedCategory"
+			ng-options="category.name for category in equipmentCategories"
+			ng-change="onCategoryChanged()">
+				<option value="">{{noSelectionText}}</option>
+		</select>
+		</span> <label for="select_equipmenttypes">Equipment Type:</label><span
+			class="nullable"> <select class="form-control"
+			ng-model="selected.selectedType"
+			ng-options="type.name for type in equipmentTypes">
+				<option value="">{{noSelectionText}}</option>
+		</select></span> 
+		<div class="btn-group" style="margin: 1em 0 1em 0">
+			<button id="button_equipment_search_add" class="btn"
+				ng-click="onAdd()" class="btn"><i class="glyphicon glyphicon-plus"></i>Add</button>
+			<button id="button_equipment_search_remove" ng-click="onRemove()"
+				class="btn">
+				<i class="glyphicon glyphicon-minus"></i>Remove
+			</button>
+		</div>
+		<h4>Required Equipment:</h4>
+		<div id="select_equipment_div" class="panel panel-default flex-col">
+			<div class="panel-body">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Type</th>
+							<th>Category</th>
+						</tr>
+					</thead>
+					<tr ng-repeat="item in searchData.equipmentArray" selection-model
+						selection-model-selected-items="selectedItems">
+						<td>{{$index + 1}}</td>
+						<td>{{item.type.name}}</td>
+						<td>{{item.category.name}}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+</div>

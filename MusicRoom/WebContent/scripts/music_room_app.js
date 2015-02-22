@@ -2,20 +2,21 @@
 'use strict';
 
 (function() {
-	var musicRoom = angular.module('musicRoom', [ 'restangular', 'rzModule', 'ui.router', 
-			'ui.bootstrap', 'ngMessages', 'ngAnimate', 'ngDialog', 'ngSanitize', 'musicRoom' ]);
-	
-	musicRoom.config(['ngDialogProvider', function (ngDialogProvider) {
+	var musicRoom = angular.module('musicRoom', [ 'restangular', 'ui.router',
+			'ui.bootstrap', 'selectionModel', 'ngMessages', 'ngAnimate',
+			'ngDialog', 'ngSanitize', 'musicRoom' ]);
+
+	musicRoom.config([ 'ngDialogProvider', function(ngDialogProvider) {
 		ngDialogProvider.setDefaults({
-			className: 'ngdialog-theme-default',
-			plain: false,
-			showClose: true,
-			closeByDocument: true,
-			closeByEscape: true,
-			appendTo: false,
+			className : 'ngdialog-theme-default',
+			plain : false,
+			showClose : true,
+			closeByDocument : true,
+			closeByEscape : true,
+			appendTo : false,
 		});
-	}]);
-	
+	} ]);
+
 	musicRoom.config(function($stateProvider, $urlRouterProvider) {
 
 		$urlRouterProvider.otherwise('/home');

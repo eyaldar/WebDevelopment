@@ -1,47 +1,60 @@
 <div class="panel panel-default flex-col">
 	<div id="studio-list-div" class="collapse panel-footer flex-grow">
-		<form name="searchForm" ng-submit="search()" novalidate>
+		<form name="searchForm" ng-submit="funcs.search()" novalidate>
 			<div class="form-group">
 				<label for="input_name">Name:</label> <input class="form-control"
-					id="input_name" ng-model="studioData.name"></input>
+					id="input_name" ng-model="searchData.name"></input>
 			</div>
-			<div data-role="fieldcontain">
-				<label for="select_roomtypes">Room type:</label> <select
-					id="select_roomtypes"></select>
+			<div data-role="field-group">
+				<label for="select_roomtypes">Room type:</label> <span
+					class="nullable"><select class="form-control"
+					ng-model="searchData.roomType"
+					ng-options="roomType as roomType.name for roomType in roomTypes">
+						<option value="">{{noSelectionText}}</option>
+				</select></span>
 			</div>
-			<div data-role="fieldcontain">
-				<label for="select_areas">Area:</label> <select id="select_areas"></select>
-				<label for="select_cities">City:</label> <select id="select_cities"></select>
+			<div data-role="field-group">
+				<label for="select_areas">Area:</label> <span class="nullable">
+					<select class="form-control" ng-model="searchData.area"
+					ng-options="area as area.name for area in areas"
+					ng-change="onAreaChanged()">
+						<option value="">{{noSelectionText}}</option>
+				</select>
+				</span> <label for="select_cities">City:</label> <span class="nullable"><select
+					class="form-control" ng-model="searchData.city"
+					ng-options="city as city.name for city in cities">
+						<option value="">{{noSelectionText}}</option>
+				</select></span>
 			</div>
-			<div data-role="fieldcontain">
-				<label for="select_equipmentcategories">Equipment Category:</label>
-				<select id="select_equipmentcategories"></select> <label
-					for="select_equipmenttypes">Equipment Type:</label> <select
-					id="select_equipmenttypes"></select> <label
-					for="select_equipment_div">Required Equipment:</label>
-				<div id="select_equipment_div" class="ui-grid-b">
-					<select id="select_equipment" class="ui-block-a"></select>
-					<div data-role="controlgroup" data-type="horizontal"
-						class="ui-block-b">
-						<button id="button_equipment_search_add" data-role="button"
-							data-icon="plus" class="equipment_button">Add</button>
-						<button id="button_equipment_search_remove" data-role="button"
-							data-icon="minus" class="equipment_button">Remove</button>
+			<div style="margin-top: 2em">
+				<div ng-include src="'templates/add_required_equipment.htm'"
+					ng-controller="RequiredEquipmentController"></div>
+			</div>
+
+			<!-- MAX ROOM RATE -->
+			<div class="form-group"
+				ng-class="{'has-error': formFuncs.hasErrorClass(searchForm, 'maxRoomRate') }">
+				<label for="input_max_room_rate"> Max Room Rate:</label> <input
+					type="number" name="maxRoomRate" min="0"
+					ng-model="searchData.maxRoomRate" class="form-control"
+					ng-model-options="{ updateOn: 'default blur' }"></input>
+				<div class="my-messages">
+					<div class="prompt message-animation"
+						ng-if="messages.showEndTimePrompt">What is your maximum
+						allowed rate? (0 for any rate)</div>
+				</div>
+				<div class="my-messages" ng-messages="searchForm.maxRoomRate.$error"
+					ng-if="formFuncs.showMessages(searchForm, 'maxRoomRate')">
+					<div class="message-animation" ng-message="min">
+						<strong>Rate must be a positive number.</strong>
+					</div>
+					<div class="message-animation" ng-message="number">
+						<strong>This field only accept numbers.</strong>
 					</div>
 				</div>
-
-				<div data-role="fieldcontains" data-type="horizontal">
-					<p id="equipment-error-paragraph"
-						style='color: red; text-align: center'></p>
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="input_max_room_rate">Max Room Rate:</label>
-				<rzslider rz-slider-floor="0" rz-slider-ceil="5000"
-					class="field-control" rz-slider-model="searchData.maxRoomRate"
-					rz-slider-translate="slider.translate"></rzslider>
 			</div>
 
+			<!-- AVAILABLE START TIME -->
 			<div class="form-group"
 				ng-class="{'has-error': formFuncs.hasErrorClass(searchForm, 'startTimePicker') }">
 				<label for="start-time-picker">Start:</label> <input
@@ -60,6 +73,7 @@
 				</div>
 			</div>
 
+			<!-- AVAILABLE END TIME -->
 			<div class="form-group"
 				ng-class="{'has-error': formFuncs.hasErrorClass(searchForm, 'endTimePicker') }">
 				<label for="end-time-picker">End:</label> <input date-time-picker
@@ -92,11 +106,15 @@
 					<div class="btn-group">
 						<button type="submit" id="button-search"
 							class="btn btn-primary center-block"
-							ng-disabled="search.$invalid">Search</button>
-						<button type="clear" id="button-clear"
-							class="btn center-block" ng-click="funcs.clear(searchForm)">Clear</button>
+							ng-disabled="searchForm.$invalid">Search</button>
+						<button type="clear" id="button-clear" class="btn center-block"
+							ng-click="funcs.clear(searchForm)">Clear</button>
 					</div>
 				</div>
+			</div>
+			<div class="my-messages">
+				<div class="message-animation alert alert-danger" role="alert"
+					style="display: block" ng-if="messages.showSubmittedError">{{errorText}}</div>
 			</div>
 		</form>
 	</div>

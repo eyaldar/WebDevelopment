@@ -120,3 +120,7 @@ div[ng-messages] {
 input[readonly].pointer {
 	cursor: pointer;
 }
+
+.selected {
+	background-color: #428BCA;
+}

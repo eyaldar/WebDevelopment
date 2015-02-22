@@ -6,20 +6,8 @@
 	var mainController = function($rootScope, $scope, Restangular, $state) {
 
 		Restangular.setBaseUrl("rest/");
-		
+
 		var userStateService = Restangular.one("users");
-
-		$rootScope.checkLoginState = function() {
-
-			userStateService.one("state").get().then(function(result) {	
-				if(result.user) {
-					$rootScope.loggedUserId = result.user.id;
-				}
-				
-				$rootScope.loggedUserName = result.name;
-				$rootScope.logged = result.logged;
-			});
-		};
 
 		$scope.logout = function() {
 			userStateService.one("logout").get().then(function(result) {
@@ -28,9 +16,21 @@
 			});
 		};
 
-		$rootScope.checkLoginState();
+		$rootScope.checkLoginState = function() {
 
+			userStateService.one("state").get().then(function(result) {
+				if (result.user) {
+					$rootScope.loggedUserId = result.user.id;
+				}
+
+				$rootScope.loggedUserName = result.name;
+				$rootScope.logged = result.logged;
+			});
+		};
+
+		$rootScope.checkLoginState();
 		$rootScope.maxRating = 5;
+		$rootScope.noSelectionText = '-Any-';
 
 		$rootScope.formFuncs = {
 			showMessages : function(form, field) {
@@ -43,7 +43,7 @@
 				return form[field].$touched && form[field].$valid;
 			}
 		};
-		
+
 		$rootScope.initDate = function() {
 			var date = new Date();
 			var roundedMinutes = 15 * Math.round(date.getMinutes() / 15);
