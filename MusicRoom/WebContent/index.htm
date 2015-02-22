@@ -50,8 +50,8 @@
 	<link rel="stylesheet" href="css/styles.css" media="screen">
 	<link rel="stylesheet" href="css/signup.css" media="screen">
 </head>
-<body class="container" ng-controller="MainController">
-	<header class="top" role="header">
+<body ng-controller="MainController" class="container container-fluid">
+	<header class="top navbar-fixed-top" role="header">
 	    	<div class="navbar-header">
 				<a ui-sref="home" class="navbar-brand pull-left">
 		      		<img src="images/musicRoom_logo.gif" height="20em"/>
@@ -72,7 +72,7 @@
 				</ul>
 	        </div>
 	</header>	
-    <div>
+    <div id="view">
 		<div ui-view="view"></div>
 	</div>
 </body>

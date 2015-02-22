@@ -1,4 +1,12 @@
-<div class="panel panel-default flex-col">
+<div class="flex-col">
+	<button class="btn" data-toggle="collapse"
+		style="cursor: pointer; outline: none; width:100%;" id="search-component"
+		data-target="#studio-list-div" aria-expended="false"
+		aria-controls="studio-list-div" ng-click="accordion.toggleIsOpen()">
+		<i class="glyphicon glyphicon-search"></i> <i class="glyphicon"
+			style="margin-top: 1em"
+			ng-class="{'glyphicon-chevron-up': accordion.isOpen, 'glyphicon-chevron-down': !accordion.isOpen }"></i>
+	</button>
 	<div id="studio-list-div" class="collapse panel-footer flex-grow">
 		<form name="searchForm" ng-submit="funcs.search()" novalidate>
 			<div class="row outer">
@@ -123,12 +131,4 @@
 			</div>
 		</form>
 	</div>
-	<button class="btn panel-footer" data-toggle="collapse"
-		style="display: block; width: 100%; cursor: pointer; outline: none"
-		data-target="#studio-list-div" aria-expended="false"
-		aria-controls="studio-list-div" ng-click="accordion.toggleIsOpen()">
-		<i class="glyphicon glyphicon-search"></i> <i class="glyphicon"
-			style="margin-top: 1em"
-			ng-class="{'glyphicon-chevron-down': !accordion.isOpen, 'glyphicon-chevron-up': accordion.isOpen }"></i>
-	</button>
 </div>

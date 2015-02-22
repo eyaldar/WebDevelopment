@@ -1,7 +1,9 @@
-<div ng-include src="'templates/studio_search.htm'" ng-controller="SearchController"></div>
-
 <div class="jumbotron text-center">
-    <h2>Studios</h2> 
+	<h2>Studios</h2>
 </div>
-<img src="images/ajax-loader.gif" height="2em" ng-show="isLoading"/>
-<div ng-include src="'templates/studio_list.htm'" class="list-group" style="margin: 1em"></div>
+<img src="images/ajax-loader.gif" height="2em" ng-show="isLoading" />
+<div ng-include src="'templates/studio_list.htm'" class="list-group" style="padding-bottom:4em"
+	style="margin: 1em"></div>
+	
+<div ng-include src="'templates/studio_search.htm'" style="opacity: 0.97;" id="search-component"
+	ng-controller="SearchController" class="navbar-fixed-bottom"></div>
