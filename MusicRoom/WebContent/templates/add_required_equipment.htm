@@ -3,7 +3,7 @@
 		style="display: block; width: 100%; cursor: pointer; outline: none"
 		data-target="#equipment-list-div" aria-expended="false"
 		aria-controls="equipment-list-div-div">Required Equipment</button>
-	<div id="equipment-list-div" class="collapse panel-footer flex-grow">
+	<div id="equipment-list-div" class="collapse panel-footer flex-grow equipment-list-search">
 		<label for="select_equipmentcategories">Equipment Category:</label> <span
 			class="nullable"> <select class="form-control"
 			ng-model="selected.selectedCategory"
@@ -21,11 +21,11 @@
 			<div style="text-align: center">
 				<div class="btn-group">
 					<button id="button_equipment_search_add" class="btn"
-						ng-click="onAdd()">
+						ng-click="onAdd()" type='button'>
 						<i class="glyphicon glyphicon-plus"></i>Add
 					</button>
 					<button id="button_equipment_search_remove" ng-click="onRemove()"
-						class="btn">
+						class="btn" type='button'>
 						<i class="glyphicon glyphicon-minus"></i>Remove
 					</button>
 				</div>
@@ -34,7 +34,7 @@
 		<h4>Required Equipment:</h4>
 		<div id="select_equipment_div" class="panel panel-default flex-col">
 			<div class="panel-body">
-				<table class="table">
+				<table class="table" >
 					<thead>
 						<tr>
 							<th>#</th>

@@ -3,6 +3,12 @@
 	padding-top: 5em
 }
 
+.equipment-list-search {
+	max-height: 15em;
+	overflow: auto;
+	width: 100%
+}
+
 @media screen and (max-width: 992px) {
 	p, .btn, input, div, span, h4 {
 		font-size: 95%;
@@ -15,6 +21,11 @@
 	}
 	h3 {
 		font-size: 18px;
+	}
+	.equipment-list-search {
+		max-height: 20em;
+		overflow: auto;
+		width: 100%
 	}
 }
 
@@ -37,6 +48,10 @@
 	}
 	.container #view {
 		padding-top: 0
+	}
+	.equipment-list-search {
+		max-height: 50em;
+		width: 100%
 	}
 }
 
