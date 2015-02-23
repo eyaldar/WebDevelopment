@@ -62,7 +62,7 @@
 					+ 'BAND_LOGO_URL	TEXT NOT NULL,'
 					+ 'BAND_GENRE		TEXT NOT NULL,'
 					+ 'STUDIO_ID 		INTEGER NOT NULL,'
-					+ 'Foreign Key (USER_TYPE_ID) references USER_TYPES(ID) on delete cascade,',
+					+ 'Foreign Key (USER_TYPE_ID) references USER_TYPES(ID) on delete cascade);',
 
 			studios : 'CREATE TABLE STUDIOS('
 					+ 'ID 				INTEGER PRIMARY KEY,'
@@ -74,12 +74,11 @@
 					+ 'SITE_URL			TEXT NOT NULL,'
 					+ 'FACEBOOK_PAGE	TEXT NOT NULL,'
 					+ 'PHONE			TEXT NOT NULL,'
-					+ 'USER_ID			INTEGER NOT NULL,'
 					+ 'EXTRA_DETAILS	TEXT NOT NULL,'
 					+ 'LOGO_URL			TEXT NOT NULL,'
-					+ 'LAST_UPDATE 		INTEGER NOT NULL'
-					+ 'AVG_RATING 		REAL NOT NULL'
-					+ 'Foreign Key (CITY_ID) references CITIES(ID) on delete cascade,',
+					+ 'LAST_UPDATE 		INTEGER NOT NULL,'
+					+ 'AVG_RATING 		REAL NOT NULL,'
+					+ 'Foreign Key (CITY_ID) references CITIES(ID) on delete cascade);',
 
 			rooms : 'CREATE TABLE ROOMS('
 					+ '    ID 				INTEGER PRIMARY KEY,'
@@ -95,11 +94,6 @@
 					+ '	   PRIMARY KEY (ROOM_ID, TYPE_ID),'
 					+ '	   Foreign Key (ROOM_ID) references ROOMS(ID) on delete cascade,'
 					+ '	   Foreign Key (TYPE_ID) references ROOM_TYPES(ID) on delete cascade);',
-
-			bands : 'CREATE TABLE BANDS(' + '    ID			INTEGER PRIMARY KEY,'
-					+ '	   BAND_NAME 	TEXT NOT NULL,'
-					+ '	   LOGO_URL	 	TEXT NOT NULL,'
-					+ '	   GENRE	 	TEXT NOT NULL,',
 
 			bandMembers : 'CREATE TABLE BAND_MEMBERS('
 					+ '    ID			INTEGER PRIMARY KEY,'
@@ -128,7 +122,7 @@
 
 			roomSchedule : 'CREATE TABLE ROOM_SCHEDULE('
 					+ '    ROOM_ID				INTEGER NOT NULL,'
-					+ '	   BAND_ID			 	INTEGER NOT NULL,'
+					+ '	   BAND_NAME		 	TEXT NOT NULL,'
 					+ '	   START_TIME 			INTEGER NOT NULL,'
 					+ '	   END_TIME				INTEGER NOT NULL,'
 					+ '	   PRIMARY KEY (ROOM_ID, START_TIME, END_TIME),'
@@ -141,12 +135,12 @@
 		};
 
 		var createIndicesQueries = {
-			studiosCities : 'CREATE INDEX STD_CT_IDX ON STUDIOS (CITY_ID)',
-			areasCities : 'CREATE INDEX CT_AREA_IDX ON CITIES (AREA_ID)',
-			studioName : 'CREATE INDEX STD_NAME_IDX ON STUDIOS (STUDIO_NAME)',
-			roomsStudios : 'CREATE INDEX ROM_STD_IDX ON ROOMS (STUDIO_ID)',
-			roomRate : 'CREATE INDEX ROM_RATE_IDX ON ROOMS (RATE)',
-			equipmentTypesCategories : 'CREATE INDEX EQP_CAT_IDX ON EQUIPMENT_TYPES (CATEGORY_ID)'
+			studiosCities : 'CREATE INDEX STD_CT_IDX ON STUDIOS (CITY_ID);',
+			areasCities : 'CREATE INDEX CT_AREA_IDX ON CITIES (AREA_ID);',
+			studioName : 'CREATE INDEX STD_NAME_IDX ON STUDIOS (STUDIO_NAME);',
+			roomsStudios : 'CREATE INDEX ROM_STD_IDX ON ROOMS (STUDIO_ID);',
+			roomRate : 'CREATE INDEX ROM_RATE_IDX ON ROOMS (RATE);',
+			equipmentTypesCategories : 'CREATE INDEX EQP_CAT_IDX ON EQUIPMENT_TYPES (CATEGORY_ID);'
 		};
 
 		db.transaction(function(tx) {
