@@ -2,6 +2,7 @@ package com.musicroom.database;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class RedisManager {
 
@@ -9,13 +10,20 @@ public class RedisManager {
 
 	public static Jedis getConnection() {
 		if (pool == null) {
+
 			pool = new JedisPool("localhost");
 		}
 
 		return pool.getResource();
 	}
-	
+
 	public static void returnResource(Jedis resource) {
-		pool.returnResource(resource);
+		try {
+			pool.returnResource(resource);
+		} catch (JedisConnectionException ex) {
+			if (resource != null) {
+				pool.returnBrokenResource(resource);
+			}
+		}
 	}
 }
