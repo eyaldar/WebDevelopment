@@ -139,6 +139,7 @@
 						}, function(result) {
 							console.log(result);
 							$scope.cities = [];
+							$scope.searchData.city = null;
 						});
 
 			} else {

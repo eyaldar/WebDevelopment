@@ -3,27 +3,19 @@
 (function() {
 	var musicRoom = angular.module("musicRoom");
 
-	var requiredEquipmentController = function($scope, Restangular) {
-
-		var equipmentCategories = [ {
-			id : '1',
-			name : 'B'
-		}, {
-			id : '2',
-			name : 'C'
-		} ];
-
-		var equipmentTypes = [ {
-			id : '1',
-			name : 'A'
-		}, {
-			id : '2',
-			name : 'B'
-		} ];
-
-		$scope.equipmentCategories = equipmentCategories;
-		$scope.equipmentTypes = equipmentTypes;
-
+	var requiredEquipmentController = function($scope, Restangular, decodeService) {
+		
+		decodeService.getDecode(
+				decodeService.decodeTypes.equipmentCategories, function(result) {
+					$scope.equipmentCategories = result;
+				}, function(result) {
+					console.log(result);
+					$scope.equipmentCategories = [];
+				});
+		
+		$scope.equipmentCategories = [];
+		$scope.equipmentTypes = [];
+		
 		$scope.selected = {
 			selectedCategory : null,
 			selectedType : null
@@ -31,8 +23,25 @@
 
 		$scope.selectedItems = [];
 		$scope.onCategoryChanged = function() {
-			console.log($scope.selected.selectedCategory);
-		};
+			var selectedCategory = $scope.selected.selectedCategory;
+			if (selectedCategory) {
+
+				decodeService.getDecodeWithParameters(
+						decodeService.decodeTypes.equipmentTypes, {
+							"category_id" : selectedCategory.id
+						}, function(result) {
+							$scope.equipmentTypes = result;
+						}, function(result) {
+							console.log(result);
+							$scope.equipmentTypes = [];
+							$scope.selected.selectedType = null;
+						});
+
+			} else {
+				$scope.equipmentTypes = [];
+				$scope.selected.selectedType = null;
+			}
+		}
 
 		$scope.onAdd = function() {
 			if ($scope.selected.selectedCategory
