@@ -2,18 +2,29 @@
     <h2 class="text-center">Sign Up</h2> 
     <form class="text-center" name="signupForm" class="form-horizontal" role="form" novalidate>
 
-		<button ui-sref="bandSignup">Band Sign Up</button>
-	    <button ui-sref="studioSignup">Studio Sign Up</button>
-
-	<!--
-	<div data-role="content" id="signup-page-div">
-         <a data-role="button" onclick="GotoPage('BandSignUpPage')">Band Sign Up</a>
-         <a data-role="button" onclick="GotoPage('StudioSignUpPage')">Studio Sign Up</a>
-     </div>
-     -->
-     
-     <!-- <p id="signup-page-errors" style="color:red; text-align: center"></p> -->
-
-	<!-- <p ng-show="errorText" ng-class="{ 'has-error' : true }" style="margin-top: 2em; margin-left: 2em">{{errorText}}</p> -->
+		<table align="center">
+		  <tr>
+		    <td>
+		    	<img src="images/band_signup.png"
+					style="height:300px; width:300px"
+				 	class="img-responsive img-thumbnail"
+				 	ui-sref="bandSignup" />
+			</td>
+		    <td>
+		    	<img src="images/studio_signup.png"
+					style="height:300px; width:300px"
+				 	class="img-responsive img-thumbnail"
+				 	ui-sref="studioSignup" />
+		    </td>
+		  </tr>
+		  <tr>
+		    <td>
+		    	<a ui-sref="bandSignup">Band Sign Up</a>
+			</td>
+		    <td>
+		    	<a ui-sref="studioSignup">Studio Sign Up</a>
+		    </td>
+		  </tr>
+		</table>
 	</form>
 </div>
