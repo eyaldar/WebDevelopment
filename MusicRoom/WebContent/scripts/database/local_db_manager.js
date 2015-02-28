@@ -74,24 +74,30 @@
 						}
 						
 						self.init = function() {
-							self.dbService = $sqlite.openDatabase(
-									DB_CONFIG.name, '1.0', DB_CONFIG.name,
-									65536);
-							self.db = self.dbService.db;
-							
-							// Check whether db initialization is required.
-							self.query("SELECT * FROM db_metadata", []).then(function(result) {
-								var metadata = self.fetch(result);
-								var now = new Date();
-								var lastUpdate = new Date(metadata.last_update);
+							if(window.openDatabase) {
+								self.dbService = $sqlite.openDatabase(
+										DB_CONFIG.name, '1.0', DB_CONFIG.name,
+										65536);
+								self.db = self.dbService.db;
 								
-								// if the last populate occured more than 24 hours ago.
-								if(((now - lastUpdate) / (3600*1000)) > 24) {
-									initDatabase(false)
-								}
-							}, function(result) {
-								initDatabase(true);
-							});
+								// Check whether db initialization is required.
+								self.query("SELECT * FROM db_metadata", []).then(function(result) {
+									var metadata = self.fetch(result);
+									var now = new Date();
+									var lastUpdate = new Date(metadata.last_update);
+									
+									// if the last populate occured more than 24 hours ago.
+									if(((now - lastUpdate) / (3600*1000)) > 24) {
+										initDatabase(false)
+									}
+								}, function(result) {
+									initDatabase(true);
+								});
+								
+								self.isOpen = true;
+							} else {
+								self.isOpen = false;
+							}
 						};
 
 						self.query = function(query, bindings) {

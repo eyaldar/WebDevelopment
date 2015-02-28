@@ -180,7 +180,8 @@ public class StudiosResource {
 	public Response setAppointment(String dataStr,
 			@Context HttpServletRequest request) {
 		try {
-			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat format = new SimpleDateFormat(
+					"yyyy-MM-dd HH:mm:ss");
 
 			// Get request data
 			JSONObject data = new JSONObject(dataStr);
@@ -437,7 +438,7 @@ public class StudiosResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response search(@Context UriInfo info) {
 		Jedis redisConn = RedisManager.getConnection();
-		
+
 		try {
 			String result;
 			String queryKey = getRedisQueryKey(info.getQueryParameters());
@@ -456,23 +457,21 @@ public class StudiosResource {
 				Date startTime = null;
 				Date endTime = null;
 
-				String name = info.getQueryParameters().getFirst("name");
-				String areaIdStr = info.getQueryParameters()
-						.getFirst("area_id");
-				String cityIdStr = info.getQueryParameters()
-						.getFirst("city_id");
-				String roomTypeIdStr = info.getQueryParameters().getFirst(
-						"room_type_id");
-				String equipTypeIdStr = info.getQueryParameters().getFirst(
-						"equipment_type_id");
-				String equipCatIdStr = info.getQueryParameters().getFirst(
-						"equipment_category_id");
-				String maxRoomRateStr = info.getQueryParameters().getFirst(
-						"max_room_rate");
-				String startTimeStr = info.getQueryParameters().getFirst(
-						"start_time");
-				String endTimeStr = info.getQueryParameters().getFirst(
-						"end_time");
+				MultivaluedMap<String, String> queryParameters = info
+						.getQueryParameters();
+
+				String name = queryParameters.getFirst("name");
+				String areaIdStr = queryParameters.getFirst("area_id");
+				String cityIdStr = queryParameters.getFirst("city_id");
+				String roomTypeIdStr = queryParameters.getFirst("room_type_id");
+				String equipTypeIdStr = queryParameters
+						.getFirst("equipment_type_id");
+				String equipCatIdStr = queryParameters
+						.getFirst("equipment_category_id");
+				String maxRoomRateStr = queryParameters
+						.getFirst("max_room_rate");
+				String startTimeStr = queryParameters.getFirst("start_time");
+				String endTimeStr = queryParameters.getFirst("end_time");
 
 				if (areaIdStr != null)
 					areaId = Integer.parseInt(areaIdStr);
@@ -625,7 +624,7 @@ public class StudiosResource {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.serverError().build();
-		}finally {
+		} finally {
 			RedisManager.returnResource(redisConn);
 		}
 	}

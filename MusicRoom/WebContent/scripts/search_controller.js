@@ -52,7 +52,7 @@
 			}
 
 			if (searchData.roomType) {
-				requestData.room_type_Id = searchData.roomType.id;
+				requestData.room_type_id = searchData.roomType.id;
 			}
 
 			if (searchData.city) {
@@ -69,11 +69,11 @@
 			}
 
 			if (searchData.equipmentArray && equipmentArray.length > 0) {
-				requestData.equipment_type = [];
+				requestData.equipment_type_id = [];
 
 				angular.forEach(searchData.equipmentArray,
 						function(value, key) {
-							requestData.equipment_type.push(value.type.id);
+							requestData.equipment_type_id.push(value.type.id);
 						});
 			}
 
