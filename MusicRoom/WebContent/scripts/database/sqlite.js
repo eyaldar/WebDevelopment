@@ -119,52 +119,6 @@ musicRoom.factory("$sqlite",
 							}
 							return a;
 						},
-						createTable: function(tableName, fields) {
-							var query = "CREATE TABLE IF NOT EXISTS {tableName} ({fields} {foreignKeys}); ";
-							var primaryFields = [];
-							var foreignKeysFields = [];
-							var fieldsQuery = "";
-							for (var field in fields) {
-								var attributes = "{type} {null}";
-								fieldsQuery += "" + field + " ";
-								
-								if(typeof fields[field]["null"]==="undefined") { 
-									fields[field]["null"]="NULL" 
-								};
-								
-								for (var attribute in fields[field]) {
-									attributes = attributes.replace(new RegExp("{" + attribute + "}", "ig"), fields[field][attribute])
-								}
-								
-								fieldsQuery += attributes;
-								if (typeof fields[field]["default"] !== "undefined") {
-									fieldsQuery += " DEFAULT " + fields[field]["default"]
-								}
-								if (typeof fields[field]["primary"] !== "undefined") {
-									fieldsQuery += " PRIMARY KEY"
-								}
-								if (typeof fields[field]["auto_increment"] !== "undefined") {
-									fieldsQuery += " AUTOINCREMENT"
-								}
-								if (Object.keys(fields)[Object.keys(fields).length - 1] != field) {
-									fieldsQuery += ","
-								}
-								if (typeof fields[field]["primary"] !== "undefined" && fields[field]["primary"]) {
-									primaryFields.push(field)
-								}
-							}
-							
-							var queryData = {
-								tableName: tableName,
-								fields: fieldsQuery,
-								foreignKeys : foreignKeysQuery
-							};
-							for (var fieldToReplace in queryData) {
-								query = query.replace(new RegExp("{" + fieldToReplace + "}", "ig"), queryData[fieldToReplace])
-							}
-							
-							return this.executeQuery(query, []);
-						},
 						dropTable: function(tableName) {
 							return this.executeQuery("DROP TABLE IF EXISTS " + tableName + "; ", []);
 						},
