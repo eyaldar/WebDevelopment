@@ -3,30 +3,29 @@
 (function() {
 	var musicRoom = angular.module("musicRoom");
 
-	var mainController = function($rootScope, $scope, Restangular, $state) {
+	var mainController = function($rootScope, $scope, Restangular, localDbManager, myDataService, $state) {
 
 		var userStateService = Restangular.one("users");
-
+		
 		$scope.logout = function() {
 			userStateService.one("logout").get().then(function(result) {
-				$rootScope.checkLoginState();
+				$rootScope.checkLoginState(true);
 				$state.go('home');
 			});
 		};
 
-		$rootScope.checkLoginState = function() {
-
-			userStateService.one("state").get().then(function(result) {
+		$rootScope.checkLoginState = function(wasChanged) {
+			myDataService.getState(wasChanged, function(result) {
 				if (result.user) {
 					$rootScope.loggedUserId = result.user.id;
 				}
 
 				$rootScope.loggedUserName = result.name;
 				$rootScope.logged = result.logged;
-			});
+			}, null);
 		};
 
-		$rootScope.checkLoginState();
+		$rootScope.checkLoginState(false);
 		$rootScope.maxRating = 5;
 		$rootScope.noSelectionText = '-Any-';
 

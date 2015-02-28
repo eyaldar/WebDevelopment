@@ -14,7 +14,7 @@
 
 		$scope.login = function() {
 			loginService.post('', $scope.credentials).then(function(result) {
-				$rootScope.checkLoginState();
+				$rootScope.checkLoginState(true);
 				$state.go('home');
 			}, function(reason) {
 				$scope.messages.showSubmittedError = true;

@@ -27,6 +27,7 @@
     <script src="scripts/directives.js"></script>
     <script src="scripts/database/sqlite.js"></script>
    	<script src="scripts/database/local_db_manager.js"></script>
+    <script src="scripts/database/my_data_service.js"></script>
    	<script src="scripts/database/decodes_service.js"></script>
     <script src="scripts/main_controller.js"></script>
     <script src="scripts/login_controller.js"></script>
@@ -67,11 +68,11 @@
 	        </div>
 	        <div class="navbar-collapse collapse" role="navigation">
 				<ul class="navbar-nav nav">
-			        <li><a ui-sref="home" ng-click="checkLoginState()">Home</a></li>
-			        <li ng-hide="logged"><a ui-sref="signup" ng-click="checkLoginState()">Sign Up</a></li>
-			        <li><a ui-sref="bands" ng-click="checkLoginState()">Bands</a></li>
-			        <li><a ui-sref="studios" ng-click="checkLoginState()">Studios</a></li>
-    			    <li><a ui-sref="manageAccount" ng-click="checkLoginState()" ng-show="logged">Manage Account</a></li>
+			        <li><a ui-sref="home" ng-click="checkLoginState(false)">Home</a></li>
+			        <li ng-hide="logged"><a ui-sref="signup" ng-click="checkLoginState(false)">Sign Up</a></li>
+			        <li><a ui-sref="bands" ng-click="checkLoginState(false)">Bands</a></li>
+			        <li><a ui-sref="studios" ng-click="checkLoginState(false)">Studios</a></li>
+    			    <li><a ui-sref="manageAccount" ng-click="checkLoginState(false)" ng-show="logged">Manage Account</a></li>
 			        <li><a ui-sref="login" ng-hide="logged">Login</a></li>
     			    <li><a ng-click="logout()" ng-show="logged" style="cursor: pointer">Logout</a></li>
 				</ul>

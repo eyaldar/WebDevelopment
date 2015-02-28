@@ -74,12 +74,14 @@ angular.module('musicRoom.config', [])
 		{
             name: 'my_data',
             columns: [
+                {name: 'id', type: 'integer not null'},
+                {name: 'is_logged', type: 'text'},
                 {name: 'user_id', type: 'integer'},
                 {name: 'name', type: 'text not null'},
 				{name: 'user_type_id', type: 'integer not null'},
 				{name: 'last_update', type: 'text not null'}
             ],
-			primaryKeys: [],
+			primaryKeys: ['id'],
 			foreignKeys: [
 				{ field: 'user_type_id', parentTable: 'user_types', foreignKey: 'id' }
 			]

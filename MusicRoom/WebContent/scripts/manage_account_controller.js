@@ -61,7 +61,7 @@
 			ngDialog.closeAll();
 
 			Restangular.one('users', $scope.loggedUserId).remove().then(function(response) {
-				$rootScope.checkLoginState();
+				$rootScope.checkLoginState(true);
 				$state.go('home');
 			}, function(response) {
 				$scope.errorText = response.data.error;
