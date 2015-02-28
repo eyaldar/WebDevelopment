@@ -3,13 +3,33 @@
 (function() {
 	var musicRoom = angular.module("musicRoom");
 
-	var roomDetailsController = function($scope, Restangular, $stateParams) {
+	var roomDetailsController = function($scope, Restangular, decodeService, localDbManager, $stateParams) {
 
 		var roomService = Restangular.one("studios", $stateParams.studioId)
 				.one($stateParams.id);
 
 		roomService.get().then(function(room) {
 			$scope.room = room;
+			$scope.room.roomTypes = [];
+			
+			angular.forEach($scope.room.room_type, function(roomTypeId) {
+				decodeService.getDecodeWithParameters(
+						decodeService.decodeTypes.roomTypes, {
+							"id" : roomTypeId
+						}, function(result) {
+							$scope.room.roomTypes.push(result[0]);
+						});
+			});
+			
+            angular.forEach($scope.room.equipment, function(equipment, index) {
+				decodeService.getDecodeWithParameters(
+						decodeService.decodeTypes.equipmentTypes, {
+							"id" : equipment.equipment_type_id
+						}, function(result) {
+							$scope.room.equipment[index].equipment_type = result[0];
+						});
+            });
+
 		});
 
 		var orderData = {

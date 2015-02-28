@@ -1,10 +1,13 @@
 'use strict';
-'use strict';
 
 (function() {
-	var musicRoom = angular.module('musicRoom', [ 'restangular', 'ui.router',
+	var musicRoom = angular.module('musicRoom', ['musicRoom.config', 'restangular', 'ui.router',
 			'ui.bootstrap', 'selectionModel', 'ngMessages', 'ngAnimate',
-			'ngDialog', 'ngSanitize', 'musicRoom' ]);
+			'ngDialog', 'ngSanitize', 'musicRoom' ]).run(function(Restangular, localDbManager) {
+				Restangular.setBaseUrl("rest/");
+				localDbManager.init();
+			}
+	);
 
 	musicRoom.config([ 'ngDialogProvider', function(ngDialogProvider) {
 		ngDialogProvider.setDefaults({

@@ -3,7 +3,7 @@
 (function() {
 	var musicRoom = angular.module("musicRoom");
 
-	var searchController = function($scope, Restangular) {
+	var searchController = function($scope, Restangular, decodeService) {
 
 		var slider = {
 			translate : function(value) {
@@ -17,10 +17,6 @@
 				accordion.isOpen = !accordion.isOpen;
 			}
 		};
-
-		var onAreaChanged = function() {
-			console.log(searchData.area);
-		}
 
 		var equipmentArray = [];
 
@@ -71,15 +67,16 @@
 				requestData.start_time = searchData.startTimeText;
 				requestData.end_time = searchData.endTimeText;
 			}
-			
-			if(searchData.equipmentArray && equipmentArray.length > 0) {
+
+			if (searchData.equipmentArray && equipmentArray.length > 0) {
 				requestData.equipment_type = [];
-				
-				angular.forEach(searchData.equipmentArray, function(value, key) {
-					equipment_type.push(value.type.id);
-				});
+
+				angular.forEach(searchData.equipmentArray,
+						function(value, key) {
+							equipment_type.push(value.type.id);
+						});
 			}
-			
+
 			return requestData;
 		}
 
@@ -98,32 +95,61 @@
 				searchData.startTimeText = '';
 				searchData.endTimeText = '';
 				searchData.maxRoomRate = 0;
-				searchData.equipmentArray.splice(0, searchData.equipmentArray.length);
-				
+				searchData.equipmentArray.splice(0,
+						searchData.equipmentArray.length);
+
 				formFuncs.search();
 			},
 			search : function(form) {
 				var requestData = buildRequestData();
-				Restangular.all("studios").getList(requestData).then(function(studios) {
-					formMessages.showSubmittedError = false;
-					
-					var items = $scope.items;
-					
-					items.splice(0, items.length);
-					items.push.apply(items, studios);
-					$scope.isLoading = false;
-					
-				}, function(response) {
-					$scope.errorText = "Error occured on server side! couldn't load studios.";
+				Restangular
+						.all("studios")
+						.getList(requestData)
+						.then(
+								function(studios) {
+									formMessages.showSubmittedError = false;
 
-					formMessages.showSubmittedError = true;
-					$scope.isLoading = false;
-				});
-				
+									var items = $scope.items;
+
+									items.splice(0, items.length);
+									items.push.apply(items, studios);
+									$scope.isLoading = false;
+
+								},
+								function(response) {
+									$scope.errorText = "Error occured on server side! couldn't load studios.";
+
+									formMessages.showSubmittedError = true;
+									$scope.isLoading = false;
+								});
+
 				$scope.isLoading = true;
 			}
 		};
 
+		var onAreaChanged = function() {
+			var selectedArea = $scope.searchData.area;
+			if (selectedArea) {
+
+				decodeService.getDecodeWithParameters(
+						decodeService.decodeTypes.cities, {
+							"area_id" : selectedArea.id
+						}, function(result) {
+							$scope.cities = result;
+						}, function(result) {
+							console.log(result);
+							$scope.cities = [];
+						});
+
+			} else {
+				$scope.cities = [];
+				$scope.searchData.city = null;
+			}
+		}
+
+		$scope.areas = [];
+		$scope.cities = [];
+		$scope.roomTypes = [];
 		$scope.nowTime = $scope.initDate();
 		$scope.onAreaChanged = onAreaChanged;
 		$scope.messages = formMessages;
@@ -132,29 +158,19 @@
 		$scope.slider = slider;
 		$scope.searchData = searchData;
 
-		$scope.areas = [ {
-			id : '1',
-			name : 'A'
-		}, {
-			id : '2',
-			name : 'B'
-		} ];
-
-		$scope.cities = [ {
-			id : '1',
-			name : 'C'
-		}, {
-			id : '2',
-			name : 'D'
-		} ];
-
-		$scope.roomTypes = [ {
-			id : '1',
-			name : 'E'
-		}, {
-			id : '2',
-			name : 'F'
-		} ];
+		decodeService.getDecode(decodeService.decodeTypes.areas, function(
+				result) {
+			$scope.areas = result;
+		}, function(result) {
+			console.log(result);
+		});
+		
+		decodeService.getDecode(decodeService.decodeTypes.roomTypes, function(
+				result) {
+			$scope.roomTypes = result;
+		}, function(result) {
+			console.log(result);
+		});
 	};
 
 	musicRoom.controller('SearchController', searchController);

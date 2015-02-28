@@ -8,8 +8,8 @@
 	<p><strong>Role: {{band_member.role}}</strong></p>
 	<h5>Instruments:</h5>
 	<ul id="instruments-list">
-		<li ng-repeat="intrument in band_member.instruments">
-			<div><label><strong>{{intrument}}</strong></label></div>
+		<li ng-repeat="intrument in band_member.instrumentObjs">
+			<div><label><strong>{{intrument.name}}</strong></label></div>
 		</li>
 	</ul>
 </div>

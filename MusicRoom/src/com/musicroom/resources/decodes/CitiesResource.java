@@ -22,7 +22,7 @@ public class CitiesResource {
 	public Response getCitiesByArea(@PathParam("id") int id) throws Exception {
 		JSONArray results = MainDBHandler
 				.selectWithParameters(
-						"select CITY_NAME as name, ID as id "
+						"select CITY_NAME as name, ID as id, AREA_ID as area_id "
 					  + "from CITIES where AREA_ID = ?",
 						id);
 
