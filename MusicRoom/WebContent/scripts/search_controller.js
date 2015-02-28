@@ -73,7 +73,7 @@
 
 				angular.forEach(searchData.equipmentArray,
 						function(value, key) {
-							equipment_type.push(value.type.id);
+							requestData.equipment_type.push(value.type.id);
 						});
 			}
 
