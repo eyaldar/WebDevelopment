@@ -111,6 +111,8 @@
 
 									var items = $scope.items;
 
+						            $scope.getCityNames(studios);
+									
 									items.splice(0, items.length);
 									items.push.apply(items, studios);
 									$scope.isLoading = false;

@@ -9,18 +9,20 @@
     	
         var studiosService = Restangular.all("studios");
         
-        
-        studiosService.getList().then(function(studios) {
-            $scope.items = studios;
-            
-            angular.forEach($scope.items, function(studio, index) {
+        $scope.getCityNames = function(items) {
+            angular.forEach(items, function(studio, index) {
 				decodeService.getDecodeWithParameters(
 						decodeService.decodeTypes.cities, {
 							"id" : studio.city_id
 						}, function(result) {
-							$scope.items[index].city = result[0];
+							items[index].city = result[0];
 						});
             });
+        };
+        
+        studiosService.getList().then(function(studios) {
+            $scope.items = studios;
+            $scope.getCityNames($scope.items);
             
             $scope.isLoading = false;
         },	function(reason) {
