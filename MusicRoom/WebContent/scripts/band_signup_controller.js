@@ -3,7 +3,7 @@
 (function() {
     var musicRoom = angular.module("musicRoom");
 
-    var bandSignupController = function($scope, Restangular) {
+    var bandSignupController = function($rootScope, $scope, Restangular, ngDialog) {
     	
     	// INIT
     	var ctrl = this;
@@ -29,7 +29,7 @@
 				if (reason.data.error) {
 					$scope.errorText = reason.data.error;
 				} else {
-					$scope.errorText = "Error occured!"
+					$scope.errorText = "Error in signup occured!"
 				}
 			});
 		};
@@ -71,6 +71,7 @@
         ctrl.signupForm.band.band_members = [];
         
         ctrl.addMember = function () {
+        	ngDialog.closeAll();
         	ctrl.signupForm.band.band_members.push(ctrl.newMember);
         	ctrl.newMember = {};
         	ctrl.newMember.instruments = [];
@@ -84,6 +85,19 @@
         // TODO: INSTRUMENTS
         
         // CONTROLLER OBJECT
+        $scope.ctrl = ctrl;
+        
+        // ADD MEMBER DIALOG
+        ctrl.openAddMemberDialog = function() {
+			var dialog = ngDialog.open({
+				template : 'templates/add_band_member.htm',
+				className : 'ngdialog-theme-plain',
+				scope : $scope, // DEBUG
+				controller : 'BandSignupController'
+			});
+		};
+        
+		// CONTROLLER OBJECT
         $scope.ctrl = ctrl;
     };
 

@@ -1,0 +1,64 @@
+<form name="bandMembersForm" class="form-horizontal" role="form" novalidate>
+	<div name="band-members" class="ngdialog-message">
+
+		<h4>Add Band Member</h4>
+		
+		<!-- MEMBER NAME -->
+		<label>Member Name</label>
+				<input id="band-name" name="band-name" 
+			class="form-control" type="text" required
+	   		ng-model="ctrl.newMember.name" />
+		<br>
+		
+		<!-- BAND MEMBER ROLE -->
+		<!-- <div class="container">-->
+			<label>Member Role</label>
+			<!-- class="form-control" -->
+			<select  ng-model="ctrl.newMember.role" required>
+	   			<option ng-selected="{{role == ctrl.newMember.role}}"
+	           			ng-repeat="role in ctrl.roles"
+	           			value="{{role}}">
+	     				{{role}}
+	   			</option>
+			</select>
+			<br>
+		<!-- </div>-->
+		
+		<!-- MEMBER PICTURE -->
+		<label>Member Picture</label>
+	 		<input id="member-picture" name="member-picture" 
+			class="form-control" type="url" required
+		   	ng-model="ctrl.newMember.picture"
+		   	ng-model-options="{ updateOn : 'default blur' }"
+		   	ng-focus="ctrl.togglePicturePrompt (true)" 
+		   	ng-blur="ctrl.togglePicturePrompt (false)"/>
+		<div class="my-messages" style=margin:2px>
+		    <div class="prompt message-animation" ng-if="ctrl.showPicturePrompt">
+		        Enter a URL of an image, it will be shown on the preview below
+		    </div>
+		</div>
+		   	
+		<label>Picture preview:</label>
+		<img ng-src="{{ctrl.newMember.picture}}"
+			width="150em"
+				class="img-responsive img-thumbnail"/>		 		
+		<br>
+		<br>
+		
+		<!-- SUMBIT ADD MEMBER
+		<div class="row">
+			<div class="col-sm-offset-5 col-sm-2 text-center">
+				<button type="button" id="button-order"
+					class="btn btn-block btn-primary center-block"
+					ng-click="ctrl.addMember()"
+					ng-disabled="bandMembersForm.$invalid">Add Member</button>
+			</div>
+		</div>
+		<br>-->
+	</div>
+	<div class="ngdialog-buttons">
+		<button type="button" class="ngdialog-button ngdialog-button-primary"
+			ng-click="ctrl.addMember()" ng-disabled="bandMembersForm.$invalid">Add Member</button>
+		<button type="button" class="ngdialog-button ngdialog-button-secondary" ng-click="closeThisDialog('button')">Cancel</button>
+	</div>	
+</form>
