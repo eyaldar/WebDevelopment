@@ -3,7 +3,7 @@
 (function() {
     var musicRoom = angular.module("musicRoom");
 
-    var bandSignupController = function($rootScope, $scope, Restangular, ngDialog) {
+    var bandSignupController = function($rootScope, $scope, Restangular, $state, ngDialog, decodeService) {
     	
     	// INIT
     	var ctrl = this;
@@ -19,9 +19,8 @@
     	
 		// SIGNUP FUNC
 		$scope.signup = function() {
-			bandSignupService.post('', ctrl.signupForm).then(function(result) {
-				$rootScope.checkLoginState();
-				$state.go('home');
+			bandSignupService.post('', ctrl.signupForm).then(function(result) {			
+				$state.go('login');
 				// TODO: add "Signed up successfully!"
 			}, function(reason) {
 				$scope.showSubmittedError = true;
@@ -65,35 +64,64 @@
         var genres = ["Rock", "Pop", "Hip-Hop", "Jazz", "Folk", "Country", "Metal"];
         ctrl.genres = genres;
         
+        var initNewMember = function() {
+        	ctrl.newMember = {};
+            ctrl.newMember.instruments = [];
+            ctrl.newMember.instrumentObjs = [];
+        };
+        ctrl.initNewMember = initNewMember;
+        
         // BAND MEMBERS
-        ctrl.newMember = {};
-        ctrl.newMember.instruments = [];
+        ctrl.initNewMember();
         ctrl.signupForm.band.band_members = [];
         
         ctrl.addMember = function () {
-        	ngDialog.closeAll();
         	ctrl.signupForm.band.band_members.push(ctrl.newMember);
-        	ctrl.newMember = {};
-        	ctrl.newMember.instruments = [];
+        	ctrl.initNewMember();
+        	
+        	ngDialog.closeAll();
         };
         
         // BAND MEMBER ROLES
         var roles = ["Singer", "Guitar", "Bass", "Drummer", "Keyboards", "Brass Instruments", "Violin", "Other"];
         //var roles = [1, 2, 3, 4, 5, 6];
         ctrl.roles = roles;
+       
+        // INSTRUMENTS
+        ctrl.instrument = undefined;
+        var onInstrumentChanged = function() {
+			var selectedInstrument = ctrl.instrument;
+			if (selectedInstrument) {
+
+				decodeService.getDecodeWithParameters(
+						decodeService.decodeTypes.equipmentTypes, {
+							"id" : selectedInstrument.id
+						}, function(result) {
+							ctrl.newMember.instruments = [];
+							ctrl.newMember.instruments.push(result[0].id);
+							
+							ctrl.newMember.instrumentObjs = [];
+							ctrl.newMember.instrumentObjs.push(result[0]);
+						});
+
+			}
+		}
         
-        // TODO: INSTRUMENTS
+        ctrl.onInstrumentChanged = onInstrumentChanged;
         
-        // CONTROLLER OBJECT
-        $scope.ctrl = ctrl;
+        decodeService.getDecode(decodeService.decodeTypes.equipmentTypes, function(
+				result) {
+        	ctrl.instruments = result;
+		}, function(result) {
+			console.log(result);
+		});
         
         // ADD MEMBER DIALOG
         ctrl.openAddMemberDialog = function() {
 			var dialog = ngDialog.open({
 				template : 'templates/add_band_member.htm',
 				className : 'ngdialog-theme-plain',
-				scope : $scope, // DEBUG
-				controller : 'BandSignupController'
+				scope : $scope
 			});
 		};
         
@@ -103,32 +131,3 @@
 
     musicRoom.controller('BandSignupController', bandSignupController);
 }());
-
-
-/*
-// MESSAGES
-var showMessages = function (field) {
-    return ctrl.signupForm[field].$touched || ctrl.signupForm.$submitted
-};
-
-ctrl.showMessages = showMessages;
-
-// ERRORS
-var hasErrorClass = function (field) {
-    return ctrl.signupForm[field].$touched 
-        && ctrl.signupForm[field].$invalid;
-};
-
-ctrl.hasErrorClass = hasErrorClass;
-*/
-
-// SUBMIT
-/*$scope.signup = function() {
-	singupService.post('', $scope.credentials).then(function(result) {
-		$rootScope.checkLoginState();
-		$state.go('home');
-	},
-	function(reason) {
-		$scope.errorText = reason.data.error;
-	});
-}*/

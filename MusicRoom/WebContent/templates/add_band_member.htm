@@ -24,6 +24,14 @@
 			<br>
 		<!-- </div>-->
 		
+		<!-- INSTRUMENTS -->
+		<label for="select_instrument">Instrument:</label>
+		<select class="form-control" ng-model="ctrl.instrument"
+			ng-options="instrument as instrument.name for instrument in ctrl.instruments"
+			ng-change="ctrl.onInstrumentChanged()">
+			<option value="">-- Choose an Instrument --</option>
+		</select>
+		
 		<!-- MEMBER PICTURE -->
 		<label>Member Picture</label>
 	 		<input id="member-picture" name="member-picture" 
