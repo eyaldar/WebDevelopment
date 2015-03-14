@@ -1,0 +1,14 @@
+<div>
+	<h3><strong>{{room.name}}</strong></h3>
+	<label><strong>Room Type: {{room.type.name}}</strong></label>
+	<br>
+	<label><strong>About the room: {{room.extra_details}}</strong></label>
+	<br>
+	<label><strong>Equipment:</strong></label>
+	<br>
+	<ul class="media-list list group">
+		<li ng-repeat="item in room.equipment" ng-include
+			src="'templates/equipment_item_info.htm'" class="list-group-item">
+		</li>
+	</ul>
+</div>

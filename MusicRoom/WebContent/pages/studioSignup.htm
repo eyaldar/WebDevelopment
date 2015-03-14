@@ -69,7 +69,25 @@
 			   	ng-model="ctrl.signupForm.studio.name" />
 			<br>
 
-			<!-- CITY -->
+			<!-- CITY & AREA -->			
+			<div data-role="field-group">
+				<label for="select_areas">Area:</label> <span class="nullable">
+					<select class="form-control" ng-model="chosenArea"
+					ng-options="area as area.name for area in areas"
+					ng-change="onAreaChanged()">
+						<option value="">-- Choose an area from the list --</option>
+				</select>
+				</span>
+				<label for="select_cities">City:</label>
+				<span class="nullable">
+					<select
+						class="form-control" ng-model="ctrl.signupForm.studio.city"
+						ng-options="city as city.name for city in cities">
+							<option value="">-- Choose a city from the selected area --</option>
+					</select>
+				</span>
+			</div>
+			<!-- CITY
 			<div class="container">
 				<label>City</label>
 				<select class="form-control" ng-model="ctrl.signupForm.studio.city" required>
@@ -79,7 +97,7 @@
 	      				{{city}}
 	    			</option>
 				</select>
-			</div>
+			</div>-->
 			
 			<!-- ADDRESS -->
 			<label>Address</label>
@@ -152,31 +170,56 @@
 			<br>
 
 		</div>
-		<!-- 
 		
+		<div name="rooms-in-studio" class="form-group has-feedback" style=margin:3px>
 		
-      
-      "rooms": [
-          {
-              "name": String,
-				"rate": Int,
-              "room_type": [Int],
-              "extra_details": String,
-              "equipment": [
-                  {
-                    "type": Int,
-                    "model": String,
-                    "manufacturer": String,
-                    "quantity": Int
-                  }
-              ]
-          }
-      ]
-  }
-}
+			<!-- ROOMS LIST -->
+			<div name="rooms-list" style=margin:1px>
+				<table align="left" width="100%">
+					<tr>
+						<td><label><strong>Room List:</strong></label></td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<ul class="list-group" id="playing-bands-list">
+									<li ng-repeat="room in ctrl.signupForm.studio.rooms" class="media-list list-group-item" 
+										ng-include src="'templates/room_signup_preview.htm'">
+									</li>
+							</ul>
+						</td>
+					</tr>
+				</table>
+			</div>
+			
+			<!-- ADD ROOM BUTTON -->
+			<div style="margin-top: 1em">
+				<div class="row">
+					<div class="col-sm-offset-5 col-sm-2 text-center">
+						<button type="button" ng-click="ctrl.openAddRoomDialog()" id="button-add-room-dialog"
+						class="btn btn-block center-block">Add Room</button>
+					</div>
+				</div>
+			</div>
+			
+		</div>
 		
+		<br>
+		<br>
 		
-		 -->
+		<!-- SIGNUP SUBMIT -->
+		<div class="row">
+			<div class="col-sm-offset-5 col-sm-2 text-center">
+				<button type="submit" id="button-signup"
+					class="btn btn-block btn-primary center-block"
+					ng-disabled="studioSignupForm.$invalid">Sign Up</button>
+			</div>
+		</div>
+	
+		<!-- ERROR MESSAGES -->
+		<div class="my-messages" style="margin-top: 1em">
+			<div class="message-animation alert alert-danger" role="alert"
+				style="display: block" ng-if="showSubmittedError">{{errorText}}</div>
+		</div>
 
 	
 	</form>

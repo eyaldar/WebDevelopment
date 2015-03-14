@@ -1,0 +1,65 @@
+<form name="roomForm" class="form-horizontal" role="form" novalidate>
+	<div name="add-room" class="ngdialog-message">
+	
+		<h4>Add a Room to the Studio</h4>
+		
+		<!-- NAME -->
+		<label>Room Name</label>
+				<input id="room-name" name="room-name" 
+			class="form-control" type="text" required
+	   		ng-model="ctrl.newRoom.name" />
+		<br>
+		
+		
+		<!-- TYPE -->
+		<div data-role="field-group">
+			<label for="select_roomtypes">Room type:</label>
+			<span class="nullable">
+				<select class="form-control"
+					ng-model="ctrl.newRoom.type"
+					ng-options="roomType as roomType.name for roomType in roomTypes">
+					<option value="">-- Select Room Type --</option>
+				</select>
+			</span>
+		</div>
+		
+		<!-- DETAILS -->
+		<label>More Details About This Room ...</label>
+				<input id="room-details"
+			class="form-control" type="text" required
+	   		ng-model="ctrl.newRoom.extra_details" />
+		<br>
+		
+		<!-- EQUIPMENT -->
+		<div name="equip-in-room" class="form-group has-feedback" style=margin:3px>
+		
+			<!-- EQUIPMENT ITEMS LIST -->
+			<div name="items-list" style=margin:1px>
+				<label>Equipment items in the room:</label>
+				<ul>
+					<li ng-repeat="item in ctrl.newRoom.equipment" ng-include
+							src="'templates/equipment_item_info.htm'" class="list-group-item">
+					</li>
+				</ul>
+			</div>
+			
+			<!-- ADD EQUIP BUTTON -->
+			<div style="margin-top: 1em">
+					<div>
+						<button type="button" ng-click="ctrl.openAddEquipmentDialog()" id="button-add-equip-dialog"
+						class="btn btn-block center-block">Add Equipment To The Room</button>
+					</div>
+			</div>
+			
+		</div>
+		 		
+		<br>
+		<br>
+		
+	</div>
+	<div class="ngdialog-buttons">
+		<button type="button" class="ngdialog-button ngdialog-button-primary"
+			ng-click="ctrl.addRoom()" ng-disabled="roomForm.$invalid">Add Room</button>
+		<button type="button" class="ngdialog-button ngdialog-button-secondary" ng-click="closeThisDialog('button')">Cancel</button>
+	</div>
+</form>	
