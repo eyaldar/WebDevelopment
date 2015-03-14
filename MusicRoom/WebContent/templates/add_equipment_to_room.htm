@@ -17,7 +17,7 @@
 		<label for="select_equipmenttypes">Equipment Type:</label>
 		<span class="nullable">
 			<select class="form-control"
-				ng-model="ctrl.newItem.type"
+				ng-model="ctrl.newItem.typeObj"
 				ng-options="type.name for type in equipmentTypes">
 				<option value="">-- Choose Type From The Selected Category --</option>
 			</select>
@@ -41,7 +41,7 @@
 		<label>Quantity</label>
 			<input id="eq-quantity" 
 				class="form-control" type="number" required
-				min="1" max="99" value="1"
+				min="1" max="99"
 	   			ng-model="ctrl.newItem.quantity" />
 		<br>
 		 		

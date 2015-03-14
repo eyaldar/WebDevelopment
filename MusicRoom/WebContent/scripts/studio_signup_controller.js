@@ -10,6 +10,12 @@
     	ctrl.signupForm = {}; // This will be passed to the server
     	ctrl.signupForm.user = {};
     	ctrl.signupForm.studio = {};
+
+    	// Not required fields are initialized to empty strings
+        ctrl.signupForm.studio.extra_details = '';
+        ctrl.signupForm.studio.site = '';
+        ctrl.signupForm.studio.facebook_page = '';
+        ctrl.signupForm.studio.logo = '';
     	
     	var studioSignupService = Restangular.one("studios");
     	
@@ -17,8 +23,18 @@
     	$scope.showSubmittedError = false;
 		$scope.errorText = '';
     	
+		$scope.error = {};
+		$scope.error.noRooms = true;
+		
+		// SHOW DEFAULT ERROR - NUMBER OF ROOMS
+		$scope.showSubmittedError = true;
+		$scope.errorText = "Studio must have at least 1 room"
+		
 		// SIGNUP FUNC
 		$scope.signup = function() {
+			
+			ctrl.signupForm.studio.city_id = ctrl.signupForm.studio.city.id 
+			
 			studioSignupService.post('', ctrl.signupForm).then(function(result) {			
 				$state.go('login');
 			}, function(reason) {
@@ -85,7 +101,10 @@
         	ctrl.newRoom = {};
             ctrl.newRoom.room_type = [];
             ctrl.newRoom.equipment = [];
-            ctrl.newRoom.rate = 0; // Initial rate is set to zero
+            ctrl.newRoom.rate = 20; // Initial rate
+            
+            // Not required fields are initialized to empty strings
+            ctrl.newRoom.extra_details = '';
         };
         ctrl.initNewRoom = initNewRoom;
         
@@ -93,8 +112,14 @@
         ctrl.signupForm.studio.rooms = [];
         
         ctrl.addRoom = function () {
+        	ctrl.newRoom.room_type.push(ctrl.newRoom.type.id);
         	ctrl.signupForm.studio.rooms.push(ctrl.newRoom);
         	ctrl.initNewRoom();
+        	
+        	// DELETE NO ROOMS ERROR
+        	$scope.showSubmittedError = false;
+    		$scope.errorText = '';
+    		$scope.error.noRooms = false;
         	
         	ngDialog.closeAll();
         };
@@ -110,13 +135,16 @@
         
 		// EQUIPMENT
 		ctrl.newItem = {};
+		ctrl.newItem.quantity = 1;
         ctrl.newRoom.equipment = [];
         
         ctrl.addEquipmentItem = function () {
+        	ctrl.newItem.type = ctrl.newItem.typeObj.id;
         	ctrl.newRoom.equipment.push(ctrl.newItem);
-        	ctrl.newItem = {};
+        	ctrl.newItem = {}; // INIT NEW EQUIP
+        	ctrl.newItem.quantity = 1;
         	
-        	ctrl.equipmentDialog.close(); // DEBUG
+        	ctrl.equipmentDialog.close();
         };
 		
 		// ADD EQUIPMENT DIALOG

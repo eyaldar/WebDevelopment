@@ -10,7 +10,7 @@
 		    <label>User Name</label>
 	  		<input id="username" name="username" 
 				class="form-control" type="text" required
-			   	ng-model="ctrl.signupForm.username" 
+			   	ng-model="ctrl.signupForm.user.name" 
 			   	ng-model-options="{ updateOn : 'default blur' }"
 			   	ng-focus="ctrl.toggleUsernamePrompt(true)" 
 			   	ng-blur="ctrl.toggleUsernamePrompt(false)"/>
@@ -30,7 +30,7 @@
 			   <input id="password" name="password" class="form-control" required
 			      type="{{ctrl.getPasswordType()}}"
 			      ng-model-options="{ updateOn : 'default blur' }"
-			      ng-model="ctrl.signupForm.password"
+			      ng-model="ctrl.signupForm.user.password"
 			      validate-password-characters />
 			    <span class="input-group-addon">
 			        <input type="checkbox" ng-model="ctrl.showPassword"> Show
@@ -81,23 +81,12 @@
 				<label for="select_cities">City:</label>
 				<span class="nullable">
 					<select
-						class="form-control" ng-model="ctrl.signupForm.studio.city"
+						class="form-control" ng-model="ctrl.signupForm.studio.city" required
 						ng-options="city as city.name for city in cities">
 							<option value="">-- Choose a city from the selected area --</option>
 					</select>
 				</span>
 			</div>
-			<!-- CITY
-			<div class="container">
-				<label>City</label>
-				<select class="form-control" ng-model="ctrl.signupForm.studio.city" required>
-	    			<option ng-selected="{{city == ctrl.signupForm.studio.city}}"
-	            			ng-repeat="city in ctrl.cities"
-	            			value="{{city}}">
-	      				{{city}}
-	    			</option>
-				</select>
-			</div>-->
 			
 			<!-- ADDRESS -->
 			<label>Address</label>
@@ -124,14 +113,14 @@
 			<!-- SITE -->
 			<label>Site</label>
 	  		<input id="studio-site" name="studio-site" 
-				class="form-control" type="text" required
+				class="form-control" type="text"
 			   	ng-model="ctrl.signupForm.studio.site" />
 			<br>
 
 			<!-- FACEBOOK -->
 			<label>Facebook Page</label>
 	  		<input id="studio-facebook" name="studio-facebook" 
-				class="form-control" type="text" required
+				class="form-control" type="text"
 			   	ng-model="ctrl.signupForm.studio.facebook" />
 			<br>
 			
@@ -145,14 +134,14 @@
 			<!-- EXTRA DETAILS -->
 			<label>More details about your studio</label>
 	  		<input id="studio-details" name="studio-details" 
-				class="form-control" type="text" required
+				class="form-control" type="text"
 			   	ng-model="ctrl.signupForm.studio.extra_details" />
 			<br>
 			
 			<!-- LOGO -->
 			<label>Studio Logo</label>
 	  		<input id="studio-logo" name="studio-logo" 
-				class="form-control" type="url" required
+				class="form-control" type="url"
 			   	ng-model="ctrl.signupForm.studio.logo"
 			   	ng-model-options="{ updateOn : 'default blur' }"
 			   	ng-focus="ctrl.toggleLogoPrompt(true)" 
@@ -162,13 +151,14 @@
 			        Enter a URL of an image, it will be shown on the preview below
 			    </div>
 			</div>
-			   	
-			<label>Logo preview:</label>
-			<img ng-src="{{ctrl.signupForm.studio.logo}}"
-				width="200em"
-		 		class="img-responsive img-thumbnail"/>	
+			
+			<!-- <div ng-show="ctrl.signupForm.studio.logo"> -->
+				<label>Logo preview:</label>
+				<img ng-src="{{ctrl.signupForm.studio.logo}}"
+					width="200em"
+			 		class="img-responsive img-thumbnail"/>	
+			<!-- </div> -->
 			<br>
-
 		</div>
 		
 		<div name="rooms-in-studio" class="form-group has-feedback" style=margin:3px>
@@ -211,7 +201,8 @@
 			<div class="col-sm-offset-5 col-sm-2 text-center">
 				<button type="submit" id="button-signup"
 					class="btn btn-block btn-primary center-block"
-					ng-disabled="studioSignupForm.$invalid">Sign Up</button>
+					ng-disabled="studioSignupForm.$invalid || error.noRooms	">Sign Up</button>
+					<!-- || error.noRooms -->
 			</div>
 		</div>
 	

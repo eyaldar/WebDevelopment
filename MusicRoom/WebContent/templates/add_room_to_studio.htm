@@ -10,12 +10,11 @@
 	   		ng-model="ctrl.newRoom.name" />
 		<br>
 		
-		
 		<!-- TYPE -->
 		<div data-role="field-group">
 			<label for="select_roomtypes">Room type:</label>
 			<span class="nullable">
-				<select class="form-control"
+				<select class="form-control" required
 					ng-model="ctrl.newRoom.type"
 					ng-options="roomType as roomType.name for roomType in roomTypes">
 					<option value="">-- Select Room Type --</option>
@@ -23,10 +22,18 @@
 			</span>
 		</div>
 		
+		<!-- Price -->
+		<label>Price Per Hour</label>
+			<input id="room-rate" 
+				class="form-control" type="number" required
+				min="1" max="999"
+	   			ng-model="ctrl.newRoom.rate" />
+		<br>
+		
 		<!-- DETAILS -->
 		<label>More Details About This Room ...</label>
 				<input id="room-details"
-			class="form-control" type="text" required
+			class="form-control" type="text"
 	   		ng-model="ctrl.newRoom.extra_details" />
 		<br>
 		
