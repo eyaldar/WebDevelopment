@@ -35,80 +35,90 @@
 			</td>
 		</tr>
 	</table>
-	<h4>
-		<strong>Order Room:</strong>
-	</h4>
-	<form name="orderForm" ng-submit="funcs.orderRoom(orderForm)"
-		novalidate>
-		<div class="my-messages">
-			<div class="message-animation alert alert-success" role="alert"
-				style="display: block" ng-if="messages.showSubmittedPrompt">Thank
-				you! Your order has been placed.</div>
-			<div class="message-animation alert alert-danger" role="alert"
-				style="display: block" ng-if="messages.showSubmittedError">{{errorText}}</div>
-		</div>
-		<div class="form-group"
-			ng-class="{'has-error': formFuncs.hasErrorClass(orderForm, 'startTimePicker') }">
-			<label for="start-time-picker">Start:</label> <input date-time-picker
-				id="start-time-picker" name="startTimePicker" type="text"
-				min-date="orderData.nowTime" date="orderData.startTime"
-				ng-focus="funcs.toggleStartTimePrompt(true)"
-				ng-blur="funcs.toggleStartTimePrompt(false)"
-				ng-model="orderData.startTimeText"
-				ng-model-options="{ updateOn: 'default blur' }"
-				is-valid-period-id="order-room"
-				is-valid-period-link
-				class="form-control pointer" required readonly />
+	<div id="order-room" ng-show="showOrderForm">
+		<h4>
+			<strong>Order Room:</strong>
+		</h4>
+		<form name="orderForm" ng-submit="funcs.orderRoom(orderForm)"
+			novalidate>
 			<div class="my-messages">
-				<div class="prompt message-animation"
-					ng-if="messages.showStartTimePrompt">When will you want to
-					start using the room?</div>
+				<div class="message-animation alert alert-success" role="alert"
+					style="display: block" ng-if="messages.showSubmittedPrompt">Thank
+					you! Your order has been placed.</div>
+				<div class="message-animation alert alert-danger" role="alert"
+					style="display: block" ng-if="messages.showSubmittedError">{{errorText}}</div>
 			</div>
-			<div class="my-messages"
-				ng-messages="orderForm.startTimePicker.$error"
-				ng-if="formFuncs.showMessages(orderForm, 'startTimePicker')">
-				<div class="message-animation" ng-message="required">
-					<strong>This field is required.</strong>
+			<div class="form-group"
+				ng-class="{'has-error': formFuncs.hasErrorClass(orderForm, 'startTimePicker') }">
+				<label for="start-time-picker">Start:</label> <input
+					date-time-picker id="start-time-picker" name="startTimePicker"
+					type="text" min-date="orderData.nowTime" date="orderData.startTime"
+					ng-focus="funcs.toggleStartTimePrompt(true)"
+					ng-blur="funcs.toggleStartTimePrompt(false)"
+					ng-model="orderData.startTimeText"
+					ng-model-options="{ updateOn: 'default blur' }"
+					is-valid-period-id="order-room" is-valid-period-link
+					class="form-control pointer" required readonly />
+				<div class="my-messages">
+					<div class="prompt message-animation"
+						ng-if="messages.showStartTimePrompt">When will you want to
+						start using the room?</div>
+				</div>
+				<div class="my-messages"
+					ng-messages="orderForm.startTimePicker.$error"
+					ng-if="formFuncs.showMessages(orderForm, 'startTimePicker')">
+					<div class="message-animation" ng-message="required">
+						<strong>This field is required.</strong>
+					</div>
 				</div>
 			</div>
-		</div>
 
-		<div class="form-group"
-			ng-class="{'has-error': formFuncs.hasErrorClass(orderForm, 'endTimePicker') }">
-			<label for="end-time-picker">End:</label> <input date-time-picker
-				id="end-time-picker" name="endTimePicker" type="text"
-				min-date="orderData.startTime" date="orderData.endTime"
-				ng-model-options="{ updateOn: 'default blur' }"
-				ng-focus="funcs.toggleEndTimePrompt(true)"
-				ng-blur="funcs.toggleEndTimePrompt(false)"
-				ng-model="orderData.endTimeText"
-				ng-model-options="{ updateOn: 'default blur' }"
-				is-valid-period-id="order-room"
-				is-valid-period-data="orderData"
-				is-valid-period
-				class="form-control pointer" required readonly />
-			<div class="my-messages">
-				<div class="prompt message-animation"
-					ng-if="messages.showEndTimePrompt">When will you finish using
-					the room?</div>
-			</div>
-			<div class="my-messages" ng-messages="orderForm.endTimePicker.$error"
-				ng-if="formFuncs.showMessages(orderForm, 'endTimePicker')">
-				<div class="message-animation" ng-message="required">
-					<strong>This field is required.</strong>
+			<div class="form-group"
+				ng-class="{'has-error': formFuncs.hasErrorClass(orderForm, 'endTimePicker') }">
+				<label for="end-time-picker">End:</label> <input date-time-picker
+					id="end-time-picker" name="endTimePicker" type="text"
+					min-date="orderData.startTime" date="orderData.endTime"
+					ng-model-options="{ updateOn: 'default blur' }"
+					ng-focus="funcs.toggleEndTimePrompt(true)"
+					ng-blur="funcs.toggleEndTimePrompt(false)"
+					ng-model="orderData.endTimeText"
+					ng-model-options="{ updateOn: 'default blur' }"
+					is-valid-period-id="order-room" is-valid-period-data="orderData"
+					is-valid-period class="form-control pointer" required readonly />
+				<div class="my-messages">
+					<div class="prompt message-animation"
+						ng-if="messages.showEndTimePrompt">When will you finish
+						using the room?</div>
 				</div>
-				<div class="message-animation" ng-message="isValidPeriod">
-					<strong>End time is earlier than start time.</strong>
+				<div class="my-messages"
+					ng-messages="orderForm.endTimePicker.$error"
+					ng-if="formFuncs.showMessages(orderForm, 'endTimePicker')">
+					<div class="message-animation" ng-message="required">
+						<strong>This field is required.</strong>
+					</div>
+					<div class="message-animation" ng-message="isValidPeriod">
+						<strong>End time is earlier than start time.</strong>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-offset-5 col-sm-2 text-center">
+					<button type="submit" id="button-order"
+						class="btn btn-block btn-primary center-block"
+						ng-disabled="orderForm.$invalid">Order</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div id="room-schedule" ng-show="showRoomSchedule">
+		<!-- SHOW ROOM SCHEDULE -->
+		<div style="margin-top: 1em; margin-bottom: 1em">
+			<div class="row">
+				<div class="col-sm-offset-5 col-sm-2 text-center">
+					<button type="button" ng-click="openRoomScheduleDialog()" id="button-room-schedule-dialog"
+					class="btn btn-block center-block">Show Room Schedule</button>
 				</div>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-sm-offset-5 col-sm-2 text-center">
-				<button type="submit" id="button-order"
-					class="btn btn-block btn-primary center-block"
-					ng-disabled="orderForm.$invalid">Order</button>
-			</div>
-		</div>
-	</form>
-
+	</div>
 </div>

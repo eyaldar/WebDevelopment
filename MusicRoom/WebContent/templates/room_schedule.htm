@@ -1,0 +1,22 @@
+<h4>Room Schedule:</h4>
+<div id="room-schedule-div" class="panel panel-default flex-col room-schedule-list">
+	<div class="panel-body">
+		<table class="table" >
+			<thead>
+				<tr>
+					<th>Band Name</th>
+					<th>Start Time</th>
+					<th>End Time</th>
+				</tr>
+			</thead>
+			<tr ng-repeat="item in roomSchedule">
+				<td>{{item.bandName}}</td>
+				<td>{{item.start_time}}</td>
+				<td>{{item.end_time}}</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<div class="ngdialog-buttons">
+	<button type="button" class="ngdialog-button ngdialog-button-secondary" ng-click="closeThisDialog('button')">Close</button>
+</div>

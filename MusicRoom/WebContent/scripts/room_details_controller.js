@@ -3,7 +3,8 @@
 (function() {
 	var musicRoom = angular.module("musicRoom");
 
-	var roomDetailsController = function($scope, Restangular, decodeService, localDbManager, $stateParams) {
+	var roomDetailsController = function($scope, $rootScope, Restangular, ngDialog, decodeService, 
+			localDbManager, $stateParams) {
 
 		var roomService = Restangular.one("studios", $stateParams.studioId)
 				.one($stateParams.id);
@@ -71,9 +72,21 @@
 			}
 		};
 
+        // ADD ROOM DIALOG
+        $scope.openRoomScheduleDialog = function() {
+			var addRoomDialog = ngDialog.open({
+				template : 'templates/room_schedule.htm',
+				className : 'ngdialog-theme-plain',
+				controller: 'RoomScheduleController',
+				scope : $scope
+			});
+		};
+		
 		$scope.messages = formMessages;
 		$scope.funcs = formFuncs;
 		$scope.orderData = orderData;
+		$scope.showOrderForm = $rootScope.logged && $rootScope.userTypeId === 2;
+		$scope.showRoomSchedule = $rootScope.logged && $rootScope.userTypeId === 1;
 	};
 
 	musicRoom.controller('RoomDetailsController', roomDetailsController);

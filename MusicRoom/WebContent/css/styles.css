@@ -167,3 +167,8 @@ input[readonly].pointer {
 .selected {
 	background-color: #428BCA;
 }
+
+.room-schedule-list {
+	max-height: 20em;
+	overflow: auto;
+}

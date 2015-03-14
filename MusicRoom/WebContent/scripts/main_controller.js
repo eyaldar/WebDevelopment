@@ -18,10 +18,15 @@
 			myDataService.getState(wasChanged, function(result) {
 				if (result.user) {
 					$rootScope.loggedUserId = result.user.id;
+					$rootScope.userTypeId = result.user.user_type_id;
+				} else {
+					$rootScope.loggedUserId = null;
+					$rootScope.userTypeId = null;
 				}
 
 				$rootScope.loggedUserName = result.name;
 				$rootScope.logged = result.logged;
+				
 			}, null);
 		};
 

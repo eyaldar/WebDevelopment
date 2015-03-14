@@ -92,6 +92,8 @@
 				searchData.roomType = null;
 				searchData.area = null;
 				searchData.city = null;
+				searchData.startTime = new Date();
+				searchData.endTime = new Date();
 				searchData.startTimeText = '';
 				searchData.endTimeText = '';
 				searchData.maxRoomRate = 0;
